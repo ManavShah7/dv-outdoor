@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9f7;
+  --surface: #ffffff;
+  --foreground: #16181a;
+  --muted: #6b6f76;
+  --border: #e6e3de;
+
+  /* Brand — a single deliberate accent, used sparingly for actions and the mark */
+  --accent: #0e7c7b;
+  --accent-foreground: #f2fbfb;
+
+  /* Status palette — the only place saturated color appears at scale (map pins, badges) */
+  --status-available: #15803d;
+  --status-booked: #1d4ed8;
+  --status-maintenance: #b45309;
+  --status-damaged: #b91c1c;
+  --status-pending: #64748b;
+  --status-permit-due: #a16207;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-status-available: var(--status-available);
+  --color-status-booked: var(--status-booked);
+  --color-status-maintenance: var(--status-maintenance);
+  --color-status-damaged: var(--status-damaged);
+  --color-status-pending: var(--status-pending);
+  --color-status-permit-due: var(--status-permit-due);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
