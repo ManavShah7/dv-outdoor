@@ -37,11 +37,21 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <StatTile label="Total boards" value={boards.length} icon={Boxes} />
-        <StatTile label="Available" value={available} icon={CircleCheck} />
-        <StatTile label="Booked" value={booked} icon={CalendarCheck2} />
-        <StatTile label="Needs attention" value={needsAttention} icon={TriangleAlert} tone="warning" />
-        <StatTile label="Permits due" value={permitsDue} icon={ShieldAlert} tone="warning" />
+        <StatTile label="Total boards" value={boards.length} icon={<Boxes className="size-4.5" />} />
+        <StatTile label="Available" value={available} icon={<CircleCheck className="size-4.5" />} />
+        <StatTile label="Booked" value={booked} icon={<CalendarCheck2 className="size-4.5" />} />
+        <StatTile
+          label="Needs attention"
+          value={needsAttention}
+          icon={<TriangleAlert className="size-4.5" />}
+          tone="warning"
+        />
+        <StatTile
+          label="Permits due"
+          value={permitsDue}
+          icon={<ShieldAlert className="size-4.5" />}
+          tone="warning"
+        />
       </div>
 
       <Card className="p-4">

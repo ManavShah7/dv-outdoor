@@ -61,7 +61,7 @@ export function BoardMap({ boards }: { boards: Board[] }) {
     });
     mapRef.current = map;
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-
+    map.on("error", (e) => console.error("MapLibre error:", e.error?.message));
     map.on("load", () => {
       map.addSource("boards", {
         type: "geojson",

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { fadeUp } from "@/lib/motion";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils";
 export function StatTile({
   label,
   value,
-  icon: Icon,
+  icon,
   tone,
 }: {
   label: string;
   value: number;
-  icon: LucideIcon;
+  icon: ReactNode;
   tone?: "default" | "warning";
 }) {
   return (
@@ -32,7 +32,7 @@ export function StatTile({
             tone === "warning" && "bg-status-permit-due/10 text-status-permit-due",
           )}
         >
-          <Icon className="size-4.5" />
+          {icon}
         </div>
       </Card>
     </motion.div>
