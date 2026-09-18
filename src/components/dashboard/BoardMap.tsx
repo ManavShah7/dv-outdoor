@@ -52,6 +52,13 @@ export function BoardMap({ boards }: { boards: Board[] }) {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // MapLibre v6 loads its tile-parsing worker as a separate module file
+    // rather than an inlined blob. Next.js's bundler can't discover that
+    // file automatically, so without this the worker 404s silently — no
+    // 'error' event, no thrown exception, tiles just never arrive. The file
+    // is copied to public/ by scripts/copy-maplibre-worker.mjs (postinstall).
+    maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
+
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: "https://tiles.openfreemap.org/styles/positron",
