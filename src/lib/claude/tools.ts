@@ -160,12 +160,11 @@ export function createBoardTools(supabase: SupabaseClient<Database>) {
   const updateBoardStatus = betaZodTool({
     name: "update_board_status",
     description:
-      "Update a board's status, photo, and/or note. This is the ONLY way to change data — always call get_board first if you don't already know the board's current status, since leaving the status unchanged still requires passing its current value back. Every call is logged to the board's status history, so write a clear note when the admin gives a reason for the change.",
+      "Update a board's status and/or note. This is the ONLY way to change a board's status — always call get_board first if you don't already know the board's current status, since leaving the status unchanged still requires passing its current value back. Every call is logged to the board's status history, so write a clear note when the admin gives a reason for the change. Note: this does not create or end a rental — that's a separate flow.",
     inputSchema: z.object({
       board_code_or_id: z.string(),
       new_status: z.enum(BOARD_STATUSES),
       note: z.string().optional(),
-      photo_url: z.string().url().optional(),
     }),
     run: async (input) => {
       const boardId = await resolveBoardId(supabase, input.board_code_or_id);
@@ -176,7 +175,6 @@ export function createBoardTools(supabase: SupabaseClient<Database>) {
       const { error } = await supabase.rpc("record_board_status_update", {
         p_board_id: boardId,
         p_new_status: input.new_status,
-        p_photo_url: input.photo_url ?? null,
         p_note: input.note ?? null,
       });
 

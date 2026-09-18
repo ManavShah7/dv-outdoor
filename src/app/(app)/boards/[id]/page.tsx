@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { ImageOff, Pencil } from "lucide-react";
-import { getBoardById, getBoardHistory } from "@/lib/supabase/boards";
+import { getBoardById, getBoardHistory, getBoardListingPhoto } from "@/lib/supabase/boards";
 import { BOARD_TYPE_LABELS } from "@/lib/boards";
 import { getSiteUrl } from "@/lib/site";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -16,8 +16,9 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
   const board = await getBoardById(id);
   if (!board) notFound();
 
-  const [history, qrDataUrl] = await Promise.all([
+  const [history, listingPhoto, qrDataUrl] = await Promise.all([
     getBoardHistory(board.id),
+    getBoardListingPhoto(board.id),
     QRCode.toDataURL(`${getSiteUrl()}/boards/${board.id}`, { margin: 1, width: 240 }),
   ]);
 
@@ -50,9 +51,9 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
         <Card className="p-5 lg:col-span-2">
           <h2 className="text-sm font-medium text-foreground">Current photo</h2>
           <div className="mt-3 flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-foreground/[0.03]">
-            {board.current_photo_url ? (
+            {listingPhoto ? (
               <Image
-                src={board.current_photo_url}
+                src={listingPhoto.photo_url}
                 alt={board.name}
                 width={800}
                 height={450}

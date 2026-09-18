@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Board, BoardStatusHistoryEntry } from "@/lib/types/database";
+import type { Board, BoardPhoto, BoardStatusHistoryEntry } from "@/lib/types/database";
 
 export async function getBoards(): Promise<Board[]> {
   const supabase = await createClient();
@@ -11,6 +11,20 @@ export async function getBoards(): Promise<Board[]> {
 export async function getBoardById(id: string): Promise<Board | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("boards").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getBoardListingPhoto(boardId: string): Promise<BoardPhoto | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("board_photos")
+    .select("*")
+    .eq("board_id", boardId)
+    .eq("category", "listing")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }

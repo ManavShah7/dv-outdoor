@@ -17,6 +17,9 @@ export type BoardStatus =
   | "under_maintenance"
   | "damaged"
   | "pending_installation";
+export type LightingType = "backlit" | "frontlit" | "none";
+export type SizeCategory = "small" | "medium" | "large";
+export type PhotoCategory = "listing" | "maintenance_reported" | "maintenance_resolved";
 
 export interface Database {
   public: {
@@ -47,10 +50,12 @@ export interface Database {
           lng: number;
           board_type: BoardType;
           size_label: string | null;
+          size_category: SizeCategory | null;
+          lighting_type: LightingType | null;
+          region: string | null;
           status: BoardStatus;
           permit_expiry_date: string | null;
-          current_photo_url: string | null;
-          assigned_agent_id: string | null;
+          permit_authority: string | null;
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -83,6 +88,24 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["board_status_history"]["Row"]>;
         Relationships: [];
       };
+      board_photos: {
+        Row: {
+          id: string;
+          board_id: string;
+          maintenance_request_id: string | null;
+          category: PhotoCategory;
+          photo_url: string;
+          caption: string | null;
+          uploaded_by: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["board_photos"]["Row"]> & {
+          board_id: string;
+          photo_url: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["board_photos"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -90,7 +113,6 @@ export interface Database {
         Args: {
           p_board_id: string;
           p_new_status: BoardStatus;
-          p_photo_url?: string | null;
           p_note?: string | null;
         };
         Returns: void;
@@ -101,4 +123,5 @@ export interface Database {
 
 export type Board = Database["public"]["Tables"]["boards"]["Row"];
 export type BoardStatusHistoryEntry = Database["public"]["Tables"]["board_status_history"]["Row"];
+export type BoardPhoto = Database["public"]["Tables"]["board_photos"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
