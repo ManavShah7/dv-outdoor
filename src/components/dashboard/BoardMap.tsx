@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import * as maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { useEffect, useRef, useState } from "react";
+import { APIProvider, Map, InfoWindow, useMap } from "@vis.gl/react-google-maps";
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { STATUS_META } from "@/lib/boards";
 import type { Board, BoardStatus } from "@/lib/types/database";
 
-// Duplicated from globals.css: MapLibre paint expressions run in WebGL and
-// can't read CSS custom properties, so these hex values must be kept in sync
-// with the --status-* tokens by hand.
+// Duplicated from globals.css since marker icons are drawn on canvas and
+// can't read CSS custom properties — keep in sync with the --status-* tokens.
 const STATUS_HEX: Record<BoardStatus, string> = {
   available: "#15803d",
   booked: "#1d4ed8",
@@ -17,168 +16,103 @@ const STATUS_HEX: Record<BoardStatus, string> = {
   pending_installation: "#64748b",
 };
 
-const GUJARAT_CENTER: [number, number] = [71.5, 22.4];
+// Saurashtra-focused by default; panning/zooming out reaches the rest of
+// Gujarat and beyond — nothing restricts the viewport.
+const SAURASHTRA_CENTER = { lat: 21.9, lng: 70.7 };
+const DEFAULT_ZOOM = 8;
 
-function boardsToGeoJSON(boards: Board[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
-  return {
-    type: "FeatureCollection",
-    features: boards.map((board) => ({
-      type: "Feature",
-      id: board.id,
-      geometry: { type: "Point", coordinates: [board.lng, board.lat] },
-      properties: {
-        id: board.id,
-        code: board.code,
-        name: board.name,
-        status: board.status,
-        color: STATUS_HEX[board.status],
-      },
-    })),
-  };
+function BoardMarkers({
+  boards,
+  onSelect,
+}: {
+  boards: Board[];
+  onSelect: (board: Board) => void;
+}) {
+  const map = useMap();
+  const clustererRef = useRef<MarkerClusterer | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+    clustererRef.current = new MarkerClusterer({ map });
+    return () => {
+      clustererRef.current?.clearMarkers();
+      clustererRef.current = null;
+    };
+  }, [map]);
+
+  useEffect(() => {
+    const clusterer = clustererRef.current;
+    if (!map || !clusterer) return;
+
+    clusterer.clearMarkers();
+
+    const markers = boards.map((board) => {
+      const marker = new google.maps.Marker({
+        position: { lat: board.lat, lng: board.lng },
+        title: board.name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: STATUS_HEX[board.status],
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 2,
+        },
+      });
+      marker.addListener("click", () => onSelect(board));
+      return marker;
+    });
+
+    clusterer.addMarkers(markers);
+  }, [map, boards, onSelect]);
+
+  return null;
 }
 
 export function BoardMap({ boards }: { boards: Board[] }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const boardsRef = useRef(boards);
+  const [selected, setSelected] = useState<Board | null>(null);
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  useEffect(() => {
-    boardsRef.current = boards;
-  }, [boards]);
+  if (!apiKey) {
+    return (
+      <div className="flex h-[520px] w-full items-center justify-center rounded-2xl bg-foreground/[0.03] text-sm text-muted">
+        Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to see the map.
+      </div>
+    );
+  }
 
-  // Create the map once. The 'load' handler reads from boardsRef so the
-  // initial paint always reflects the latest props even if this effect ran
-  // before the first render's data arrived.
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    // MapLibre v6 loads its tile-parsing worker as a separate module file
-    // rather than an inlined blob. Next.js's bundler can't discover that
-    // file automatically, so without this the worker 404s silently — no
-    // 'error' event, no thrown exception, tiles just never arrive. The file
-    // is copied to public/ by scripts/copy-maplibre-worker.mjs (postinstall).
-    maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
-
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/positron",
-      center: GUJARAT_CENTER,
-      zoom: 6.4,
-      attributionControl: { compact: true },
-    });
-    mapRef.current = map;
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-    map.on("error", (e) => console.error("MapLibre error:", e.error?.message));
-    map.on("load", () => {
-      map.addSource("boards", {
-        type: "geojson",
-        data: boardsToGeoJSON(boardsRef.current),
-        cluster: true,
-        clusterMaxZoom: 13,
-        clusterRadius: 45,
-      });
-
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "boards",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": "#16181a",
-          "circle-radius": ["step", ["get", "point_count"], 16, 10, 20, 30, 26],
-          "circle-opacity": 0.85,
-        },
-      });
-
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "boards",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["Noto Sans Medium"],
-          "text-size": 12,
-        },
-        paint: { "text-color": "#faf9f7" },
-      });
-
-      map.addLayer({
-        id: "board-points",
-        type: "circle",
-        source: "boards",
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-color": ["get", "color"],
-          "circle-radius": 7,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
-
-      map.on("click", "clusters", async (e: maplibregl.MapLayerMouseEvent) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        const clusterId = features[0]?.properties?.cluster_id;
-        const source = map.getSource("boards") as maplibregl.GeoJSONSource;
-        if (clusterId == null) return;
-        const zoom = await source.getClusterExpansionZoom(clusterId);
-        map.easeTo({
-          center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
-          zoom,
-        });
-      });
-
-      map.on("click", "board-points", (e: maplibregl.MapLayerMouseEvent) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
-        const { id, code, name, status } = feature.properties as {
-          id: string;
-          code: string;
-          name: string;
-          status: BoardStatus;
-        };
-
-        new maplibregl.Popup({ offset: 12, closeButton: false })
-          .setLngLat((feature.geometry as GeoJSON.Point).coordinates as [number, number])
-          .setHTML(
-            `<div style="font-family:var(--font-sans);min-width:160px">
-               <p style="font-size:13px;font-weight:600;color:#16181a;margin:0 0 2px">${name}</p>
-               <p style="font-size:11px;color:#6b6f76;margin:0 0 6px">${code} · ${STATUS_META[status].label}</p>
-               <a href="/boards/${id}" style="font-size:12px;font-weight:500;color:#0e7c7b">View board →</a>
-             </div>`,
-          )
-          .addTo(map);
-      });
-
-      map.on("mouseenter", "board-points", () => (map.getCanvas().style.cursor = "pointer"));
-      map.on("mouseleave", "board-points", () => (map.getCanvas().style.cursor = ""));
-      map.on("mouseenter", "clusters", () => (map.getCanvas().style.cursor = "pointer"));
-      map.on("mouseleave", "clusters", () => (map.getCanvas().style.cursor = ""));
-    });
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  // Keep the rendered points in sync whenever the boards prop changes
-  // (e.g. a status-filter chip is toggled) without recreating the map.
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const syncData = () => {
-      const source = map.getSource("boards") as maplibregl.GeoJSONSource | undefined;
-      source?.setData(boardsToGeoJSON(boards));
-    };
-
-    if (map.isStyleLoaded() && map.getSource("boards")) {
-      syncData();
-    } else {
-      map.once("load", syncData);
-    }
-  }, [boards]);
-
-  return <div ref={containerRef} className="h-[520px] w-full rounded-2xl" />;
+  return (
+    <APIProvider apiKey={apiKey}>
+      <Map
+        defaultCenter={SAURASHTRA_CENTER}
+        defaultZoom={DEFAULT_ZOOM}
+        gestureHandling="greedy"
+        disableDefaultUI={false}
+        className="h-[520px] w-full rounded-2xl"
+      >
+        <BoardMarkers boards={boards} onSelect={setSelected} />
+        {selected && (
+          <InfoWindow
+            position={{ lat: selected.lat, lng: selected.lng }}
+            onCloseClick={() => setSelected(null)}
+          >
+            <div style={{ minWidth: 160 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, margin: "0 0 2px", color: "#16181a" }}>
+                {selected.name}
+              </p>
+              <p style={{ fontSize: 11, color: "#6b6f76", margin: "0 0 6px" }}>
+                {selected.code} · {STATUS_META[selected.status].label}
+              </p>
+              <a
+                href={`/boards/${selected.id}`}
+                style={{ fontSize: 12, fontWeight: 500, color: "#0e7c7b" }}
+              >
+                View board →
+              </a>
+            </div>
+          </InfoWindow>
+        )}
+      </Map>
+    </APIProvider>
+  );
 }
