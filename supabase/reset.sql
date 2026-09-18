@@ -25,7 +25,6 @@ drop function if exists create_rental(uuid, uuid, numeric, rate_period, date, da
 drop function if exists record_board_status_update(uuid, board_status, text, text) cascade;
 drop function if exists record_board_status_update(uuid, board_status, text) cascade;
 drop function if exists current_app_role() cascade;
-drop function if exists current_role() cascade;
 drop function if exists handle_new_user() cascade;
 drop function if exists set_updated_at() cascade;
 
