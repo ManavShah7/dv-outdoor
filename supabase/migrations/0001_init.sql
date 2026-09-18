@@ -82,7 +82,7 @@ alter table profiles enable row level security;
 alter table boards enable row level security;
 alter table board_status_history enable row level security;
 
-create function current_role() returns user_role as $$
+create function current_app_role() returns user_role as $$
   select role from profiles where id = auth.uid();
 $$ language sql stable security definer set search_path = public;
 
@@ -92,7 +92,7 @@ create policy "profiles_select_authenticated" on profiles
   for select to authenticated using (true);
 
 create policy "profiles_update_own" on profiles
-  for update to authenticated using (id = auth.uid() or current_role() = 'admin');
+  for update to authenticated using (id = auth.uid() or current_app_role() = 'admin');
 
 -- boards: any signed-in user can read; only admins can insert/delete/update
 -- directly. Field agents never get a raw UPDATE grant — a row policy can't
@@ -103,13 +103,13 @@ create policy "boards_select_authenticated" on boards
   for select to authenticated using (true);
 
 create policy "boards_insert_admin" on boards
-  for insert to authenticated with check (current_role() = 'admin');
+  for insert to authenticated with check (current_app_role() = 'admin');
 
 create policy "boards_delete_admin" on boards
-  for delete to authenticated using (current_role() = 'admin');
+  for delete to authenticated using (current_app_role() = 'admin');
 
 create policy "boards_update_admin" on boards
-  for update to authenticated using (current_role() = 'admin');
+  for update to authenticated using (current_app_role() = 'admin');
 
 -- board_status_history is written exclusively by record_board_status_update();
 -- no direct insert policy for authenticated users.
@@ -127,7 +127,7 @@ create function record_board_status_update(
   p_note text default null
 ) returns void as $$
 declare
-  v_role user_role := current_role();
+  v_role user_role := current_app_role();
   v_assigned_agent uuid;
   v_old_status board_status;
 begin
