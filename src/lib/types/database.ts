@@ -1,4 +1,4 @@
-// Hand-written to match supabase/migrations/0001_init.sql.
+// Hand-written to match supabase/migrations/0001_schema.sql.
 // Once a live Supabase project exists, regenerate with:
 //   npx supabase gen types typescript --project-id <ref> > src/lib/types/database.ts
 
@@ -77,7 +77,6 @@ export interface Database {
           changed_by: string | null;
           old_status: BoardStatus | null;
           new_status: BoardStatus;
-          photo_url: string | null;
           note: string | null;
           created_at: string;
         };

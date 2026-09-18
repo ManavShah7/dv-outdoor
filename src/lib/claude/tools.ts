@@ -38,7 +38,7 @@ async function resolveBoardId(
 /**
  * Read/write tools for the admin chatbot. Every write goes through the same
  * record_board_status_update() RPC that field agents use (see
- * supabase/migrations/0001_init.sql) — there is no separate, less-audited
+ * supabase/migrations/0001_schema.sql) — there is no separate, less-audited
  * write path for the chatbot. Reads run through the caller's own
  * cookie-scoped Supabase client, so RLS (not the tool schema) is the real
  * security boundary.
