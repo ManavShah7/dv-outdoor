@@ -10,7 +10,7 @@ type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-accent text-accent-foreground shadow-[0_1px_2px_rgba(14,124,123,0.16),0_4px_10px_-2px_rgba(14,124,123,0.32)] hover:bg-accent/90",
+    "bg-accent text-accent-foreground shadow-[0_1px_2px_rgba(45,212,191,0.2),0_4px_14px_-2px_rgba(45,212,191,0.35)] hover:bg-accent/90",
   secondary: "bg-surface text-foreground border border-border hover:border-foreground/25",
   ghost: "text-foreground hover:bg-foreground/5",
   danger: "bg-status-damaged text-white hover:bg-status-damaged/90",

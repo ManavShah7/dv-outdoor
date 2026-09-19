@@ -92,8 +92,10 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
 
         <Card className="flex flex-col items-center gap-3 p-6">
           <h2 className="self-start text-[11px] font-semibold uppercase tracking-wide text-muted">QR sticker</h2>
-          {/* eslint-disable-next-line @next/next/no-img-element -- data URL, next/image can't optimize it */}
-          <img src={qrDataUrl} alt={`QR code for ${board.code}`} className="size-40" />
+          <div className="rounded-2xl bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element -- data URL, next/image can't optimize it */}
+            <img src={qrDataUrl} alt={`QR code for ${board.code}`} className="size-40" />
+          </div>
           <p className="text-center text-xs text-muted">
             Scanning this links directly to this board&apos;s record for field agents.
           </p>

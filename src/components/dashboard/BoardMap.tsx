@@ -10,12 +10,34 @@ import { cn } from "@/lib/utils";
 // Duplicated from globals.css since marker icons are drawn on canvas and
 // can't read CSS custom properties — keep in sync with the --status-* tokens.
 const STATUS_HEX: Record<BoardStatus, string> = {
-  available: "#15803d",
-  booked: "#1d4ed8",
-  under_maintenance: "#b45309",
-  damaged: "#b91c1c",
-  pending_installation: "#64748b",
+  available: "#34d399",
+  booked: "#60a5fa",
+  under_maintenance: "#fbbf24",
+  damaged: "#f87171",
+  pending_installation: "#9aa1ac",
 };
+
+// A restrained near-black map style (Apple Maps/Uber-style dark mode) —
+// muted geometry, minimal label noise, so the colored board pins are the
+// only thing that really pops.
+const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { elementType: "geometry", stylers: [{ color: "#0f1115" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#0f1115" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#7d8391" }] },
+  { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#2a2e37" }] },
+  { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#8b909c" }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#c7cad1" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#7d8391" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#161a1f" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#22262e" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#1a1d23" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#6b7078" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2c313a" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#9aa0ab" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#1c2027" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#060a10" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#4c5560" }] },
+];
 
 // Saurashtra-focused by default; panning/zooming out reaches the rest of
 // Gujarat and beyond — nothing restricts the viewport.
@@ -56,7 +78,7 @@ function BoardMarkers({
           scale: 8,
           fillColor: STATUS_HEX[board.status],
           fillOpacity: 1,
-          strokeColor: "#ffffff",
+          strokeColor: "#0f1115",
           strokeWeight: 2,
         },
       });
@@ -89,6 +111,7 @@ export function BoardMap({ boards, className }: { boards: Board[]; className?: s
         defaultZoom={DEFAULT_ZOOM}
         gestureHandling="greedy"
         disableDefaultUI={false}
+        styles={DARK_MAP_STYLE}
         className={className}
       >
         <BoardMarkers boards={boards} onSelect={setSelected} />
@@ -97,16 +120,16 @@ export function BoardMap({ boards, className }: { boards: Board[]; className?: s
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ minWidth: 160 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, margin: "0 0 2px", color: "#16181a" }}>
+            <div style={{ minWidth: 160, fontFamily: "var(--font-sans)" }}>
+              <p style={{ fontSize: 13, fontWeight: 600, margin: "0 0 2px", color: "#f2f3f5" }}>
                 {selected.name}
               </p>
-              <p style={{ fontSize: 11, color: "#6b6f76", margin: "0 0 6px" }}>
+              <p style={{ fontSize: 11, color: "#8b8e96", margin: "0 0 6px" }}>
                 {selected.code} · {STATUS_META[selected.status].label}
               </p>
               <a
                 href={`/boards/${selected.id}`}
-                style={{ fontSize: 12, fontWeight: 500, color: "#0e7c7b" }}
+                style={{ fontSize: 12, fontWeight: 500, color: "#2dd4bf" }}
               >
                 View board →
               </a>

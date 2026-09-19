@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf9f7;
-  --surface: #ffffff;
-  --foreground: #16181a;
-  --muted: #6b6f76;
-  --border: #e6e3de;
+  --background: #0a0b0d;
+  --surface: #15171b;
+  --foreground: #f2f3f5;
+  --muted: #8b8e96;
+  --border: rgba(255, 255, 255, 0.09);
 
   /* Brand — a single deliberate accent, used sparingly for actions and the mark */
-  --accent: #0e7c7b;
-  --accent-foreground: #f2fbfb;
+  --accent: #2dd4bf;
+  --accent-foreground: #06201d;
 
   /* Status palette — the only place saturated color appears at scale (map pins, badges) */
-  --status-available: #15803d;
-  --status-booked: #1d4ed8;
-  --status-maintenance: #b45309;
-  --status-damaged: #b91c1c;
-  --status-pending: #64748b;
-  --status-permit-due: #a16207;
+  --status-available: #34d399;
+  --status-booked: #60a5fa;
+  --status-maintenance: #fbbf24;
+  --status-damaged: #f87171;
+  --status-pending: #9aa1ac;
+  --status-permit-due: #fcd34d;
 }
 
 @theme inline {
@@ -44,14 +44,16 @@
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Soft, diffuse elevation instead of hard borders — layered like macOS/iOS cards. */
-  --shadow-card: 0 1px 2px rgba(20, 20, 20, 0.03), 0 6px 16px -4px rgba(20, 20, 20, 0.06);
-  --shadow-card-hover: 0 2px 4px rgba(20, 20, 20, 0.04), 0 12px 24px -6px rgba(20, 20, 20, 0.09);
-  --shadow-float: 0 4px 10px rgba(20, 20, 20, 0.08), 0 16px 40px -8px rgba(20, 20, 20, 0.14);
+  /* Dark mode: shadows only add depth (there's no light background to darken),
+     so hairline borders (see --border) carry edge definition and these stay
+     purely about grounding a floating element against whatever's behind it. */
+  --shadow-card: 0 10px 28px -8px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.65);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 28px 64px -14px rgba(0, 0, 0, 0.8);
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
@@ -61,6 +63,29 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.01em;
+}
+
+/* Google Maps' InfoWindow chrome is generated outside React's control and
+   ignores our theme entirely by default (always white) — retarget it to
+   match the dark map. Class names are Maps JS API internals, not a
+   documented contract, so re-check this if a Maps SDK bump ever changes them. */
+.gm-style .gm-style-iw-c {
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  border-radius: 16px;
+}
+.gm-style .gm-style-iw-d {
+  background: var(--surface);
+  overflow: hidden !important;
+}
+.gm-style .gm-style-iw-t::after {
+  background: var(--surface);
+}
+.gm-style .gm-style-iw-tc::after {
+  background: var(--surface);
+}
+.gm-style .gm-ui-hover-effect > span {
+  background-color: var(--muted) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
