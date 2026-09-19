@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Board inventory, status, and field operations for DV Outdoor Advertising.",
     start_url: "/field",
     display: "standalone",
-    background_color: "#0a0b0d",
-    theme_color: "#2dd4bf",
+    background_color: "#faf9f7",
+    theme_color: "#0e7c7b",
     icons: [
       {
         src: "/favicon.ico",

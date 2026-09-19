@@ -9,7 +9,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // No project connected yet — render pages as-is; each one shows its own
   // "connect Supabase" notice rather than gating behind a login that can't work.
   if (!isSupabaseConfigured()) {
-    return <main className="min-h-full bg-background">{children}</main>;
+    return <main className="min-h-full bg-background p-6">{children}</main>;
   }
 
   const session = await getCurrentProfile();
