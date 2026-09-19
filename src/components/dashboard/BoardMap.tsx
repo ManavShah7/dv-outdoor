@@ -5,6 +5,7 @@ import { APIProvider, Map, InfoWindow, useMap } from "@vis.gl/react-google-maps"
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { STATUS_META } from "@/lib/boards";
 import type { Board, BoardStatus } from "@/lib/types/database";
+import { cn } from "@/lib/utils";
 
 // Duplicated from globals.css since marker icons are drawn on canvas and
 // can't read CSS custom properties — keep in sync with the --status-* tokens.
@@ -69,13 +70,13 @@ function BoardMarkers({
   return null;
 }
 
-export function BoardMap({ boards }: { boards: Board[] }) {
+export function BoardMap({ boards, className }: { boards: Board[]; className?: string }) {
   const [selected, setSelected] = useState<Board | null>(null);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
     return (
-      <div className="flex h-[520px] w-full items-center justify-center rounded-2xl bg-foreground/[0.03] text-sm text-muted">
+      <div className={cn("flex items-center justify-center bg-foreground/[0.03] text-sm text-muted", className)}>
         Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to see the map.
       </div>
     );
@@ -88,7 +89,7 @@ export function BoardMap({ boards }: { boards: Board[] }) {
         defaultZoom={DEFAULT_ZOOM}
         gestureHandling="greedy"
         disableDefaultUI={false}
-        className="h-[520px] w-full rounded-2xl"
+        className={className}
       >
         <BoardMarkers boards={boards} onSelect={setSelected} />
         {selected && (

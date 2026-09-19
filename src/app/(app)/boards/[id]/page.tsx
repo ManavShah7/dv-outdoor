@@ -23,7 +23,7 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-6">
       <div className="flex items-start justify-between">
         <div>
           <p className="font-mono text-xs tracking-tight text-muted">{board.code}</p>
