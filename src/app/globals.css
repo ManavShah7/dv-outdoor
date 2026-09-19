@@ -36,8 +36,18 @@
   --color-status-pending: var(--status-pending);
   --color-status-permit-due: var(--status-permit-due);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* -apple-system resolves to real SF Pro/SF Pro Display on macOS and iOS —
+     the actual font files can't be embedded on a public site (Apple restricts
+     SF Pro to Apple's own platforms/apps), so the system stack is the
+     correct way to get genuine SF Pro rendering rather than a workaround. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Soft, diffuse elevation instead of hard borders — layered like macOS/iOS cards. */
+  --shadow-card: 0 1px 2px rgba(20, 20, 20, 0.03), 0 6px 16px -4px rgba(20, 20, 20, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(20, 20, 20, 0.04), 0 12px 24px -6px rgba(20, 20, 20, 0.09);
+  --shadow-float: 0 4px 10px rgba(20, 20, 20, 0.08), 0 16px 40px -8px rgba(20, 20, 20, 0.14);
 }
 
 html {
@@ -47,9 +57,10 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
 }
 
 @media (prefers-reduced-motion: reduce) {

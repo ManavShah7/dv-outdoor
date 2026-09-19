@@ -26,18 +26,18 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-mono text-xs text-muted">{board.code}</p>
-          <h1 className="text-xl font-semibold text-foreground">{board.name}</h1>
-          <p className="text-sm text-muted">
+          <p className="font-mono text-xs tracking-tight text-muted">{board.code}</p>
+          <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight text-foreground">{board.name}</h1>
+          <p className="mt-0.5 text-sm text-muted">
             {board.city}
             {board.address ? ` · ${board.address}` : ""}
           </p>
         </div>
         <Link
           href={`/boards/${board.id}/edit`}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-sm font-medium text-foreground transition-colors hover:border-foreground/25"
+          className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border bg-surface px-4 text-sm font-medium tracking-tight text-foreground transition-colors hover:border-foreground/25"
         >
-          <Pencil className="size-4" />
+          <Pencil className="size-3.5" />
           Edit
         </Link>
       </div>
@@ -48,8 +48,8 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="p-5 lg:col-span-2">
-          <h2 className="text-sm font-medium text-foreground">Current photo</h2>
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted">Current photo</h2>
           <div className="mt-3 flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-foreground/[0.03]">
             {listingPhoto ? (
               <Image
@@ -67,31 +67,31 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
             )}
           </div>
 
-          <h2 className="mt-6 text-sm font-medium text-foreground">Details</h2>
+          <h2 className="mt-7 text-[11px] font-semibold uppercase tracking-wide text-muted">Details</h2>
           <dl className="mt-3 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
             <div>
-              <dt className="text-xs text-muted">Type</dt>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">Type</dt>
               <dd className="text-foreground">{BOARD_TYPE_LABELS[board.board_type]}</dd>
             </div>
             <div>
-              <dt className="text-xs text-muted">Size</dt>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">Size</dt>
               <dd className="text-foreground">{board.size_label ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-xs text-muted">Permit expiry</dt>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">Permit expiry</dt>
               <dd className="text-foreground">{board.permit_expiry_date ?? "—"}</dd>
             </div>
           </dl>
           {board.notes && (
             <>
-              <h2 className="mt-6 text-sm font-medium text-foreground">Notes</h2>
+              <h2 className="mt-7 text-[11px] font-semibold uppercase tracking-wide text-muted">Notes</h2>
               <p className="mt-2 text-sm text-muted">{board.notes}</p>
             </>
           )}
         </Card>
 
-        <Card className="flex flex-col items-center gap-3 p-5">
-          <h2 className="self-start text-sm font-medium text-foreground">QR sticker</h2>
+        <Card className="flex flex-col items-center gap-3 p-6">
+          <h2 className="self-start text-[11px] font-semibold uppercase tracking-wide text-muted">QR sticker</h2>
           {/* eslint-disable-next-line @next/next/no-img-element -- data URL, next/image can't optimize it */}
           <img src={qrDataUrl} alt={`QR code for ${board.code}`} className="size-40" />
           <p className="text-center text-xs text-muted">
@@ -107,8 +107,8 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ id
         </Card>
       </div>
 
-      <Card className="p-5">
-        <h2 className="text-sm font-medium text-foreground">Status history</h2>
+      <Card className="p-6">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted">Status history</h2>
         <div className="mt-4">
           <StatusHistoryTimeline entries={history} />
         </div>

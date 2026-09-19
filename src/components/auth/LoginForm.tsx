@@ -35,12 +35,16 @@ export function LoginForm() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-      <Card className="w-full max-w-sm p-8">
-        <h1 className="text-lg font-semibold text-foreground">DV Outdoor Advertising</h1>
+    <motion.div initial="hidden" animate="visible" variants={fadeUp} className="flex flex-col items-center">
+      <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-accent text-sm font-semibold tracking-tight text-accent-foreground shadow-[var(--shadow-float)]">
+        DV
+      </div>
+
+      <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-float)]">
+        <h1 className="text-[19px] font-semibold tracking-tight text-foreground">DV Outdoor Advertising</h1>
         <p className="mt-1 text-sm text-muted">Sign in to the board portal.</p>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-3.5">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-xs font-medium text-muted">
               Email
@@ -71,7 +75,7 @@ export function LoginForm() {
 
           {error && <p className="text-sm text-status-damaged">{error}</p>}
 
-          <Button type="submit" disabled={loading} className="mt-2 w-full">
+          <Button type="submit" disabled={loading} className="mt-2.5 w-full">
             {loading ? "Signing in…" : "Sign in"}
           </Button>
         </form>

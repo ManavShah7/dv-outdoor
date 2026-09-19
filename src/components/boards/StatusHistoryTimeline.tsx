@@ -15,7 +15,7 @@ export function StatusHistoryTimeline({ entries }: { entries: BoardStatusHistory
             style={{ backgroundColor: STATUS_META[entry.new_status].color }}
           />
           <div>
-            <p className="text-sm text-foreground">
+            <p className="text-sm tracking-tight text-foreground">
               Marked <span className="font-medium">{STATUS_META[entry.new_status].label}</span>
               {entry.old_status && (
                 <span className="text-muted"> (was {STATUS_META[entry.old_status].label})</span>

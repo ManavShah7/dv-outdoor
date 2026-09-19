@@ -7,7 +7,7 @@ export default async function BoardsPage() {
   if (!isSupabaseConfigured()) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-xl font-semibold text-foreground">Boards</h1>
+        <h1 className="text-[26px] font-semibold tracking-tight text-foreground">Boards</h1>
         <ConnectSupabaseNotice />
       </div>
     );
@@ -17,7 +17,7 @@ export default async function BoardsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold text-foreground">Boards</h1>
+      <h1 className="text-[26px] font-semibold tracking-tight text-foreground">Boards</h1>
       <BoardsTable boards={boards} />
     </div>
   );

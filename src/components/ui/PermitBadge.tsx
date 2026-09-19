@@ -19,7 +19,7 @@ export function PermitBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium tracking-tight",
         days < 0
           ? "border-status-damaged/30 bg-status-damaged/10 text-status-damaged"
           : "border-status-permit-due/30 bg-status-permit-due/10 text-status-permit-due",

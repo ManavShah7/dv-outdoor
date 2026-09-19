@@ -55,24 +55,24 @@ export function ChatWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 16 }}
             transition={springSubtle}
-            className="fixed bottom-24 right-6 z-50 flex h-[520px] w-[380px] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xl"
+            className="fixed bottom-24 right-6 z-50 flex h-[520px] w-[380px] flex-col overflow-hidden rounded-[28px] border border-border/60 bg-surface shadow-[var(--shadow-float)]"
           >
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
               <div>
-                <p className="text-sm font-medium text-foreground">Board assistant</p>
+                <p className="text-sm font-semibold tracking-tight text-foreground">Board assistant</p>
                 <p className="text-xs text-muted">Ask about inventory, status, or permits</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="text-muted transition-colors hover:text-foreground"
+                className="flex size-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
             </div>
 
-            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
               {messages.length === 0 && (
-                <p className="text-sm text-muted">
+                <p className="text-sm tracking-tight text-muted">
                   Try “which boards in Surat need attention?” or “mark AHD-SG-014 as under
                   maintenance, lighting is out.”
                 </p>
@@ -81,7 +81,7 @@ export function ChatWidget() {
                 <div
                   key={i}
                   className={cn(
-                    "max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm",
+                    "max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm tracking-tight",
                     m.role === "user"
                       ? "ml-auto bg-accent text-accent-foreground"
                       : "bg-foreground/[0.04] text-foreground",
@@ -104,20 +104,20 @@ export function ChatWidget() {
                 e.preventDefault();
                 send();
               }}
-              className="flex items-center gap-2 border-t border-border p-3"
+              className="flex items-center gap-2 border-t border-border/70 p-3.5"
             >
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about your boards…"
-                className="h-9 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-accent/60"
+                className="h-10 flex-1 rounded-full border border-border bg-background px-4 text-sm outline-none transition-shadow focus:border-accent/50 focus:ring-4 focus:ring-accent/12"
               />
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.9 }}
                 transition={springSnappy}
                 disabled={loading || !input.trim()}
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground disabled:opacity-40"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground disabled:opacity-40"
               >
                 <Send className="size-4" />
               </motion.button>
@@ -130,7 +130,7 @@ export function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         whileTap={{ scale: 0.95 }}
         transition={springSnappy}
-        className="fixed bottom-6 right-6 z-50 flex size-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg"
+        className="fixed bottom-6 right-6 z-50 flex size-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-[var(--shadow-float)]"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span

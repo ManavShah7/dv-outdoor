@@ -9,7 +9,8 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
-  primary: "bg-accent text-accent-foreground hover:bg-accent/90",
+  primary:
+    "bg-accent text-accent-foreground shadow-[0_1px_2px_rgba(14,124,123,0.16),0_4px_10px_-2px_rgba(14,124,123,0.32)] hover:bg-accent/90",
   secondary: "bg-surface text-foreground border border-border hover:border-foreground/25",
   ghost: "text-foreground hover:bg-foreground/5",
   danger: "bg-status-damaged text-white hover:bg-status-damaged/90",
@@ -31,7 +32,7 @@ export function Button({
       whileTap={{ scale: 0.97 }}
       transition={springSnappy}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none",
+        "inline-flex items-center justify-center rounded-full font-medium tracking-tight transition-[background-color,box-shadow,border-color] disabled:opacity-40 disabled:pointer-events-none",
         variantClasses[variant],
         sizeClasses[size],
         className,

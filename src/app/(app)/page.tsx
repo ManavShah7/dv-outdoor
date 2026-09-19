@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   if (!isSupabaseConfigured()) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+        <h1 className="text-[26px] font-semibold tracking-tight text-foreground">Dashboard</h1>
         <ConnectSupabaseNotice />
       </div>
     );
@@ -30,13 +30,13 @@ export default async function DashboardPage() {
   ).length;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-7">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted">{boards.length} boards across Gujarat</p>
+        <h1 className="text-[26px] font-semibold tracking-tight text-foreground">Dashboard</h1>
+        <p className="mt-0.5 text-sm text-muted">{boards.length} boards across Gujarat</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-5">
         <StatTile label="Total boards" value={boards.length} icon={<Boxes className="size-4.5" />} />
         <StatTile label="Available" value={available} icon={<CircleCheck className="size-4.5" />} />
         <StatTile label="Booked" value={booked} icon={<CalendarCheck2 className="size-4.5" />} />

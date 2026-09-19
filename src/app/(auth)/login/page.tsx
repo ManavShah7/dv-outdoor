@@ -5,7 +5,13 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-full items-center justify-center bg-background p-6">
+    <div
+      className="flex min-h-full items-center justify-center p-6"
+      style={{
+        background:
+          "radial-gradient(ellipse 60% 45% at 50% 0%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%), var(--background)",
+      }}
+    >
       {isSupabaseConfigured() ? (
         <Suspense>
           <LoginForm />

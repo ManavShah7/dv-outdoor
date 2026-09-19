@@ -20,9 +20,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-full">
       <Sidebar isAdmin={isAdmin} />
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-y-auto">
         <TopBar profile={session.profile} />
-        <main className="flex-1 overflow-y-auto bg-background p-6">{children}</main>
+        <main className="flex-1 bg-background p-6">{children}</main>
       </div>
       {isAdmin && <ChatWidget />}
     </div>

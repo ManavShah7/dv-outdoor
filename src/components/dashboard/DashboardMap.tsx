@@ -36,9 +36,9 @@ export function DashboardMap({ boards }: { boards: Board[] }) {
               key={status}
               onClick={() => toggle(status)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium tracking-tight transition-[background-color,color,border-color] active:scale-95",
                 active
-                  ? "border-transparent bg-foreground/5 text-foreground"
+                  ? "border-transparent bg-foreground/[0.06] text-foreground"
                   : "border-border text-muted hover:text-foreground",
               )}
             >
