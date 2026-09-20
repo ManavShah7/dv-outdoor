@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 // `Map` is aliased: the component name would otherwise shadow the built-in Map.
-import { APIProvider, Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
+import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { Board } from "@/lib/types";
 import { CITY_CENTRES } from "@/lib/mockBoards";
 
@@ -258,8 +258,7 @@ export function BoardMap({
 
   return (
     <div className="relative size-full">
-      <APIProvider apiKey={key}>
-        <GoogleMap
+          <GoogleMap
           defaultCenter={SAURASHTRA}
           defaultZoom={8}
           minZoom={6}
@@ -276,7 +275,6 @@ export function BoardMap({
         >
           <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} />
         </GoogleMap>
-      </APIProvider>
-    </div>
+      </div>
   );
 }

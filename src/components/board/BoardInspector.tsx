@@ -2,17 +2,38 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { ImageOff, X } from "lucide-react";
+import { useState } from "react";
+import { StreetView } from "@/components/map/StreetView";
 import type { Board } from "@/lib/types";
 import { inr, fullDate, daysUntil, cn } from "@/lib/utils";
 import { Button, Card, Field, SectionHeader, StatusLabel } from "@/components/ui/Primitives";
 import { BoardQr } from "@/components/boards/BoardQr";
 
-function Photo() {
-  // Real listing photos land here. Until then, an honest empty state rather
-  // than a grey rectangle pretending to be an image.
+function Visual({ lat, lng }: { lat: number; lng: number }) {
+  const [view, setView] = useState<"street" | "photo">("street");
   return (
-    <div className="flex aspect-[4/3] w-full items-center justify-center material-inset">
-      <ImageOff className="size-7 text-ink-600" strokeWidth={1.5} />
+    <div className="relative aspect-[4/3] w-full overflow-hidden">
+      {view === "street" ? (
+        <StreetView lat={lat} lng={lng} className="absolute inset-0" />
+      ) : (
+        <div className="flex size-full items-center justify-center material-inset">
+          <ImageOff className="size-7 text-ink-600" strokeWidth={1.5} />
+        </div>
+      )}
+      <div className="absolute left-3 top-3 z-10 flex gap-1 rounded-[var(--radius-pill)] material-thick p-1">
+        {(["street", "photo"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={cn(
+              "rounded-[var(--radius-pill)] px-3 py-1.5 text-caption font-[590] transition-colors",
+              view === v ? "bg-white/15 text-ink-0" : "text-ink-400 hover:text-ink-100",
+            )}
+          >
+            {v === "street" ? "Street view" : "Photo"}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -33,7 +54,7 @@ export function BoardInspector({
   return (
     <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
       <div className="relative">
-        <Photo />
+        <Visual lat={board.lat} lng={board.lng} />
         <button
           onClick={onClose}
           aria-label="Close"

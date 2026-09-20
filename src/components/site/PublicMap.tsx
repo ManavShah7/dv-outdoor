@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 // `Map` is aliased: the component name would otherwise shadow the built-in Map.
-import { APIProvider, Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
+import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { PublicBoard } from "@/lib/publicBoards";
 
 const CITY_ZOOM_MAX = 9.2;
@@ -113,12 +113,17 @@ function Layers({
     return () => l.remove();
   }, [map]);
 
-  // Follow the filters — the map should show what the rail left behind.
+  // Follow the filters — the map should show what the rail left behind. Skip
+  // while a board is open: fitBounds settles asynchronously and would land
+  // after the fly-to below, yanking the view back off the selected board.
   useEffect(() => {
-    if (!map || boards.length === 0) return;
+    if (!map || boards.length === 0 || selected) return;
     const b = new google.maps.LatLngBounds();
     for (const x of boards) b.extend({ lat: x.lat, lng: x.lng });
     map.fitBounds(b, { top: 56, right: 56, bottom: 72, left: 56 });
+    // `selected` is intentionally not a dep — re-fitting when it clears would
+    // throw away wherever the user had panned to.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, boards]);
 
   useEffect(() => {
@@ -200,7 +205,6 @@ export function PublicMap({
   }
 
   return (
-    <APIProvider apiKey={key}>
       <GoogleMap
         defaultCenter={{ lat: 21.98, lng: 70.55 }}
         defaultZoom={8}
@@ -218,6 +222,5 @@ export function PublicMap({
       >
         <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} />
       </GoogleMap>
-    </APIProvider>
   );
 }

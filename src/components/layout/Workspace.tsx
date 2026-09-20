@@ -10,6 +10,7 @@ import { SearchPanel, type QuickFilter } from "@/components/board/SearchPanel";
 import { BoardInspector, ManageMenu } from "@/components/board/BoardInspector";
 import { BookingFlow, type BookingDraft } from "@/components/board/BookingFlow";
 import { BoardMap } from "@/components/map/BoardMap";
+import { MapsProvider } from "@/components/map/MapsProvider";
 import { MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
 import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
 import { BoardsView } from "@/components/boards/BoardsView";
@@ -200,6 +201,7 @@ export function Workspace({ adminName }: { adminName?: string }) {
     : null;
 
   return (
+    <MapsProvider>
     <div className="relative h-dvh w-full overflow-hidden">
       {/* canvas */}
       <div className="absolute inset-0">
@@ -364,5 +366,6 @@ export function Workspace({ adminName }: { adminName?: string }) {
       </div>
       </div>
     </div>
+    </MapsProvider>
   );
 }

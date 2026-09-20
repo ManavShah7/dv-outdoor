@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { APIProvider, Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
+import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
+import { MapsProvider } from "@/components/map/MapsProvider";
 import { PUBLIC_BOARDS } from "@/lib/publicBoards";
 import { CITY_CENTRES } from "@/lib/mockBoards";
 
@@ -59,7 +60,7 @@ export function CoverageMap() {
 
   return (
     <div className="h-[420px] w-full">
-      <APIProvider apiKey={key}>
+      <MapsProvider>
         <GoogleMap
           defaultCenter={{ lat: 21.98, lng: 70.8 }}
           defaultZoom={7.6}
@@ -76,7 +77,7 @@ export function CoverageMap() {
         >
           <Dots />
         </GoogleMap>
-      </APIProvider>
+      </MapsProvider>
     </div>
   );
 }
