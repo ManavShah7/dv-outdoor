@@ -21,10 +21,12 @@ export function BoardInspector({
   board,
   onClose,
   onManage,
+  onBook,
 }: {
   board: Board;
   onClose: () => void;
   onManage: () => void;
+  onBook: () => void;
 }) {
   const remaining = board.rental ? daysUntil(board.rental.endDate) : null;
 
@@ -124,9 +126,12 @@ export function BoardInspector({
       </section>
 
       {/* Pinned: the primary action should never require scrolling to find. */}
-      <div className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
-        <Button variant={board.status === "available" ? "primary" : "secondary"} onClick={onManage}>
-          Manage board
+      <div className="sticky bottom-0 mt-auto flex gap-2 border-t border-white/[0.07] material-thick px-8 py-5">
+        {board.status !== "booked" && (
+          <Button variant="primary" onClick={onBook}>Book this board</Button>
+        )}
+        <Button variant="secondary" onClick={onManage} className={board.status !== "booked" ? "w-auto shrink-0 px-5" : undefined}>
+          {board.status !== "booked" ? "More" : "Manage board"}
         </Button>
       </div>
     </div>

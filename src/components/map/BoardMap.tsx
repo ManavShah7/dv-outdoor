@@ -45,19 +45,22 @@ function pinIcon(board: Board, selected: boolean) {
   const k = (PIN_SCALE[board.sizeCategory ?? "medium"] ?? 1) * (selected ? 1.34 : 1);
   const w = Math.round(26 * k);
   const h = Math.round(34 * k);
-  const pad = selected ? 16 : 6;
+  const pad = selected ? 20 : 6;
   const W = w + pad * 2;
   const H = h + pad * 2;
 
+  const cy = pad + w / 2;
   const halo = selected
-    ? `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w / 2 + 9}" fill="${color}" fill-opacity="0.22"/>`
+    ? `<circle cx="${W / 2}" cy="${cy}" r="${w / 2 + 13}" fill="${color}" fill-opacity="0.16"/>
+       <circle cx="${W / 2}" cy="${cy}" r="${w / 2 + 13}" fill="none" stroke="${color}" stroke-opacity="0.55" stroke-width="1.5"/>
+       <circle cx="${W / 2}" cy="${cy}" r="${w / 2 + 6}" fill="#fff" fill-opacity="0.95"/>`
     : "";
 
   // backlit boards carry a bright centre; frontlit and unlit stay hollow
   const core =
     board.lighting === "backlit"
-      ? `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w * 0.17}" fill="#fff"/>`
-      : `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w * 0.17}" fill="#fff" fill-opacity="0.34"/>`;
+      ? `<circle cx="${W / 2}" cy="${cy}" r="${w * 0.17}" fill="#fff"/>`
+      : `<circle cx="${W / 2}" cy="${cy}" r="${w * 0.17}" fill="#fff" fill-opacity="0.34"/>`;
 
   return {
     url: svgUrl(

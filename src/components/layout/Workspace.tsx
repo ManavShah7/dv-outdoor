@@ -16,6 +16,8 @@ import { BoardsView } from "@/components/boards/BoardsView";
 import { BoardCreate } from "@/components/boards/BoardCreate";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { Toast } from "@/components/ui/Toast";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+import type { AgentAction } from "@/lib/agentTools";
 
 function matches(b: Board, q: string, f: QuickFilter | null) {
   if (f) {
@@ -81,6 +83,44 @@ export function Workspace() {
   function selectBoard(b: Board) {
     setSelectedId(b.id);
     setMode("idle");
+  }
+
+  function applyAgentActions(actions: AgentAction[]) {
+    let note: string | null = null;
+    for (const a of actions) {
+      if (a.kind === "focus_board") {
+        const b = boards.find((x) => x.code === a.code);
+        if (b) { setSelectedId(b.id); setNav("search"); setSearchOpen(true); }
+      } else if (a.kind === "set_status") {
+        setBoards((prev) =>
+          prev.map((b) => (b.code === a.code ? { ...b, status: a.status } : b)),
+        );
+        note = `${a.code} set to ${a.status.replace(/_/g, " ")}`;
+      } else if (a.kind === "book_board") {
+        setBoards((prev) =>
+          prev.map((b) =>
+            b.code === a.code
+              ? {
+                  ...b,
+                  status: "booked",
+                  availableSince: undefined,
+                  rental: {
+                    company: a.company,
+                    rate: a.rate,
+                    startDate: a.startDate,
+                    endDate: a.endDate,
+                    printedBy: a.printedBy,
+                    contactPerson: "—",
+                    phone: "—",
+                  },
+                }
+              : b,
+          ),
+        );
+        note = `${a.code} booked to ${a.company}`;
+      }
+    }
+    if (note) setToast(note);
   }
 
   function confirmBooking(d: BookingDraft) {
@@ -206,6 +246,7 @@ export function Workspace() {
                 board={selected}
                 onClose={() => setSelectedId(null)}
                 onManage={() => setMode("managing")}
+                onBook={() => setMode("booking")}
               />
             ) : (
               <SearchPanel
@@ -301,6 +342,7 @@ export function Workspace() {
           />
         )}
 
+        <ChatWidget onActions={applyAgentActions} />
         <Toast message={toast} onDone={() => setToast(null)} />
       </div>
       </div>
