@@ -25,7 +25,12 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  // Same here: a stale refresh token is a signed-out user, not an error.
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    /* ignore — the route handlers redirect unauthenticated users */
+  }
   return response;
 }
 

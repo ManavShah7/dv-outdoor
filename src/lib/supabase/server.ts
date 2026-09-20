@@ -48,12 +48,23 @@ export type Profile = {
 /** The signed-in user's profile, or null. */
 export async function getProfile(): Promise<Profile | null> {
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
+
+  // A stale cookie whose refresh token no longer exists throws rather than
+  // returning null. That is a signed-out user, not a failure — treat it as
+  // such instead of letting it surface as an unhandled AuthApiError.
+  let userId: string | undefined;
+  try {
+    const { data: auth, error } = await supabase.auth.getUser();
+    if (error || !auth.user) return null;
+    userId = auth.user.id;
+  } catch {
+    return null;
+  }
+  if (!userId) return null;
   const { data } = await supabase
     .from("profiles")
     .select("id, email, full_name, phone, role, status")
-    .eq("id", auth.user.id)
+    .eq("id", userId)
     .single();
   return (data as Profile) ?? null;
 }
