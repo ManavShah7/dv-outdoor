@@ -1,5 +1,4 @@
 import { PUBLIC_BOARDS, PUBLIC_CITIES } from "@/lib/publicBoards";
-import { SiteHeader } from "@/components/site/SiteChrome";
 import { InventoryBrowser } from "@/components/site/InventoryBrowser";
 
 export const metadata = {
@@ -14,8 +13,7 @@ export default async function PublicBoardsPage({
 }) {
   const { board, city } = await searchParams;
   return (
-    <div className="site">
-      <SiteHeader />
+    <div>
       <InventoryBrowser
         boards={PUBLIC_BOARDS}
         cities={PUBLIC_CITIES}

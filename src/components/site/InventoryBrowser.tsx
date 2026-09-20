@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, ImageOff, Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ImageOff, Search, SlidersHorizontal, X } from "lucide-react";
 import type { PublicBoard } from "@/lib/publicBoards";
 import { cn, inr, fullDate } from "@/lib/utils";
 import { PublicMap } from "@/components/site/PublicMap";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { StreetView } from "@/components/map/StreetView";
 import { MapsProvider } from "@/components/map/MapsProvider";
+import { SiteSidebar } from "@/components/site/SiteSidebar";
 
 type Size = "small" | "medium" | "large";
 type Light = "backlit" | "frontlit" | "none";
@@ -19,41 +20,24 @@ function lightingLabel(l: PublicBoard["lighting"]) {
   return l === "backlit" ? "Back-lit" : l === "frontlit" ? "Front-lit" : "Non-lit";
 }
 
-/* ---------------------------------------------------- collapsible section */
-function Section({
-  title, count, children, defaultOpen = false,
+/* ------------------------------------------------- quick filter list row */
+function FilterRow({
+  label, on, onClick,
 }: {
-  title: string; count?: number; children: React.ReactNode; defaultOpen?: boolean;
+  label: string; on: boolean; onClick: () => void;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="border-b border-white/[0.06]">
-      <button onClick={() => setOpen((v) => !v)} className="flex w-full items-center gap-2.5 py-4 text-left">
-        <span className="text-body font-[620] text-ink-0">{title}</span>
-        <ChevronDown className={cn("size-4 text-ink-500 transition-transform", open && "rotate-180")} strokeWidth={2.2} />
-        {!!count && (
-          <span className="ml-auto grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
-            {count}
-          </span>
-        )}
-      </button>
-      {open && <div className="pb-5">{children}</div>}
-    </div>
-  );
-}
-
-function Pill({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-control)] px-3.5 text-footnote font-[520]",
-        "ring-1 ring-inset transition-colors",
-        on ? "bg-accent text-accent-on ring-transparent" : "bg-black/25 text-ink-300 ring-white/[0.08] hover:bg-white/[0.07]",
+        "h-12 rounded-[var(--radius-control)] px-4 text-left text-body font-[520]",
+        "ring-1 ring-inset transition-colors duration-150",
+        on
+          ? "bg-accent text-accent-on ring-transparent"
+          : "material-inset text-ink-100 ring-white/[0.07] hover:bg-white/[0.07]",
       )}
     >
-      {children}
-      {on ? <X className="size-3.5" strokeWidth={2.6} /> : <Plus className="size-3.5" strokeWidth={2.4} />}
+      {label}
     </button>
   );
 }
@@ -222,21 +206,31 @@ export function InventoryBrowser({
 
   const showPanel = !!board || panelOpen;
 
+  const counts = useMemo(() => ({
+    total: boards.length,
+    available: boards.filter((b) => b.availability === "available").length,
+    booked: boards.filter((b) => b.availability === "booked").length,
+    cities: cities.length,
+  }), [boards, cities]);
+
   return (
     <MapsProvider>
-    <div className="relative h-[calc(100dvh-68px)] overflow-hidden">
+    <div className="relative h-dvh overflow-hidden">
       {/* canvas */}
       <div className="absolute inset-0">
         <PublicMap
           boards={results}
           selected={open}
           onSelect={setOpen}
-          insetLeft={showPanel ? PANEL_W + 24 : 24}
+          insetLeft={328 + (showPanel ? PANEL_W : 0) + 24}
         />
       </div>
 
       {/* floating chrome */}
       <div className="pointer-events-none absolute inset-0 flex">
+        <div className="pointer-events-auto">
+          <SiteSidebar counts={counts} />
+        </div>
         <AnimatePresence mode="wait" initial={false}>
           {showPanel && (
             <motion.div
@@ -251,54 +245,89 @@ export function InventoryBrowser({
                 <BoardPanel board={board} onBack={() => setOpen(null)} />
               ) : (
                 <div className="flex h-full w-[427px] flex-col material-thick border-r border-white/[0.07]">
-                  <div className="flex items-center gap-2 border-b border-white/[0.07] px-5 py-3.5">
-                    <span className="inline-flex items-center gap-2 rounded-[var(--radius-control)] px-3 py-2 text-footnote font-[590] text-ink-100 ring-1 ring-inset ring-white/[0.1]">
-                      <SlidersHorizontal className="size-4" strokeWidth={2.2} />
-                      Filters
-                      {activeCount > 0 && (
-                        <span className="grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
-                          {activeCount}
-                        </span>
-                      )}
-                    </span>
-                    {activeCount > 0 && (
-                      <button onClick={clearAll} className="text-footnote text-ink-500 hover:text-ink-200">Clear</button>
-                    )}
-                    <button
-                      onClick={() => setPanelOpen(false)}
-                      aria-label="Hide filters"
-                      className="ml-auto grid size-8 place-items-center rounded-[8px] text-ink-500 hover:text-ink-0"
-                    >
-                      <ChevronsLeft className="size-[18px]" strokeWidth={2.2} />
-                    </button>
-                  </div>
+                  <div className="px-8 pb-6 pt-8">
+                    <div className="flex items-center justify-between">
+                      <h1 className="text-title2 font-[680] text-ink-0">Billboards</h1>
+                      <button
+                        onClick={() => setPanelOpen(false)}
+                        aria-label="Close filters"
+                        className="grid size-8 place-items-center rounded-full material-inset text-ink-400 transition-colors hover:text-ink-0"
+                      >
+                        <X className="size-4" strokeWidth={2.2} />
+                      </button>
+                    </div>
 
-                  <div className="min-h-0 flex-1 overflow-y-auto px-5">
-                    <div className="relative py-4">
-                      <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-ink-500" strokeWidth={2} />
+                    <div className="relative mt-4">
+                      <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-ink-500" strokeWidth={1.9} />
                       <input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search for city or road"
-                        className="h-12 w-full rounded-[var(--radius-control)] bg-black/30 pl-11 pr-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+                        placeholder="Road, area, city or pincode"
+                        className={cn(
+                          "h-12 w-full rounded-[var(--radius-control)] material-inset pl-11",
+                          query ? "pr-11" : "pr-4",
+                          "text-body text-ink-0 placeholder:text-ink-500",
+                          "ring-1 ring-white/[0.07] ring-inset outline-none",
+                          "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
+                        )}
                       />
+                      {query && (
+                        <button
+                          onClick={() => setQuery("")}
+                          aria-label="Clear search"
+                          className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-ink-700 text-ink-300 hover:text-ink-0"
+                        >
+                          <X className="size-3.5" strokeWidth={2.4} />
+                        </button>
+                      )}
                     </div>
 
-                    <Section title="Regions" count={selectedCities.length} defaultOpen>
-                      <div className="flex flex-wrap gap-2">
-                        {cities.map((c) => (
-                          <Pill key={c} on={selectedCities.includes(c)} onClick={() => toggle(selectedCities, c, setSelectedCities)}>
-                            {c}
-                          </Pill>
-                        ))}
-                      </div>
-                    </Section>
+                    {activeCount > 0 && (
+                      <button
+                        onClick={clearAll}
+                        className="mt-3 text-footnote text-ink-500 underline-offset-2 transition-colors hover:text-ink-200 hover:underline"
+                      >
+                        Clear {activeCount} filter{activeCount > 1 ? "s" : ""}
+                      </button>
+                    )}
+                  </div>
 
-                    <Section title="Availability" count={availableOnly ? 1 : 0} defaultOpen>
-                      <Pill on={availableOnly} onClick={() => setAvailableOnly((v) => !v)}>Free right now</Pill>
-                    </Section>
+                  <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-8">
+                    <h2 className="text-caption2 uppercase text-ink-500">Quick filters</h2>
+                    <div className="mt-3 flex flex-col gap-2">
+                      <FilterRow label="Available now" on={availableOnly} onClick={() => setAvailableOnly((v) => !v)} />
+                      {(["backlit", "frontlit"] as Light[]).map((l) => (
+                        <FilterRow
+                          key={l}
+                          label={lightingLabel(l)}
+                          on={lights.includes(l)}
+                          onClick={() => toggle(lights, l, setLights)}
+                        />
+                      ))}
+                      {(["small", "medium", "large"] as Size[]).map((s) => (
+                        <FilterRow
+                          key={s}
+                          label={s[0].toUpperCase() + s.slice(1)}
+                          on={sizes.includes(s)}
+                          onClick={() => toggle(sizes, s, setSizes)}
+                        />
+                      ))}
+                    </div>
 
-                    <Section title="Budget" count={maxRate < 150000 ? 1 : 0} defaultOpen>
+                    <h2 className="mt-7 text-caption2 uppercase text-ink-500">Cities</h2>
+                    <div className="mt-3 flex flex-col gap-2">
+                      {cities.map((c) => (
+                        <FilterRow
+                          key={c}
+                          label={c}
+                          on={selectedCities.includes(c)}
+                          onClick={() => toggle(selectedCities, c, setSelectedCities)}
+                        />
+                      ))}
+                    </div>
+
+                    <h2 className="mt-7 text-caption2 uppercase text-ink-500">Budget</h2>
+                    <div className="mt-3 rounded-[var(--radius-card)] material-inset p-5 ring-1 ring-white/[0.07] ring-inset">
                       <input
                         type="range" min={10000} max={150000} step={5000}
                         value={maxRate} onChange={(e) => setMaxRate(Number(e.target.value))}
@@ -308,30 +337,10 @@ export function InventoryBrowser({
                         <span>₹10,000</span>
                         <span className="font-[620] text-ink-100">up to {inr(maxRate)}</span>
                       </div>
-                    </Section>
-
-                    <Section title="Size" count={sizes.length}>
-                      <div className="flex flex-wrap gap-2">
-                        {(["small", "medium", "large"] as Size[]).map((s) => (
-                          <Pill key={s} on={sizes.includes(s)} onClick={() => toggle(sizes, s, setSizes)}>
-                            <span className="capitalize">{s}</span>
-                          </Pill>
-                        ))}
-                      </div>
-                    </Section>
-
-                    <Section title="Lighting" count={lights.length}>
-                      <div className="flex flex-wrap gap-2">
-                        {(["backlit", "frontlit", "none"] as Light[]).map((l) => (
-                          <Pill key={l} on={lights.includes(l)} onClick={() => toggle(lights, l, setLights)}>
-                            {lightingLabel(l)}
-                          </Pill>
-                        ))}
-                      </div>
-                    </Section>
+                    </div>
                   </div>
 
-                  <div className="border-t border-white/[0.07] bg-black/20 px-5 py-3.5">
+                  <div className="border-t border-white/[0.07] px-8 py-4">
                     <p className="text-footnote font-[590] tabular-nums text-ink-100">
                       {results.length.toLocaleString("en-IN")} site{results.length === 1 ? "" : "s"} match
                     </p>
