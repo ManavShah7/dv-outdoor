@@ -10,11 +10,8 @@ function Photo() {
   // Real listing photos land here. Until then, an honest empty state rather
   // than a grey rectangle pretending to be an image.
   return (
-    <div className="flex aspect-[4/3] w-full items-center justify-center bg-chrome-raised">
-      <div className="flex flex-col items-center gap-2 text-ink-500">
-        <ImageOff className="size-7" strokeWidth={1.5} />
-        <span className="text-footnote">No photo yet</span>
-      </div>
+    <div className="flex aspect-[4/3] w-full items-center justify-center material-inset">
+      <ImageOff className="size-7 text-ink-600" strokeWidth={1.5} />
     </div>
   );
 }
@@ -31,7 +28,7 @@ export function BoardInspector({
   const remaining = board.rental ? daysUntil(board.rental.endDate) : null;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto bg-chrome">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
       <div className="relative">
         <Photo />
         <button
@@ -44,7 +41,7 @@ export function BoardInspector({
       </div>
 
       {/* identity */}
-      <div className="border-b border-chrome-line/60 px-8 py-7">
+      <div className="border-b border-white/[0.07] px-8 py-7">
         <h1 className="text-title2 font-[680] text-ink-0">{board.name}</h1>
         <p className="mt-2 text-body text-ink-300">{board.address}</p>
         <p className="mt-3 text-footnote tabular-nums text-ink-500">
@@ -53,7 +50,7 @@ export function BoardInspector({
       </div>
 
       {/* availability */}
-      <section className="border-b border-chrome-line/60 px-8 py-7">
+      <section className="border-b border-white/[0.07] px-8 py-7">
         <SectionHeader>Availability</SectionHeader>
         <Card className="mt-4">
           {board.rental ? (
@@ -118,7 +115,7 @@ export function BoardInspector({
       </section>
 
       {/* Pinned: the primary action should never require scrolling to find. */}
-      <div className="sticky bottom-0 mt-auto border-t border-chrome-line/60 bg-chrome px-8 py-5">
+      <div className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
         <Button variant={board.status === "available" ? "primary" : "secondary"} onClick={onManage}>
           Manage board
         </Button>

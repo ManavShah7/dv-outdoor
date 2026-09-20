@@ -62,14 +62,14 @@ export function SearchPanel({
   const searching = query.trim().length > 0 || active !== null;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden bg-chrome">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden material-thick border-r border-white/[0.06]">
       <div className="px-8 pb-6 pt-8">
         <div className="flex items-center justify-between">
           <h1 className="text-title2 font-[680] text-ink-0">Search</h1>
           <button
             onClick={onClose}
             aria-label="Close search"
-            className="grid size-8 place-items-center rounded-full bg-chrome-raised text-ink-400 transition-colors hover:text-ink-0"
+            className="grid size-8 place-items-center rounded-full material-inset text-ink-400 transition-colors hover:text-ink-0"
           >
             <X className="size-4" strokeWidth={2.2} />
           </button>
@@ -81,10 +81,10 @@ export function SearchPanel({
             onChange={(e) => onQuery(e.target.value)}
             placeholder="Road, area, city or pincode"
             className={cn(
-              "h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised pl-11",
+              "h-12 w-full rounded-[var(--radius-control)] material-inset pl-11",
               query ? "pr-11" : "pr-4",
               "text-body text-ink-0 placeholder:text-ink-500",
-              "ring-1 ring-chrome-line/70 ring-inset outline-none",
+              "ring-1 ring-white/[0.07] ring-inset outline-none",
               "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
             )}
           />
@@ -114,7 +114,7 @@ export function SearchPanel({
             {query.trim() && (
               <button
                 onClick={() => onQuery("")}
-                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-chrome-raised py-1.5 pl-3 pr-2 text-footnote font-[590] text-ink-200 ring-1 ring-chrome-line ring-inset transition-colors hover:bg-chrome-line"
+                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] material-inset py-1.5 pl-3 pr-2 text-footnote font-[590] text-ink-200 ring-1 ring-white/[0.08] ring-inset transition-colors hover:bg-white/[0.07]"
               >
                 &ldquo;{query.trim()}&rdquo;
                 <X className="size-3.5 opacity-70 group-hover:opacity-100" strokeWidth={2.6} />
@@ -148,7 +148,7 @@ export function SearchPanel({
                       "ring-1 ring-inset transition-colors duration-150",
                       on
                         ? "bg-accent text-accent-on ring-transparent"
-                        : "bg-chrome-raised text-ink-100 ring-chrome-line/70 hover:bg-chrome-line",
+                        : "material-inset text-ink-100 ring-white/[0.07] hover:bg-white/[0.07]",
                     )}
                   >
                     {label}
@@ -167,7 +167,7 @@ export function SearchPanel({
                 <button
                   key={b.id}
                   onClick={() => onSelect(b)}
-                  className="rounded-[var(--radius-control)] px-4 py-3 text-left transition-colors duration-150 hover:bg-chrome-raised"
+                  className="rounded-[var(--radius-control)] px-4 py-3 text-left transition-colors duration-150 hover:material-inset"
                 >
                   <div className="flex items-center gap-2.5">
                     <span

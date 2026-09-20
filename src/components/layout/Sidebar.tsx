@@ -31,7 +31,7 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-chrome-line/70 ring-inset">
+    <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
       <div className="text-subhead text-ink-300">{label}</div>
       <div
         className="mt-1 text-display font-[680] tabular-nums"
@@ -53,16 +53,16 @@ export function Sidebar({
   counts: Counts;
 }) {
   return (
-    <aside className="flex h-full w-[328px] shrink-0 flex-col bg-chrome">
+    <aside className="flex h-full w-[328px] shrink-0 flex-col material-thick border-r border-white/[0.06]">
       {/* wordmark */}
-      <div className="flex h-[108px] items-center border-b border-chrome-line/60 px-10">
+      <div className="flex h-[108px] items-center border-b border-white/[0.07] px-10">
         <span className="text-title3 font-[680] tracking-[-0.02em] text-ink-0">
           DV Outdoor
         </span>
       </div>
 
       {/* navigation */}
-      <nav className="border-b border-chrome-line/60 py-4">
+      <nav className="border-b border-white/[0.07] py-4">
         {NAV.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
@@ -98,7 +98,7 @@ export function Sidebar({
         <StatCard label="Booked Boards"    value={counts.booked}    color="var(--color-booked)" />
         <StatCard label="Available Boards" value={counts.available} color="var(--color-available)" />
 
-        <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-chrome-line/70 ring-inset">
+        <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
           <div className="text-subhead text-ink-300">Maintenance</div>
           <div className="mt-3 flex gap-8">
             <div>

@@ -24,7 +24,7 @@ export function Button({
         variant === "primary" &&
           "bg-accent text-accent-on hover:bg-accent-hover",
         variant === "secondary" &&
-          "bg-chrome-raised text-ink-0 ring-1 ring-chrome-line ring-inset hover:bg-chrome-line",
+          "material-inset text-ink-0 ring-1 ring-white/[0.08] ring-inset hover:bg-white/[0.07]",
         variant === "plain" && "text-ink-300 hover:text-ink-0",
         className,
       )}
@@ -45,8 +45,8 @@ export function Card({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-card)] bg-chrome-raised p-5",
-        "ring-1 ring-chrome-line/70 ring-inset",
+        "rounded-[var(--radius-card)] material-inset p-5",
+        "ring-1 ring-white/[0.07] ring-inset",
         className,
       )}
       {...props}

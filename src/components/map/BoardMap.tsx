@@ -51,10 +51,12 @@ function Layers({
   boards,
   selectedId,
   onSelect,
+  insetLeft,
 }: {
   boards: Board[];
   selectedId?: string;
   onSelect: (b: Board) => void;
+  insetLeft: number;
 }) {
   const map = useMap();
   const [zoom, setZoom] = useState(8.4);
@@ -73,8 +75,8 @@ function Layers({
     fitted.current = true;
     const b = new google.maps.LatLngBounds();
     for (const board of boards) b.extend({ lat: board.lat, lng: board.lng });
-    map.fitBounds(b, { top: 72, right: 72, bottom: 96, left: 72 });
-  }, [map, boards]);
+    map.fitBounds(b, { top: 72, right: 72, bottom: 96, left: insetLeft });
+  }, [map, boards, insetLeft]);
 
   // Selecting a board should take you there — otherwise the inspector and the
   // map are describing two different places.
@@ -82,9 +84,11 @@ function Layers({
     if (!map || !selectedId) return;
     const b = boards.find((x) => x.id === selectedId);
     if (!b) return;
-    map.panTo({ lat: b.lat, lng: b.lng });
     if ((map.getZoom() ?? 0) < 13) map.setZoom(15);
-  }, [map, selectedId, boards]);
+    map.panTo({ lat: b.lat, lng: b.lng });
+    // shift the target right of the floating chrome so it lands in open canvas
+    map.panBy(-insetLeft / 2, 0);
+  }, [map, selectedId, boards, insetLeft]);
 
   const cityCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -136,23 +140,26 @@ export function BoardMap({
   boards,
   selectedId,
   onSelect,
+  insetLeft = 0,
 }: {
   boards: Board[];
   selectedId?: string;
   onSelect: (b: Board) => void;
+  /** width of the floating chrome covering the left of the canvas */
+  insetLeft?: number;
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!key) {
     return (
-      <div className="grid flex-1 place-items-center bg-ink-100 text-ink-600">
+      <div className="grid size-full place-items-center bg-ink-100 text-ink-600">
         <p className="text-subhead">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not set.</p>
       </div>
     );
   }
 
   return (
-    <div className="relative flex-1">
+    <div className="relative size-full">
       <APIProvider apiKey={key}>
         <GoogleMap
           defaultCenter={SAURASHTRA}
@@ -169,7 +176,7 @@ export function BoardMap({
           ]}
           style={{ width: "100%", height: "100%" }}
         >
-          <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} />
+          <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} />
         </GoogleMap>
       </APIProvider>
     </div>

@@ -63,9 +63,9 @@ export function BookingFlow({
     d.company.trim() && d.startDate && d.endDate && rateNum > 0 && d.printedBy && datesValid;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto bg-chrome">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
       {/* header */}
-      <div className="flex items-start justify-between border-b border-chrome-line/60 px-8 pb-6 pt-8">
+      <div className="flex items-start justify-between border-b border-white/[0.07] px-8 pb-6 pt-8">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             {step === "review" && (
@@ -89,7 +89,7 @@ export function BookingFlow({
         <button
           onClick={onCancel}
           aria-label="Cancel"
-          className="grid size-8 shrink-0 place-items-center rounded-full bg-chrome-raised text-ink-400 hover:text-ink-0"
+          className="grid size-8 shrink-0 place-items-center rounded-full material-inset text-ink-400 hover:text-ink-0"
         >
           <X className="size-4" strokeWidth={2.2} />
         </button>
@@ -142,7 +142,7 @@ export function BookingFlow({
             </div>
 
             {discount !== null && (
-              <div className="-mt-2 flex items-center justify-between rounded-[var(--radius-control)] bg-chrome px-4 py-3">
+              <div className="-mt-2 flex items-center justify-between rounded-[var(--radius-control)] bg-black/25 px-4 py-3">
                 <span className="text-footnote text-ink-400">
                   Asking {inr(board.askingRate)}
                 </span>
@@ -204,15 +204,12 @@ export function BookingFlow({
                 <Field label="Phone">{d.phone || "—"}</Field>
               </div>
             )}
-            <p className="text-footnote text-ink-500">
-              Confirming writes a permanent rental record. It can be ended or amended later,
-              but never overwritten.
-            </p>
+
           </Card>
         )}
       </div>
 
-      <motion.div layout className="sticky bottom-0 mt-auto border-t border-chrome-line/60 bg-chrome px-8 py-5">
+      <motion.div layout className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
         {step === "form" ? (
           <Button variant="primary" disabled={!canProceed} onClick={() => setStep("review")}>
             Proceed

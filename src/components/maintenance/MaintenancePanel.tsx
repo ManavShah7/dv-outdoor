@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { X, ThumbsUp, ThumbsDown, ArrowLeft, Sparkles, TriangleAlert } from "lucide-react";
+import { X, ThumbsUp, ThumbsDown, ArrowLeft, TriangleAlert } from "lucide-react";
 import type { Board } from "@/lib/types";
 import type { MaintenanceRequest, Severity } from "@/lib/mockMaintenance";
 import { cn, inr } from "@/lib/utils";
@@ -67,20 +67,20 @@ export function MaintenanceList({
   const totalOpen = grouped.reduce((n, g) => n + g.items.length, 0);
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden bg-chrome">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden material-thick border-r border-white/[0.06]">
       <div className="px-8 pb-5 pt-8">
         <div className="flex items-center justify-between">
           <h1 className="text-title2 font-[680] text-ink-0">Maintenance</h1>
           <button
             onClick={onClose}
             aria-label="Close maintenance"
-            className="grid size-8 place-items-center rounded-full bg-chrome-raised text-ink-400 transition-colors hover:text-ink-0"
+            className="grid size-8 place-items-center rounded-full material-inset text-ink-400 transition-colors hover:text-ink-0"
           >
             <X className="size-4" strokeWidth={2.2} />
           </button>
         </div>
         <p className="mt-2 text-subhead text-ink-400">
-          {totalOpen} open {totalOpen === 1 ? "request" : "requests"}, sorted by AI urgency
+          {totalOpen} open {totalOpen === 1 ? "request" : "requests"}
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export function MaintenanceList({
             </div>
 
             {items.length === 0 ? (
-              <p className="rounded-[var(--radius-card)] bg-chrome-raised/50 px-4 py-3 text-footnote text-ink-500">
+              <p className="rounded-[var(--radius-card)] material-inset/50 px-4 py-3 text-footnote text-ink-500">
                 Nothing in this bucket.
               </p>
             ) : (
@@ -109,7 +109,7 @@ export function MaintenanceList({
                     <button
                       key={r.id}
                       onClick={() => onSelect(r)}
-                      className="rounded-[var(--radius-card)] bg-chrome-raised px-4 py-3.5 text-left ring-1 ring-chrome-line/60 ring-inset transition-colors hover:bg-chrome-line"
+                      className="rounded-[var(--radius-card)] material-inset px-4 py-3.5 text-left ring-1 ring-white/[0.06] ring-inset transition-colors hover:bg-white/[0.07]"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <span className="truncate text-subhead font-[590] text-ink-0">
@@ -127,8 +127,8 @@ export function MaintenanceList({
                           </span>
                         )}
                         {disagrees && (
-                          <span className="inline-flex items-center gap-1 text-caption text-ink-500">
-                            <Sparkles className="size-3" /> re-rated
+                          <span className="text-caption text-ink-500">
+                            re-rated from {SEV[r.reporterSeverity].label.toLowerCase()}
                           </span>
                         )}
                       </div>
@@ -161,8 +161,8 @@ export function MaintenanceDetail({
   const disagrees = request.aiSeverity !== request.reporterSeverity;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto bg-chrome">
-      <div className="flex items-start gap-2 border-b border-chrome-line/60 px-8 pb-6 pt-8">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
+      <div className="flex items-start gap-2 border-b border-white/[0.07] px-8 pb-6 pt-8">
         <button
           onClick={onBack}
           aria-label="Back"
@@ -177,7 +177,7 @@ export function MaintenanceDetail({
       </div>
 
       {/* what the field crew sent */}
-      <section className="border-b border-chrome-line/60 px-8 py-7">
+      <section className="border-b border-white/[0.07] px-8 py-7">
         <SectionHeader>Reported</SectionHeader>
         <Card className="mt-4 flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-4">
@@ -196,11 +196,8 @@ export function MaintenanceDetail({
       </section>
 
       {/* the triage */}
-      <section className="border-b border-chrome-line/60 px-8 py-7">
-        <div className="flex items-center gap-2">
-          <Sparkles className="size-4 text-accent" />
-          <SectionHeader>AI assessment</SectionHeader>
-        </div>
+      <section className="border-b border-white/[0.07] px-8 py-7">
+        <SectionHeader>Assessment</SectionHeader>
         <Card className="mt-4 flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <div>
@@ -231,7 +228,7 @@ export function MaintenanceDetail({
           </div>
 
           {request.wasRentedAtReport && (
-            <div className="flex items-center gap-2.5 rounded-[var(--radius-control)] bg-chrome px-4 py-3">
+            <div className="flex items-center gap-2.5 rounded-[var(--radius-control)] bg-black/25 px-4 py-3">
               <TriangleAlert className="size-4 shrink-0" style={{ color: SEV[request.aiSeverity].color }} />
               <span className="text-footnote text-ink-200">
                 <span className="font-[620] tabular-nums">{inr(request.revenueAtRisk)}</span> of paid
@@ -242,7 +239,7 @@ export function MaintenanceDetail({
 
           {/* the feedback signal that tunes future triage prompts */}
           <div>
-            <div className="text-footnote text-ink-400">Was this assessment right?</div>
+            <div className="text-footnote text-ink-400">Was this right?</div>
             <div className="mt-2.5 flex gap-2">
               {(["up", "down"] as const).map((v) => {
                 const on = request.adminFeedback === v;
@@ -256,7 +253,7 @@ export function MaintenanceDetail({
                       "text-footnote font-[590] ring-1 ring-inset transition-colors",
                       on
                         ? "bg-accent text-accent-on ring-transparent"
-                        : "bg-chrome text-ink-300 ring-chrome-line hover:text-ink-0",
+                        : "bg-black/25 text-ink-300 ring-white/[0.08] hover:text-ink-0",
                     )}
                   >
                     <Icon className="size-4" strokeWidth={2} />
@@ -266,15 +263,13 @@ export function MaintenanceDetail({
               })}
             </div>
             {request.adminFeedback && (
-              <p className="mt-2 text-caption text-ink-500">
-                Logged. Recent corrections are fed back into future assessments.
-              </p>
+              <p className="mt-2 text-caption text-ink-500">Saved.</p>
             )}
           </div>
         </Card>
       </section>
 
-      <div className="sticky bottom-0 mt-auto border-t border-chrome-line/60 bg-chrome px-8 py-5">
+      <div className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
         {request.status === "in_progress" ? (
           <p className="text-center text-footnote text-ink-500">
             Already under maintenance. The crew closes it from the field.

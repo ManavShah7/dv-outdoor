@@ -5,8 +5,8 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const controlBase =
-  "h-12 w-full min-w-0 rounded-[var(--radius-control)] bg-chrome-raised px-4 text-body text-ink-0 " +
-  "placeholder:text-ink-500 ring-1 ring-chrome-line/70 ring-inset outline-none " +
+  "h-12 w-full min-w-0 rounded-[var(--radius-control)] material-inset px-4 text-body text-ink-0 " +
+  "placeholder:text-ink-500 ring-1 ring-white/[0.07] ring-inset outline-none " +
   "transition-shadow duration-150 focus:ring-2 focus:ring-accent";
 
 export function Label({ children }: { children: React.ReactNode }) {
@@ -64,7 +64,7 @@ export function Select({
       >
         <option value="" disabled>{placeholder}</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-chrome text-ink-0">
+          <option key={o.value} value={o.value} className="bg-ink-900 text-ink-0">
             {o.label}
           </option>
         ))}
@@ -112,7 +112,7 @@ export function CompanyCombo({
       />
       {isNew && !open && (
         <p className="mt-1.5 text-footnote" style={{ color: "var(--color-maintenance)" }}>
-          New company — will be created
+          New company
         </p>
       )}
       {open && matches.length > 0 && (

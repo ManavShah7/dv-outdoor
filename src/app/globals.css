@@ -106,7 +106,7 @@
   /* Inter for the public portal and anything a client sees — SF Pro only
      renders on Apple devices, and DV's clients are largely Android/Windows.
      Metrically near-identical, so the design does not shift. */
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-instrument), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* ---- ELEVATION — chrome sits ON the map, so shadows are directional. */
@@ -121,33 +121,39 @@
    flat card on a flat page — glass over nothing is just grey, and that is the
    single most common tell of a fake "Apple-style" UI.
    ============================================================================ */
-@utility material-thin {
-  background-color: color-mix(in srgb, var(--chrome) 62%, transparent);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+/* NB: these are plain classes, NOT @utility. Tailwind v4 owns `backdrop-filter`
+   through its own --tw-backdrop-* composition and silently strips a raw
+   backdrop-filter declaration written inside @utility, emitting an empty rule.
+   The blur simply never applies and nothing warns you. */
+.material-thin {
+  background-color: color-mix(in srgb, var(--chrome) 52%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
 }
-@utility material-regular {
-  background-color: color-mix(in srgb, var(--chrome) 80%, transparent);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
+.material-regular {
+  background-color: color-mix(in srgb, var(--chrome) 66%, transparent);
+  -webkit-backdrop-filter: blur(32px) saturate(140%);
+  backdrop-filter: blur(32px) saturate(140%);
 }
-@utility material-thick {
-  background-color: color-mix(in srgb, var(--chrome) 94%, transparent);
-  backdrop-filter: blur(40px) saturate(160%);
-  -webkit-backdrop-filter: blur(40px) saturate(160%);
+/* Sidebars and inspectors. Dense text has to stay readable over a bright map:
+   the blur is what buys that, by destroying the competing detail behind it —
+   which is why it can sit this translucent and still read cleanly. */
+.material-thick {
+  background-color: color-mix(in srgb, var(--chrome) 78%, transparent);
+  -webkit-backdrop-filter: blur(48px) saturate(135%);
+  backdrop-filter: blur(48px) saturate(135%);
 }
-/* The static half of Liquid Glass: a bright specular top edge. Real-time
-   refraction needs WebGL/SVG displacement and wrecks scroll perf on the
-   Android phones DV's clients use — deliberately not doing that. */
-@utility specular-edge {
-  box-shadow: var(--shadow-inset-hairline), var(--shadow-panel);
+/* Cards nested inside a material panel — translucent against their parent so
+   the layering stays legible instead of flattening into one slab. */
+.material-inset {
+  background-color: color-mix(in srgb, var(--chrome-raised) 55%, transparent);
 }
 
 html { color-scheme: dark; }
 
 body {
   font-family: var(--font-sans);
-  background: var(--chrome);
+  background: var(--color-ink-950);
   color: var(--color-ink-0);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

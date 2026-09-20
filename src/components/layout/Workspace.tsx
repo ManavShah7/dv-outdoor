@@ -147,7 +147,20 @@ export function Workspace() {
     : null;
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden">
+    <div className="relative h-dvh w-full overflow-hidden">
+      {/* canvas */}
+      <div className="absolute inset-0">
+        <BoardMap
+          boards={filtered}
+          selectedId={selected?.id}
+          onSelect={selectBoard}
+          insetLeft={panel ? 328 + 427 + 24 : 328 + 24}
+        />
+      </div>
+
+      {/* floating chrome */}
+      <div className="pointer-events-none absolute inset-0 flex">
+      <div className="pointer-events-auto">
       <Sidebar
         active={nav}
         onNavigate={(id) => {
@@ -164,6 +177,7 @@ export function Workspace() {
         }}
         counts={counts}
       />
+      </div>
 
       <AnimatePresence mode="wait" initial={false}>
         {panel && (
@@ -173,7 +187,7 @@ export function Workspace() {
             animate={{ width: 427, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.34, ease: [0.32, 0.72, 0, 1] }}
-            className="h-full shrink-0 overflow-hidden border-l border-chrome-line/60"
+            className="pointer-events-auto h-full shrink-0 overflow-hidden"
           >
             {panel === "maint-list" ? (
               <MaintenanceList
@@ -223,9 +237,7 @@ export function Workspace() {
         )}
       </AnimatePresence>
 
-      <div className="relative flex min-w-0 flex-1">
-        <BoardMap boards={filtered} selectedId={selected?.id} onSelect={selectBoard} />
-
+      <div className="relative min-w-0 flex-1">
         {mode === "managing" && selected && (
           <ManageMenu
             board={selected}
@@ -240,6 +252,7 @@ export function Workspace() {
           />
         )}
 
+
         {/* Floating count chip — chrome over the map, so it earns a material. */}
         <div className="pointer-events-none absolute left-6 top-6 z-10 rounded-[var(--radius-pill)] material-regular specular-edge px-4 py-2">
           <span className="text-subhead font-[590] tabular-nums text-ink-0">
@@ -252,6 +265,7 @@ export function Workspace() {
 
         <AccentSwitcher />
         <Toast message={toast} onDone={() => setToast(null)} />
+      </div>
       </div>
     </div>
   );
