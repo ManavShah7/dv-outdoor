@@ -23,7 +23,7 @@ export function LoginForm({ next }: { next?: string }) {
       setBusy(false);
       return;
     }
-    router.replace(next ?? "/");
+    router.replace(next ?? "/admin");
     router.refresh();
   }
 

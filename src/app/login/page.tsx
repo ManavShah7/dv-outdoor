@@ -10,7 +10,7 @@ export default async function LoginPage({
   const { next } = await searchParams;
   const profile = await getProfile();
   if (profile?.status === "approved") {
-    redirect(next ?? (profile.role === "admin" ? "/" : "/field"));
+    redirect(next ?? (profile.role === "admin" ? "/admin" : "/field"));
   }
   return <LoginForm next={next} />;
 }

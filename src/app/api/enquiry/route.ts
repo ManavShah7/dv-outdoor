@@ -1,0 +1,54 @@
+import { createAdminClient } from "@/lib/supabase/server";
+import { BOARDS } from "@/lib/mockBoards";
+
+/**
+ * Public enquiry ("check availability"). Writes a lead — never inventory.
+ * Runs under the service role because the public has no Supabase session and
+ * RLS is admin-only by design; everything it writes is validated here first.
+ */
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => null);
+
+  const companyName = String(body?.companyName ?? "").trim();
+  const contactPerson = String(body?.contactPerson ?? "").trim();
+  const phone = String(body?.phone ?? "").trim();
+  const email = String(body?.email ?? "").trim() || null;
+  const message = String(body?.message ?? "").trim() || null;
+  const boardCode = String(body?.boardCode ?? "").trim() || null;
+  const startDate = String(body?.startDate ?? "").trim() || null;
+  const durationDays = Number(body?.durationDays) || null;
+
+  if (companyName.length < 2) return Response.json({ error: "Enter your company name." }, { status: 400 });
+  if (contactPerson.length < 2) return Response.json({ error: "Enter a contact name." }, { status: 400 });
+  if (phone.replace(/\D/g, "").length < 8) return Response.json({ error: "Enter a valid phone number." }, { status: 400 });
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return Response.json({ error: "That email does not look right." }, { status: 400 });
+  }
+  if (message && message.length > 2000) {
+    return Response.json({ error: "Message is too long." }, { status: 400 });
+  }
+
+  const board = boardCode ? BOARDS.find((b) => b.code === boardCode) : null;
+
+  try {
+    const db = createAdminClient();
+    const { error } = await db.from("client_requests").insert({
+      board_id: null, // boards aren't in the database yet; the code is in the message
+      company_name: companyName,
+      contact_person: contactPerson,
+      phone,
+      email,
+      message: [board ? `Board: ${board.code} — ${board.name}, ${board.address}` : null, message]
+        .filter(Boolean)
+        .join("\n\n") || null,
+      requested_start_date: startDate,
+      requested_duration_days: durationDays,
+      source: "client_portal",
+    });
+    if (error) return Response.json({ error: "Could not send that. Please call us instead." }, { status: 500 });
+  } catch {
+    return Response.json({ error: "Could not send that. Please call us instead." }, { status: 500 });
+  }
+
+  return Response.json({ ok: true });
+}
