@@ -61,7 +61,7 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close assistant" : "Open assistant"}
-        className="pointer-events-auto absolute bottom-6 left-6 z-40 grid size-14 place-items-center rounded-full bg-accent text-accent-on shadow-[var(--shadow-pop)] transition-transform hover:scale-105"
+        className="pointer-events-auto absolute bottom-6 right-6 z-40 grid size-14 place-items-center rounded-full bg-accent text-accent-on shadow-[var(--shadow-pop)] transition-transform hover:scale-105"
       >
         {open ? <X className="size-6" strokeWidth={2.4} /> : <MessageSquare className="size-6" strokeWidth={2.2} />}
       </button>
@@ -73,7 +73,7 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
-            className="pointer-events-auto absolute bottom-24 left-6 z-40 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-white/[0.08]"
+            className="pointer-events-auto absolute bottom-24 right-6 z-40 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-white/[0.08]"
           >
             <div className="shrink-0 border-b border-white/[0.07] px-5 py-4">
               <h2 className="text-subhead font-[620] text-ink-0">Ask about your boards</h2>
