@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, MapPin, Search, Wrench, PhoneCall } from "lucide-react";
 import { publicStats, liveBrandNames, PUBLIC_BOARDS, PUBLIC_CITIES } from "@/lib/publicBoards";
-import { SiteFooter } from "@/components/site/SiteChrome";
-import { SiteSidebar } from "@/components/site/SiteSidebar";
+import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
 import { CoverageMap } from "@/components/site/CoverageMap";
 import { ContactForm } from "@/components/site/ContactForm";
 import { inr } from "@/lib/utils";
@@ -26,17 +25,9 @@ export default function LandingPage() {
     .sort((a, b) => b.askingRate - a.askingRate)
     .slice(0, 3);
 
-  const counts = {
-    total: PUBLIC_BOARDS.length,
-    available: stats.available,
-    booked: PUBLIC_BOARDS.length - stats.available,
-    cities: stats.cities,
-  };
-
   return (
-    <div className="flex h-dvh overflow-hidden">
-      <SiteSidebar counts={counts} />
-      <main className="min-w-0 flex-1 overflow-y-auto">
+    <div className="min-h-dvh">
+      <SiteHeader />
 
       {/* ------------------------------------------------------------- hero */}
       <section className="relative isolate overflow-hidden">
@@ -54,7 +45,7 @@ export default function LandingPage() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/60 to-transparent" />
 
-        <div className="mx-auto max-w-[1180px] px-10 py-24 sm:py-28">
+        <div className="mx-auto max-w-[1180px] px-6 py-24 sm:py-32">
           <div className="max-w-[640px]">
             <h1 className="text-[clamp(2.4rem,5.5vw,3.9rem)] font-[680] leading-[1.06] tracking-[-0.035em] text-ink-0">
               Billboard advertising across Gujarat, made simple
@@ -87,7 +78,7 @@ export default function LandingPage() {
 
       {/* ---------------------------------------------------------- trusted */}
       <section className="border-y border-white/[0.07] py-12">
-        <div className="mx-auto max-w-[1180px] px-10">
+        <div className="mx-auto max-w-[1180px] px-6">
           <p className="text-center text-subhead font-[590] text-ink-100">Trusted by leading brands</p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
             {brands.map((b) => (
@@ -101,7 +92,7 @@ export default function LandingPage() {
 
       {/* ------------------------------------------------------------ stats */}
       <section className="py-16">
-        <div className="mx-auto max-w-[1180px] px-10">
+        <div className="mx-auto max-w-[1180px] px-6">
           <dl className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
             {[
               { n: stats.boards.toLocaleString("en-IN"), l: "Sites owned" },
@@ -122,7 +113,7 @@ export default function LandingPage() {
 
       {/* -------------------------------------------------------------- how */}
       <section id="how" className="scroll-mt-20 border-t border-white/[0.07] py-20">
-        <div className="mx-auto max-w-[1180px] px-10">
+        <div className="mx-auto max-w-[1180px] px-6">
           <h2 className="max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] leading-[1.12] tracking-[-0.03em] text-ink-0">
             Three steps from map to live campaign
           </h2>
@@ -146,7 +137,7 @@ export default function LandingPage() {
 
       {/* --------------------------------------------------------- coverage */}
       <section id="coverage" className="scroll-mt-20 border-t border-white/[0.07] py-20">
-        <div className="mx-auto max-w-[1180px] px-10">
+        <div className="mx-auto max-w-[1180px] px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] tracking-[-0.03em] text-ink-0">
@@ -168,7 +159,7 @@ export default function LandingPage() {
 
       {/* -------------------------------------------------------- available */}
       <section className="border-t border-white/[0.07] py-20">
-        <div className="mx-auto max-w-[1180px] px-10">
+        <div className="mx-auto max-w-[1180px] px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] tracking-[-0.03em] text-ink-0">
               Free right now
@@ -213,7 +204,7 @@ export default function LandingPage() {
 
       {/* ---------------------------------------------------------- contact */}
       <section id="contact" className="scroll-mt-20 border-t border-white/[0.07] py-20">
-        <div className="mx-auto grid max-w-[1180px] gap-12 px-10 lg:grid-cols-[1fr_minmax(0,460px)]">
+        <div className="mx-auto grid max-w-[1180px] gap-12 px-6 lg:grid-cols-[1fr_minmax(0,460px)]">
           <div>
             <h2 className="max-w-[16ch] text-[clamp(1.9rem,4vw,2.9rem)] font-[680] leading-[1.1] tracking-[-0.03em] text-ink-0">
               Tell us the city. We&rsquo;ll tell you what&rsquo;s free.
@@ -236,8 +227,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-        <SiteFooter />
-      </main>
+      <SiteFooter />
     </div>
   );
 }

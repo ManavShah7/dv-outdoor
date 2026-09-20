@@ -9,7 +9,6 @@ import { PublicMap } from "@/components/site/PublicMap";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { StreetView } from "@/components/map/StreetView";
 import { MapsProvider } from "@/components/map/MapsProvider";
-import { SiteSidebar } from "@/components/site/SiteSidebar";
 
 type Size = "small" | "medium" | "large";
 type Light = "backlit" | "frontlit" | "none";
@@ -223,31 +222,21 @@ export function InventoryBrowser({
 
   const showPanel = !!board || panelOpen;
 
-  const counts = useMemo(() => ({
-    total: boards.length,
-    available: boards.filter((b) => b.availability === "available").length,
-    booked: boards.filter((b) => b.availability === "booked").length,
-    cities: cities.length,
-  }), [boards, cities]);
-
   return (
     <MapsProvider>
-    <div className="relative h-dvh overflow-hidden">
+    <div className="relative h-[calc(100dvh-68px)] overflow-hidden">
       {/* canvas */}
       <div className="absolute inset-0">
         <PublicMap
           boards={results}
           selected={open}
           onSelect={setOpen}
-          insetLeft={328 + (showPanel ? PANEL_W : 0) + 24}
+          insetLeft={showPanel ? PANEL_W + 24 : 24}
         />
       </div>
 
       {/* floating chrome */}
       <div className="pointer-events-none absolute inset-0 flex">
-        <div className="pointer-events-auto">
-          <SiteSidebar counts={counts} />
-        </div>
         <AnimatePresence mode="wait" initial={false}>
           {showPanel && (
             <motion.div
