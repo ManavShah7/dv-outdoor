@@ -1,6 +1,8 @@
 "use client";
 
-import { Search, FolderClosed, Wrench, BarChart3, Settings } from "lucide-react";
+import { Search, FolderClosed, Wrench, BarChart3, Settings, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -47,11 +49,21 @@ export function Sidebar({
   active,
   onNavigate,
   counts,
+  adminName,
 }: {
   active: NavId;
   onNavigate: (id: NavId) => void;
   counts: Counts;
+  adminName?: string;
 }) {
+  const router = useRouter();
+
+  async function signOut() {
+    await createClient().auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  }
+
   return (
     <aside className="flex h-full w-[328px] shrink-0 flex-col material-thick border-r border-white/[0.06]">
       {/* wordmark */}
@@ -121,6 +133,21 @@ export function Sidebar({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="shrink-0 border-t border-white/[0.07] px-6 py-4">
+        <button
+          onClick={signOut}
+          className="flex w-full items-center gap-3 rounded-[var(--radius-control)] px-4 py-2.5 text-left transition-colors hover:bg-white/[0.06]"
+        >
+          <LogOut className="size-[18px] shrink-0 text-ink-500" strokeWidth={2} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-footnote font-[590] text-ink-200">
+              {adminName ?? "Signed in"}
+            </span>
+            <span className="block text-caption text-ink-600">Sign out</span>
+          </span>
+        </button>
       </div>
     </aside>
   );

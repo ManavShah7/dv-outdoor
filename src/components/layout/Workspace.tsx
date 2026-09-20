@@ -15,6 +15,7 @@ import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
 import { BoardsView } from "@/components/boards/BoardsView";
 import { BoardCreate } from "@/components/boards/BoardCreate";
 import { AnalyticsView } from "@/components/analytics/AnalyticsView";
+import { TeamSettings } from "@/components/settings/TeamSettings";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { Toast } from "@/components/ui/Toast";
 import { ChatWidget } from "@/components/chat/ChatWidget";
@@ -40,7 +41,7 @@ function matches(b: Board, q: string, f: QuickFilter | null) {
 
 type Mode = "idle" | "managing" | "booking";
 
-export function Workspace() {
+export function Workspace({ adminName }: { adminName?: string }) {
   const [boards, setBoards] = useState<Board[]>(BOARDS);
   const [nav, setNav] = useState<NavId>("search");
   const [searchOpen, setSearchOpen] = useState(true);
@@ -183,7 +184,8 @@ export function Workspace() {
   const onMaintenance = nav === "maintenance";
   const onBoards = nav === "boards";
   const onAnalytics = nav === "analytics";
-  const fullScreen = onMaintenance || onBoards || onAnalytics;
+  const onSettings = nav === "settings";
+  const fullScreen = onMaintenance || onBoards || onAnalytics || onSettings;
 
   const existingCodes = useMemo(
     () => new Set(boards.map((b) => b.code.toUpperCase())),
@@ -223,6 +225,7 @@ export function Workspace() {
           if (id !== "boards") setCreating(false);
         }}
         counts={counts}
+        adminName={adminName}
       />
       </div>
 
@@ -299,6 +302,12 @@ export function Workspace() {
           )}
 
           <Toast message={toast} onDone={() => setToast(null)} />
+        </div>
+      )}
+
+      {onSettings && (
+        <div className="pointer-events-auto relative min-w-0 flex-1">
+          <TeamSettings meEmail={adminName ?? ""} />
         </div>
       )}
 

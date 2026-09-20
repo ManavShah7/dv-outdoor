@@ -16,10 +16,10 @@ const SEVERITIES: { id: Severity; label: string; help: string; color: string }[]
  * Deliberately oversized controls and one decision per screenful. This is used
  * one-handed, outdoors, in sunlight, by someone who does not use apps much.
  */
-export function FieldReport({ board }: { board: Board }) {
+export function FieldReport({ board, agentName }: { board: Board; agentName: string }) {
   const underMaintenance = board.status === "under_maintenance";
 
-  const [name, setName] = useState("");
+  const name = agentName;
   const [severity, setSeverity] = useState<Severity | null>(null);
   const [note, setNote] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -162,16 +162,10 @@ export function FieldReport({ board }: { board: Board }) {
         className="mt-4 w-full rounded-[var(--radius-card)] bg-chrome-raised p-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent"
       />
 
-      {/* who is reporting — replaces having an account */}
-      <div className="mt-4">
-        <label className="mb-2 block text-subhead text-ink-300">Your name</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Type your name"
-          className="h-[60px] w-full rounded-[var(--radius-card)] bg-chrome-raised px-5 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent"
-        />
-      </div>
+      {/* identity comes from the account, so there is nothing to type */}
+      <p className="mt-5 text-footnote text-ink-500">
+        Reporting as <span className="text-ink-200">{agentName}</span>
+      </p>
 
       <button
         disabled={!canSend}
