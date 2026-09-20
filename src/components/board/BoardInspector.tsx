@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ImageOff, X } from "lucide-react";
 import type { Board } from "@/lib/types";
@@ -134,12 +133,14 @@ export function BoardInspector({
 export function ManageMenu({
   board,
   onDismiss,
+  onBook,
+  onRequestMaintenance,
 }: {
   board: Board;
   onDismiss: () => void;
+  onBook: () => void;
+  onRequestMaintenance: () => void;
 }) {
-  const [note, setNote] = useState<string | null>(null);
-
   return (
     <AnimatePresence>
       <motion.div
@@ -162,17 +163,18 @@ export function ManageMenu({
 
         <div className="mt-5 flex flex-col gap-2.5">
           {board.status !== "booked" && (
-            <Button variant="primary" onClick={() => setNote("Booking flow comes next.")}>
+            <Button variant="primary" onClick={onBook}>
               Mark as booked
             </Button>
           )}
-          <Button onClick={() => setNote("Maintenance flow comes next.")}>
-            Request maintenance
-          </Button>
-          <Button onClick={() => setNote("Edit flow comes next.")}>Edit details</Button>
+          <Button onClick={onRequestMaintenance}>Request maintenance</Button>
         </div>
 
-        {note && <p className="mt-4 text-footnote text-ink-400">{note}</p>}
+        {board.status === "booked" && (
+          <p className="mt-4 text-footnote text-ink-500">
+            Already booked. End the current lease before rebooking.
+          </p>
+        )}
       </motion.div>
     </AnimatePresence>
   );
