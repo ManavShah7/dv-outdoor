@@ -15,7 +15,6 @@ import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
 import { BoardsView } from "@/components/boards/BoardsView";
 import { BoardCreate } from "@/components/boards/BoardCreate";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
-import { AccentSwitcher } from "@/components/ui/AccentSwitcher";
 import { Toast } from "@/components/ui/Toast";
 
 function matches(b: Board, q: string, f: QuickFilter | null) {
@@ -264,31 +263,13 @@ export function Workspace() {
         <div className="pointer-events-auto relative min-w-0 flex-1">
           <BoardsView
             boards={boards}
-            onOpen={(b) => setSelectedId(b.id)}
+            onOpen={(b) => {
+              setSelectedId(b.id);
+              setNav("search");
+              setSearchOpen(true);
+            }}
             onCreate={() => setCreating(true)}
           />
-
-          {selected && (
-            <>
-              <button
-                aria-label="Close board"
-                onClick={() => setSelectedId(null)}
-                className="absolute inset-0 z-20 bg-black/45"
-              />
-              <motion.div
-                initial={{ x: 32, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute inset-y-0 right-0 z-30 w-[427px] border-l border-white/[0.08] shadow-[var(--shadow-pop)]"
-              >
-                <BoardInspector
-                  board={selected}
-                  onClose={() => setSelectedId(null)}
-                  onManage={() => setMode("managing")}
-                />
-              </motion.div>
-            </>
-          )}
 
           {creating && (
             <BoardCreate
@@ -320,18 +301,6 @@ export function Workspace() {
           />
         )}
 
-
-        {/* Floating count chip — chrome over the map, so it earns a material. */}
-        <div className="pointer-events-none absolute left-6 top-6 z-10 rounded-[var(--radius-pill)] material-regular specular-edge px-4 py-2">
-          <span className="text-subhead font-[590] tabular-nums text-ink-0">
-            {filtered.length.toLocaleString("en-IN")}
-          </span>
-          <span className="ml-1.5 text-subhead text-ink-300">
-            {filtered.length === boards.length ? "boards" : `of ${boards.length}`}
-          </span>
-        </div>
-
-        <AccentSwitcher />
         <Toast message={toast} onDone={() => setToast(null)} />
       </div>
       </div>
