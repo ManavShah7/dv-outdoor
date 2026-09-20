@@ -14,6 +14,7 @@ import { MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
 import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
 import { BoardsView } from "@/components/boards/BoardsView";
 import { BoardCreate } from "@/components/boards/BoardCreate";
+import { AnalyticsView } from "@/components/analytics/AnalyticsView";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { Toast } from "@/components/ui/Toast";
 import { ChatWidget } from "@/components/chat/ChatWidget";
@@ -181,7 +182,8 @@ export function Workspace() {
 
   const onMaintenance = nav === "maintenance";
   const onBoards = nav === "boards";
-  const fullScreen = onMaintenance || onBoards;
+  const onAnalytics = nav === "analytics";
+  const fullScreen = onMaintenance || onBoards || onAnalytics;
 
   const existingCodes = useMemo(
     () => new Set(boards.map((b) => b.code.toUpperCase())),
@@ -297,6 +299,12 @@ export function Workspace() {
           )}
 
           <Toast message={toast} onDone={() => setToast(null)} />
+        </div>
+      )}
+
+      {onAnalytics && (
+        <div className="pointer-events-auto relative min-w-0 flex-1">
+          <AnalyticsView boards={boards} />
         </div>
       )}
 

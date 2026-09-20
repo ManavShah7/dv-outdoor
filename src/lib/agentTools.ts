@@ -1,6 +1,8 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { BOARDS } from "./mockBoards";
 import { MAINTENANCE } from "./mockMaintenance";
+import { COMPANY_PROFILES, CATEGORY_PROFILES, MONTH_NAMES } from "./analytics";
+import { CATEGORIES } from "./companies";
 import type { Board } from "./types";
 
 /**
@@ -90,6 +92,42 @@ export const TOOLS: Anthropic.Tool[] = [
         severity: { type: "string", enum: ["red", "orange", "yellow"] },
         limit: { type: "number" },
       },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_client_profile",
+    description:
+      "Everything known about one client: total bookings, boards held now and at peak, lifetime value, average rate and discount, average lease length, which calendar months they book in, year-on-year totals, favourite cities and areas, and their size/lighting preferences. Use the client's name, partial is fine.",
+    input_schema: {
+      type: "object",
+      properties: { company: { type: "string" } },
+      required: ["company"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "list_clients",
+    description:
+      "All clients ranked by lifetime value, optionally filtered to one category. Use for 'who are our biggest clients', 'which jewellery brands book with us'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        category: { type: "string", enum: CATEGORIES },
+        limit: { type: "number" },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_category_profile",
+    description:
+      "Rollup for an industry category: number of clients, bookings, lifetime value, boards held now, average rate, monthly seasonality and favourite areas. Omit `category` to get every category ranked by value.",
+    input_schema: {
+      type: "object",
+      properties: { category: { type: "string", enum: CATEGORIES } },
       required: [],
       additionalProperties: false,
     },
@@ -254,6 +292,49 @@ export function runTool(
           };
         });
       return { result: { open: rows.length, requests: rows } };
+    }
+
+    case "get_client_profile": {
+      const q = String(input.company ?? "").toLowerCase();
+      const p = COMPANY_PROFILES.find((x) => x.company.toLowerCase().includes(q));
+      if (!p) return { result: { error: `No client matching "${input.company}".` } };
+      return {
+        result: {
+          ...p,
+          monthlyBookings: Object.fromEntries(p.monthlyBookings.map((n, i) => [MONTH_NAMES[i], n])),
+        },
+      };
+    }
+
+    case "list_clients": {
+      const limit = Math.min(Number(input.limit ?? 15) || 15, 40);
+      const rows = COMPANY_PROFILES.filter((p) => !input.category || p.category === input.category)
+        .slice(0, limit)
+        .map((p) => ({
+          company: p.company,
+          category: p.category,
+          currentBoards: p.currentBoards,
+          totalBookings: p.totalBookings,
+          lifetimeValue: p.lifetimeValue,
+          currentMonthlyValue: p.currentMonthlyValue,
+          avgMonthlyRate: p.avgMonthlyRate,
+          topCity: p.topCities[0]?.label ?? null,
+        }));
+      return { result: { clients: rows, totalClients: COMPANY_PROFILES.length } };
+    }
+
+    case "get_category_profile": {
+      const wanted = input.category
+        ? CATEGORY_PROFILES.filter((c) => c.category === input.category)
+        : CATEGORY_PROFILES;
+      return {
+        result: {
+          categories: wanted.map((c) => ({
+            ...c,
+            monthlyBookings: Object.fromEntries(c.monthlyBookings.map((n, i) => [MONTH_NAMES[i], n])),
+          })),
+        },
+      };
     }
 
     case "book_board": {
