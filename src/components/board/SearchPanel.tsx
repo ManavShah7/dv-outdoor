@@ -3,7 +3,7 @@
 import { Search, X } from "lucide-react";
 import type { Board } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { statusMeta } from "@/components/ui/Primitives";
+import { BoardCard } from "@/components/boards/BoardCard";
 
 export type QuickFilter =
   | { kind: "status"; value: Board["status"] }
@@ -162,28 +162,13 @@ export function SearchPanel({
             <h2 className="text-caption2 uppercase text-ink-500">
               {results.length.toLocaleString("en-IN")} result{results.length === 1 ? "" : "s"}
             </h2>
-            <div className="mt-3 flex flex-col gap-1.5">
-              {results.slice(0, 200).map((b) => (
-                <button
-                  key={b.id}
-                  onClick={() => onSelect(b)}
-                  className="rounded-[var(--radius-control)] px-4 py-3 text-left transition-colors duration-150 hover:material-inset"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="size-[7px] shrink-0 rounded-full"
-                      style={{ background: statusMeta(b.status).color }}
-                    />
-                    <span className="truncate text-subhead font-[590] text-ink-0">{b.name}</span>
-                  </div>
-                  <div className="mt-0.5 truncate pl-[17px] text-footnote text-ink-400">
-                    {b.area}, {b.city} · {b.code}
-                  </div>
-                </button>
+            <div className="mt-3 flex flex-col gap-3">
+              {results.slice(0, 60).map((b) => (
+                <BoardCard key={b.id} board={b} onOpen={() => onSelect(b)} />
               ))}
-              {results.length > 200 && (
-                <p className="px-4 py-3 text-footnote text-ink-500">
-                  Showing first 200. Narrow the search to see more.
+              {results.length > 60 && (
+                <p className="px-1 py-2 text-footnote text-ink-500">
+                  Showing the first 60. Narrow the search to see more.
                 </p>
               )}
             </div>

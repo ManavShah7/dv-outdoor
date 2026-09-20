@@ -5,6 +5,7 @@ import { ImageOff, X } from "lucide-react";
 import type { Board } from "@/lib/types";
 import { inr, fullDate, daysUntil, cn } from "@/lib/utils";
 import { Button, Card, Field, SectionHeader, StatusLabel } from "@/components/ui/Primitives";
+import { BoardQr } from "@/components/boards/BoardQr";
 
 function Photo() {
   // Real listing photos land here. Until then, an honest empty state rather
@@ -111,6 +112,14 @@ export function BoardInspector({
             </span>
           </Field>
           <Field label="Asking rate" accent="money">{inr(board.askingRate)}</Field>
+        </Card>
+      </section>
+
+      {/* QR — the sticker that puts the field crew straight onto this board. */}
+      <section className="border-t border-white/[0.07] px-8 py-7">
+        <SectionHeader>Field QR</SectionHeader>
+        <Card className="mt-4">
+          <BoardQr board={board} />
         </Card>
       </section>
 

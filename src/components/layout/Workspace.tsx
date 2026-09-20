@@ -12,6 +12,8 @@ import { BookingFlow, type BookingDraft } from "@/components/board/BookingFlow";
 import { BoardMap } from "@/components/map/BoardMap";
 import { MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
 import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
+import { BoardsView } from "@/components/boards/BoardsView";
+import { BoardCreate } from "@/components/boards/BoardCreate";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { AccentSwitcher } from "@/components/ui/AccentSwitcher";
 import { Toast } from "@/components/ui/Toast";
@@ -42,6 +44,7 @@ export function Workspace() {
   const [searchOpen, setSearchOpen] = useState(true);
   const [requests, setRequests] = useState<MaintenanceRequest[]>(MAINTENANCE);
   const [openRequestId, setOpenRequestId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<QuickFilter | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -138,9 +141,16 @@ export function Workspace() {
   }
 
   const onMaintenance = nav === "maintenance";
+  const onBoards = nav === "boards";
+  const fullScreen = onMaintenance || onBoards;
+
+  const existingCodes = useMemo(
+    () => new Set(boards.map((b) => b.code.toUpperCase())),
+    [boards],
+  );
 
   const panel: "detail" | "search" | "booking" | null =
-    onMaintenance ? null
+    fullScreen ? null
     : mode === "booking" && selected ? "booking"
     : selected ? "detail"
     : nav === "search" && searchOpen ? "search"
@@ -169,6 +179,7 @@ export function Workspace() {
           setMode("idle");
           if (id === "search") setSearchOpen(true);
           if (id === "maintenance") setOpenRequestId(null);
+          if (id !== "boards") setCreating(false);
         }}
         counts={counts}
       />
@@ -249,7 +260,53 @@ export function Workspace() {
         </div>
       )}
 
-      <div className={cn("pointer-events-none relative min-w-0 flex-1", onMaintenance && "hidden")}>
+      {onBoards && (
+        <div className="pointer-events-auto relative min-w-0 flex-1">
+          <BoardsView
+            boards={boards}
+            onOpen={(b) => setSelectedId(b.id)}
+            onCreate={() => setCreating(true)}
+          />
+
+          {selected && (
+            <>
+              <button
+                aria-label="Close board"
+                onClick={() => setSelectedId(null)}
+                className="absolute inset-0 z-20 bg-black/45"
+              />
+              <motion.div
+                initial={{ x: 32, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute inset-y-0 right-0 z-30 w-[427px] border-l border-white/[0.08] shadow-[var(--shadow-pop)]"
+              >
+                <BoardInspector
+                  board={selected}
+                  onClose={() => setSelectedId(null)}
+                  onManage={() => setMode("managing")}
+                />
+              </motion.div>
+            </>
+          )}
+
+          {creating && (
+            <BoardCreate
+              existingCodes={existingCodes}
+              onCancel={() => setCreating(false)}
+              onCreate={(b) => {
+                setBoards((prev) => [b, ...prev]);
+                setCreating(false);
+                setToast(`${b.name} created — QR ready to print`);
+              }}
+            />
+          )}
+
+          <Toast message={toast} onDone={() => setToast(null)} />
+        </div>
+      )}
+
+      <div className={cn("pointer-events-none relative min-w-0 flex-1", fullScreen && "hidden")}>
         {mode === "managing" && selected && (
           <ManageMenu
             board={selected}
