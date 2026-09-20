@@ -157,6 +157,30 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ============================================================================
+   PUBLIC SITE — light surface. The admin tool stays dark; a marketing site and
+   an internal tool are different products with different jobs, and clients
+   expect a light page. Scoped to .site so nothing here reaches the admin.
+   ============================================================================ */
+.site {
+  --s-bg:        #ffffff;
+  --s-bg-soft:   #f5f6f7;
+  --s-bg-sunk:   #eceef0;
+  --s-text:      #0e1216;
+  --s-text-mid:  #4a535d;
+  --s-text-soft: #78828d;
+  --s-line:      #e3e6e9;
+  --s-line-soft: #eef0f2;
+  --s-accent:      #0a6ed1;
+  --s-accent-dark: #0857a6;
+  --s-accent-soft: #eaf2fd;
+  --s-good:      #14874a;
+
+  color-scheme: light;
+  background: var(--s-bg);
+  color: var(--s-text);
+}
+
 html { color-scheme: dark; }
 
 body {

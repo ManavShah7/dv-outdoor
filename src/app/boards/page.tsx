@@ -1,5 +1,5 @@
 import { PUBLIC_BOARDS, PUBLIC_CITIES } from "@/lib/publicBoards";
-import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
+import { SiteHeader } from "@/components/site/SiteChrome";
 import { InventoryBrowser } from "@/components/site/InventoryBrowser";
 
 export const metadata = {
@@ -14,7 +14,7 @@ export default async function PublicBoardsPage({
 }) {
   const { board, city } = await searchParams;
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="site">
       <SiteHeader />
       <InventoryBrowser
         boards={PUBLIC_BOARDS}
@@ -22,7 +22,6 @@ export default async function PublicBoardsPage({
         initialBoard={board ?? null}
         initialCity={city ?? null}
       />
-      <SiteFooter />
     </div>
   );
 }

@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import type { PublicBoard } from "@/lib/publicBoards";
-import { cn } from "@/lib/utils";
+
 
 function Input({ label, hint, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string }) {
   return (
     <label className="block min-w-0">
-      <span className="mb-1.5 block text-footnote text-ink-400">{label}</span>
+      <span className="mb-1.5 block text-[13px]" style={{ color: "var(--s-text-soft)" }}>{label}</span>
       <input
         {...props}
-        className="h-11 w-full min-w-0 rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+        className="h-11 w-full min-w-0 rounded-[10px] border px-4 text-[15px] outline-none"
+        style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", color: "var(--s-text)" }}
       />
-      {hint && <span className="mt-1.5 block text-caption text-ink-600">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-[12px]" style={{ color: "var(--s-text-soft)" }}>{hint}</span>}
     </label>
   );
 }
@@ -60,19 +61,20 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
       <div className="flex flex-col items-center py-10 text-center">
         <span
           className="grid size-14 place-items-center rounded-full"
-          style={{ background: "color-mix(in srgb, var(--color-available) 16%, transparent)" }}
+          style={{ background: "color-mix(in srgb, var(--s-good) 12%, transparent)" }}
         >
-          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--color-available)" }} />
+          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--s-good)" }} />
         </span>
-        <h3 className="mt-5 text-title2 font-[680] text-ink-0">Enquiry sent</h3>
-        <p className="mt-2.5 max-w-[34ch] text-body text-ink-300">
+        <h3 className="mt-5 text-[22px] font-[700] tracking-[-0.02em]" style={{ color: "var(--s-text)" }}>Enquiry sent</h3>
+        <p className="mt-2.5 max-w-[34ch] text-[15px] leading-relaxed" style={{ color: "var(--s-text-soft)" }}>
           We have your details for {board.code}. Someone from the office will call you
           today.
         </p>
         {onDone && (
           <button
             onClick={onDone}
-            className="mt-7 rounded-[var(--radius-pill)] px-6 py-3 text-subhead font-[590] text-ink-200 ring-1 ring-white/[0.12] ring-inset transition-colors hover:bg-white/[0.06]"
+            className="mt-7 rounded-full border px-6 py-3 text-[15px] font-[600]"
+            style={{ borderColor: "var(--s-line)", color: "var(--s-text-mid)" }}
           >
             Keep browsing
           </button>
@@ -93,14 +95,15 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
       <div className="grid gap-3 sm:grid-cols-2">
         <Input label="Wanted from" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-footnote text-ink-400">For how long</span>
+          <span className="mb-1.5 block text-[13px]" style={{ color: "var(--s-text-soft)" }}>For how long</span>
           <select
             value={months}
             onChange={(e) => setMonths(e.target.value)}
-            className="h-11 w-full min-w-0 appearance-none rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="h-11 w-full min-w-0 appearance-none rounded-[10px] border px-4 text-[15px] outline-none"
+            style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", color: "var(--s-text)" }}
           >
             {[1, 2, 3, 6, 12].map((m) => (
-              <option key={m} value={m} className="bg-ink-900">
+              <option key={m} value={m} className="">
                 {m} month{m > 1 ? "s" : ""}
               </option>
             ))}
@@ -109,31 +112,30 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
       </div>
 
       <label className="block">
-        <span className="mb-1.5 block text-footnote text-ink-400">Anything else</span>
+        <span className="mb-1.5 block text-[13px]" style={{ color: "var(--s-text-soft)" }}>Anything else</span>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={3}
           placeholder="Optional"
-          className="w-full rounded-[var(--radius-control)] bg-black/30 p-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+          className="w-full rounded-[10px] border p-4 text-[15px] outline-none"
+          style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", color: "var(--s-text)" }}
         />
       </label>
 
       {error && (
-        <p className="text-footnote" style={{ color: "var(--color-damaged)" }}>{error}</p>
+        <p className="text-[14px]" style={{ color: "#c62828" }}>{error}</p>
       )}
 
       <button
         type="submit"
         disabled={!valid || busy}
-        className={cn(
-          "h-12 w-full rounded-[var(--radius-control)] bg-accent text-body font-[620] text-accent-on",
-          "transition-opacity disabled:opacity-35",
-        )}
+        className="h-12 w-full rounded-full text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
+        style={{ background: "var(--s-accent)" }}
       >
         {busy ? "Sending…" : "Send enquiry"}
       </button>
-      <p className="text-caption text-ink-600">
+      <p className="text-[12px]" style={{ color: "var(--s-text-soft)" }}>
         No payment, no commitment — this just starts a conversation.
       </p>
     </form>

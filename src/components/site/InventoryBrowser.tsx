@@ -2,78 +2,72 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, ChevronsLeft, MapPin, Plus, Search, SlidersHorizontal, X } from "lucide-react";
 import type { PublicBoard } from "@/lib/publicBoards";
 import { cn, inr, fullDate } from "@/lib/utils";
+import { PublicMap } from "@/components/site/PublicMap";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 
-type Avail = "all" | "available" | "booked";
-type Size = "all" | "small" | "medium" | "large";
-type Light = "all" | "backlit" | "frontlit";
+type Size = "small" | "medium" | "large";
+type Light = "backlit" | "frontlit" | "none";
 
 function lightingLabel(l: PublicBoard["lighting"]) {
   return l === "backlit" ? "Back-lit" : l === "frontlit" ? "Front-lit" : "Non-lit";
 }
 
-function Chip({
-  on, children, ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { on: boolean }) {
+/* ---------------------------------------------------- collapsible section */
+function Section({
+  title, count, children, defaultOpen = false,
+}: {
+  title: string; count?: number; children: React.ReactNode; defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <button
-      {...props}
-      className={cn(
-        "h-9 shrink-0 rounded-[var(--radius-pill)] px-4 text-footnote font-[520] ring-1 ring-inset transition-colors",
-        on
-          ? "bg-accent text-accent-on ring-transparent"
-          : "bg-black/25 text-ink-200 ring-white/[0.1] hover:bg-white/[0.07]",
-      )}
-    >
-      {children}
-    </button>
+    <div className="border-b" style={{ borderColor: "var(--s-line-soft)" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2.5 py-4 text-left"
+      >
+        <span className="text-[16px] font-[600] tracking-[-0.01em]" style={{ color: "var(--s-text)" }}>
+          {title}
+        </span>
+        <ChevronDown
+          className={cn("size-4 transition-transform", open && "rotate-180")}
+          strokeWidth={2.2}
+          style={{ color: "var(--s-text-soft)" }}
+        />
+        {!!count && (
+          <span
+            className="ml-auto grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white"
+            style={{ background: "var(--s-good)" }}
+          >
+            {count}
+          </span>
+        )}
+      </button>
+      {open && <div className="pb-5">{children}</div>}
+    </div>
   );
 }
 
-function BoardTile({ b, onOpen }: { b: PublicBoard; onOpen: () => void }) {
-  const free = b.availability === "available";
+/* ------------------------------------------------------------ pill option */
+function Pill({
+  on, onClick, children,
+}: {
+  on: boolean; onClick: () => void; children: React.ReactNode;
+}) {
   return (
     <button
-      onClick={onOpen}
-      className="flex flex-col rounded-[var(--radius-card)] bg-chrome-raised p-5 text-left ring-1 ring-white/[0.07] ring-inset transition-colors hover:bg-white/[0.05]"
+      onClick={onClick}
+      className="inline-flex h-10 items-center gap-1.5 rounded-[10px] border px-3.5 text-[14px] font-[500] transition-colors"
+      style={
+        on
+          ? { background: "var(--s-good)", borderColor: "transparent", color: "#fff" }
+          : { background: "var(--s-bg)", borderColor: "var(--s-line)", color: "var(--s-text-soft)" }
+      }
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-caption text-ink-500">{b.code}</span>
-        <span
-          className="shrink-0 rounded-[var(--radius-pill)] px-2.5 py-1 text-caption font-[620]"
-          style={{
-            color: free ? "var(--color-available)" : "var(--color-booked)",
-            background: `color-mix(in srgb, ${free ? "var(--color-available)" : "var(--color-booked)"} 15%, transparent)`,
-          }}
-        >
-          {free ? "Available" : "Booked"}
-        </span>
-      </div>
-
-      <h3 className="mt-3.5 text-title3 font-[620] leading-tight text-ink-0">{b.name}</h3>
-      <p className="mt-1.5 flex items-start gap-1.5 text-footnote text-ink-400">
-        <MapPin className="mt-0.5 size-3.5 shrink-0 text-ink-600" strokeWidth={2} />
-        {b.area}, {b.city}
-      </p>
-
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-footnote text-ink-500">
-        <span className="capitalize">{b.sizeCategory}</span>
-        <span className="tabular-nums">{b.widthFt}×{b.heightFt} ft</span>
-        <span>{lightingLabel(b.lighting)}</span>
-      </div>
-
-      <div className="mt-4 flex items-baseline gap-2 border-t border-white/[0.07] pt-4">
-        <span className="text-body font-[620] tabular-nums text-ink-0">{inr(b.askingRate)}</span>
-        <span className="text-footnote text-ink-500">/ month</span>
-        {!free && b.freeFrom && (
-          <span className="ml-auto text-caption tabular-nums text-ink-500">
-            free {fullDate(b.freeFrom)}
-          </span>
-        )}
-      </div>
+      {children}
+      {on ? <X className="size-3.5" strokeWidth={2.6} /> : <Plus className="size-3.5" strokeWidth={2.4} />}
     </button>
   );
 }
@@ -87,243 +81,272 @@ export function InventoryBrowser({
   initialCity: string | null;
 }) {
   const [query, setQuery] = useState("");
-  const [city, setCity] = useState<string | null>(initialCity);
-  const [avail, setAvail] = useState<Avail>("all");
-  const [size, setSize] = useState<Size>("all");
-  const [light, setLight] = useState<Light>("all");
-  const [maxRate, setMaxRate] = useState<number | null>(null);
+  const [selectedCities, setSelectedCities] = useState<string[]>(initialCity ? [initialCity] : []);
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [sizes, setSizes] = useState<Size[]>([]);
+  const [lights, setLights] = useState<Light[]>([]);
+  const [maxRate, setMaxRate] = useState(150000);
+  const [panelOpen, setPanelOpen] = useState(true);
   const [open, setOpen] = useState<string | null>(initialBoard);
-  const [shown, setShown] = useState(24);
+
+  const toggle = <T,>(list: T[], v: T, set: (x: T[]) => void) =>
+    set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     return boards.filter((b) => {
-      if (city && b.city !== city) return false;
-      if (avail !== "all" && b.availability !== avail) return false;
-      if (size !== "all" && b.sizeCategory !== size) return false;
-      if (light !== "all" && b.lighting !== light) return false;
-      if (maxRate && b.askingRate > maxRate) return false;
+      if (selectedCities.length && !selectedCities.includes(b.city)) return false;
+      if (availableOnly && b.availability !== "available") return false;
+      if (sizes.length && !sizes.includes(b.sizeCategory as Size)) return false;
+      if (lights.length && !lights.includes(b.lighting as Light)) return false;
+      if (b.askingRate > maxRate) return false;
       if (!q) return true;
       return (
-        b.name.toLowerCase().includes(q) ||
-        b.area.toLowerCase().includes(q) ||
-        b.city.toLowerCase().includes(q) ||
-        b.address.toLowerCase().includes(q) ||
-        b.pincode.includes(q) ||
-        b.code.toLowerCase().includes(q)
+        b.name.toLowerCase().includes(q) || b.area.toLowerCase().includes(q) ||
+        b.city.toLowerCase().includes(q) || b.address.toLowerCase().includes(q) ||
+        b.pincode.includes(q) || b.code.toLowerCase().includes(q)
       );
     });
-  }, [boards, query, city, avail, size, light, maxRate]);
-
-  // Reset pagination when the filters change. Adjusting state during render
-  // off a changed signature is React's documented pattern for this — an effect
-  // would render the stale page count first, then immediately re-render.
-  const filterSig = `${query}|${city}|${avail}|${size}|${light}|${maxRate}`;
-  const [prevSig, setPrevSig] = useState(filterSig);
-  if (filterSig !== prevSig) {
-    setPrevSig(filterSig);
-    setShown(24);
-  }
+  }, [boards, query, selectedCities, availableOnly, sizes, lights, maxRate]);
 
   const board = open ? boards.find((b) => b.code === open) ?? null : null;
-  const active = [city, avail !== "all" ? avail : null, size !== "all" ? size : null,
-                  light !== "all" ? light : null, maxRate ? "price" : null].filter(Boolean).length;
+  const activeCount =
+    selectedCities.length + sizes.length + lights.length +
+    (availableOnly ? 1 : 0) + (maxRate < 150000 ? 1 : 0);
+
+  function clearAll() {
+    setSelectedCities([]); setAvailableOnly(false); setSizes([]); setLights([]); setMaxRate(150000);
+  }
 
   return (
-    <main className="flex-1 px-6 pb-20 pt-10">
-      <div className="mx-auto max-w-[1200px]">
-        <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-[680] tracking-[-0.03em] text-ink-0">
-          Our inventory
-        </h1>
-        <p className="mt-2 text-body text-ink-400">
-          {boards.length} sites across {cities.length} cities. Prices are per month, before
-          printing and mounting.
-        </p>
-
-        {/* search */}
-        <div className="relative mt-7">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-ink-500" strokeWidth={1.9} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Road, area, city or pincode"
-            className={cn(
-              "h-12 w-full rounded-[var(--radius-control)] bg-black/30 pl-11",
-              query ? "pr-11" : "pr-4",
-              "text-body text-ink-0 placeholder:text-ink-600",
-              "ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent",
-            )}
-          />
-          {query && (
-            <button
-              onClick={() => setQuery("")}
-              aria-label="Clear search"
-              className="absolute right-3 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-ink-300 hover:text-ink-0"
-            >
-              <X className="size-4" strokeWidth={2.4} />
-            </button>
-          )}
-        </div>
-
-        {/* filters */}
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Chip on={avail === "available"} onClick={() => setAvail(avail === "available" ? "all" : "available")}>
-            Available now
-          </Chip>
-          <Chip on={light === "backlit"} onClick={() => setLight(light === "backlit" ? "all" : "backlit")}>
-            Back-lit
-          </Chip>
-          <Chip on={size === "large"} onClick={() => setSize(size === "large" ? "all" : "large")}>
-            Large format
-          </Chip>
-          <Chip on={maxRate === 50000} onClick={() => setMaxRate(maxRate === 50000 ? null : 50000)}>
-            Under ₹50,000
-          </Chip>
-
-          <span className="mx-1 h-6 w-px bg-white/[0.1]" />
-
-          <div className="flex gap-2 overflow-x-auto">
-            {cities.map((c) => (
-              <Chip key={c} on={city === c} onClick={() => setCity(city === c ? null : c)}>
-                {c}
-              </Chip>
-            ))}
-          </div>
-
-          {active > 0 && (
-            <button
-              onClick={() => { setCity(null); setAvail("all"); setSize("all"); setLight("all"); setMaxRate(null); }}
-              className="ml-auto inline-flex items-center gap-1.5 text-footnote text-ink-500 transition-colors hover:text-ink-200"
-            >
-              <SlidersHorizontal className="size-3.5" strokeWidth={2} />
-              Clear {active} filter{active > 1 ? "s" : ""}
-            </button>
-          )}
-        </div>
-
-        <p className="mt-6 text-footnote tabular-nums text-ink-500">
-          {results.length.toLocaleString("en-IN")} site{results.length === 1 ? "" : "s"}
-        </p>
-
-        {results.length === 0 ? (
-          <p className="mt-16 text-center text-body text-ink-500">
-            Nothing matches that. Try a wider area or clear a filter.
-          </p>
-        ) : (
-          <>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {results.slice(0, shown).map((b) => (
-                <BoardTile key={b.code} b={b} onOpen={() => setOpen(b.code)} />
-              ))}
-            </div>
-            {results.length > shown && (
-              <div className="mt-10 text-center">
-                <button
-                  onClick={() => setShown((n) => n + 24)}
-                  className="rounded-[var(--radius-pill)] px-7 py-3 text-subhead font-[590] text-ink-200 ring-1 ring-white/[0.12] ring-inset transition-colors hover:bg-white/[0.06]"
-                >
-                  Show more ({results.length - shown} left)
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* detail + enquiry */}
-      <AnimatePresence>
-        {board && (
-          <>
-            <motion.button
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              aria-label="Close"
-              onClick={() => setOpen(null)}
-              className="fixed inset-0 z-40 bg-black/60"
-            />
+    <div className="site flex min-h-dvh flex-col">
+      <div className="flex min-h-0 flex-1">
+        {/* ------------------------------------------------- filter panel */}
+        <AnimatePresence initial={false}>
+          {panelOpen && (
             <motion.aside
-              initial={{ x: 40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 40, opacity: 0 }}
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 380, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-              className="fixed inset-y-0 right-0 z-50 w-full max-w-[460px] overflow-y-auto border-l border-white/[0.08] material-thick"
+              className="shrink-0 overflow-hidden border-r"
+              style={{ borderColor: "var(--s-line)", background: "var(--s-bg)" }}
             >
-              <div className="flex items-start justify-between gap-3 border-b border-white/[0.07] px-7 pb-6 pt-7">
-                <div className="min-w-0">
-                  <span className="font-mono text-caption text-ink-500">{board.code}</span>
-                  <h2 className="mt-1 text-title2 font-[680] leading-tight text-ink-0">{board.name}</h2>
-                  <p className="mt-2 text-subhead text-ink-300">{board.address}</p>
+              <div className="flex h-[calc(100dvh-68px)] w-[380px] flex-col">
+                {/* toolbar */}
+                <div className="flex items-center gap-2 border-b px-5 py-3.5" style={{ borderColor: "var(--s-line)" }}>
+                  <span
+                    className="inline-flex items-center gap-2 rounded-[10px] border px-3 py-2 text-[14px] font-[600]"
+                    style={{ borderColor: "var(--s-line)", color: "var(--s-text)" }}
+                  >
+                    <SlidersHorizontal className="size-4" strokeWidth={2.2} />
+                    Filters
+                    {activeCount > 0 && (
+                      <span
+                        className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white"
+                        style={{ background: "var(--s-good)" }}
+                      >
+                        {activeCount}
+                      </span>
+                    )}
+                  </span>
+                  {activeCount > 0 && (
+                    <button onClick={clearAll} className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>
+                      Clear
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setPanelOpen(false)}
+                    aria-label="Hide filters"
+                    className="ml-auto grid size-8 place-items-center rounded-[8px]"
+                    style={{ color: "var(--s-text-soft)" }}
+                  >
+                    <ChevronsLeft className="size-[18px]" strokeWidth={2.2} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setOpen(null)}
-                  aria-label="Close"
-                  className="grid size-8 shrink-0 place-items-center rounded-full bg-black/30 text-ink-400 hover:text-ink-0"
-                >
-                  <X className="size-4" strokeWidth={2.2} />
-                </button>
-              </div>
 
-              <div className="border-b border-white/[0.07] px-7 py-6">
-                <div className="grid grid-cols-2 gap-5">
+                <div className="min-h-0 flex-1 overflow-y-auto px-5">
+                  {/* search */}
+                  <div className="relative py-4">
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2" strokeWidth={2} style={{ color: "var(--s-text-soft)" }} />
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search for city or road"
+                      className="h-12 w-full rounded-[12px] border pl-11 pr-4 text-[15px] outline-none"
+                      style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", color: "var(--s-text)" }}
+                    />
+                  </div>
+
+                  <Section title="Regions" count={selectedCities.length} defaultOpen>
+                    <div className="flex flex-wrap gap-2">
+                      {cities.map((c) => (
+                        <Pill key={c} on={selectedCities.includes(c)} onClick={() => toggle(selectedCities, c, setSelectedCities)}>
+                          {c}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Section>
+
+                  <Section title="Availability" count={availableOnly ? 1 : 0} defaultOpen>
+                    <Pill on={availableOnly} onClick={() => setAvailableOnly((v) => !v)}>
+                      Free right now
+                    </Pill>
+                  </Section>
+
+                  <Section title="Budget" count={maxRate < 150000 ? 1 : 0} defaultOpen>
+                    <input
+                      type="range" min={10000} max={150000} step={5000}
+                      value={maxRate}
+                      onChange={(e) => setMaxRate(Number(e.target.value))}
+                      className="w-full accent-[var(--s-good)]"
+                    />
+                    <div className="mt-2 flex justify-between text-[14px]" style={{ color: "var(--s-text-soft)" }}>
+                      <span>₹10,000</span>
+                      <span className="font-[600]" style={{ color: "var(--s-text)" }}>
+                        up to {inr(maxRate)}
+                      </span>
+                    </div>
+                  </Section>
+
+                  <Section title="Size" count={sizes.length}>
+                    <div className="flex flex-wrap gap-2">
+                      {(["small", "medium", "large"] as Size[]).map((s) => (
+                        <Pill key={s} on={sizes.includes(s)} onClick={() => toggle(sizes, s, setSizes)}>
+                          <span className="capitalize">{s}</span>
+                        </Pill>
+                      ))}
+                    </div>
+                  </Section>
+
+                  <Section title="Lighting" count={lights.length}>
+                    <div className="flex flex-wrap gap-2">
+                      {(["backlit", "frontlit", "none"] as Light[]).map((l) => (
+                        <Pill key={l} on={lights.includes(l)} onClick={() => toggle(lights, l, setLights)}>
+                          {lightingLabel(l)}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Section>
+                </div>
+
+                {/* results */}
+                <div className="border-t px-5 py-3.5" style={{ borderColor: "var(--s-line)", background: "var(--s-bg-soft)" }}>
+                  <p className="text-[14px] font-[600] tabular-nums" style={{ color: "var(--s-text)" }}>
+                    {results.length.toLocaleString("en-IN")} site{results.length === 1 ? "" : "s"} match
+                  </p>
+                </div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
+
+        {/* ---------------------------------------------------------- map */}
+        <div className="relative min-w-0 flex-1">
+          <PublicMap boards={results} selected={open} onSelect={setOpen} />
+
+          {!panelOpen && (
+            <button
+              onClick={() => setPanelOpen(true)}
+              className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-[12px] border bg-white px-4 py-2.5 text-[14px] font-[600] shadow-sm"
+              style={{ borderColor: "var(--s-line)", color: "var(--s-text)" }}
+            >
+              <SlidersHorizontal className="size-4" strokeWidth={2.2} />
+              Filters
+              {activeCount > 0 && (
+                <span className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white" style={{ background: "var(--s-good)" }}>
+                  {activeCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* board detail sheet */}
+          <AnimatePresence>
+            {board && (
+              <motion.aside
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 30, opacity: 0 }}
+                transition={{ duration: 0.26, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute right-4 top-4 bottom-4 z-20 w-[400px] max-w-[calc(100%-2rem)] overflow-y-auto rounded-[18px] border bg-white shadow-[0_12px_48px_-16px_rgba(16,24,32,0.32)]"
+                style={{ borderColor: "var(--s-line)" }}
+              >
+                <div className="flex items-start justify-between gap-3 border-b px-6 pb-5 pt-6" style={{ borderColor: "var(--s-line-soft)" }}>
+                  <div className="min-w-0">
+                    <span className="font-mono text-[12px]" style={{ color: "var(--s-text-soft)" }}>{board.code}</span>
+                    <h2 className="mt-1 text-[22px] font-[700] leading-tight tracking-[-0.02em]" style={{ color: "var(--s-text)" }}>
+                      {board.name}
+                    </h2>
+                    <p className="mt-1.5 flex items-start gap-1.5 text-[14px]" style={{ color: "var(--s-text-soft)" }}>
+                      <MapPin className="mt-0.5 size-3.5 shrink-0" strokeWidth={2} />
+                      {board.address}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setOpen(null)}
+                    aria-label="Close"
+                    className="grid size-8 shrink-0 place-items-center rounded-full"
+                    style={{ background: "var(--s-bg-sunk)", color: "var(--s-text-mid)" }}
+                  >
+                    <X className="size-4" strokeWidth={2.2} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5 border-b px-6 py-5" style={{ borderColor: "var(--s-line-soft)" }}>
                   <div>
-                    <p className="text-footnote text-ink-500">Rate</p>
-                    <p className="mt-1 text-title3 font-[680] tabular-nums text-ink-0">
+                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Rate</p>
+                    <p className="mt-0.5 text-[20px] font-[700] tabular-nums" style={{ color: "var(--s-text)" }}>
                       {inr(board.askingRate)}
-                      <span className="ml-1 text-footnote font-normal text-ink-500">/mo</span>
+                      <span className="ml-1 text-[13px] font-[400]" style={{ color: "var(--s-text-soft)" }}>/mo</span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-footnote text-ink-500">Availability</p>
-                    <p
-                      className="mt-1 text-title3 font-[680]"
-                      style={{ color: board.availability === "available" ? "var(--color-available)" : "var(--color-booked)" }}
-                    >
+                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Availability</p>
+                    <p className="mt-0.5 text-[20px] font-[700]" style={{ color: board.availability === "available" ? "var(--s-good)" : "var(--s-text-mid)" }}>
                       {board.availability === "available" ? "Free now" : "Booked"}
                     </p>
                     {board.freeFrom && (
-                      <p className="text-caption tabular-nums text-ink-500">
+                      <p className="text-[12px] tabular-nums" style={{ color: "var(--s-text-soft)" }}>
                         opens {fullDate(board.freeFrom)}
                       </p>
                     )}
                   </div>
                   <div>
-                    <p className="text-footnote text-ink-500">Size</p>
-                    <p className="mt-1 text-subhead font-[590] tabular-nums text-ink-100">
+                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Size</p>
+                    <p className="mt-0.5 text-[15px] font-[600] tabular-nums" style={{ color: "var(--s-text)" }}>
                       {board.widthFt}×{board.heightFt} ft
-                      <span className="ml-1.5 text-footnote font-normal capitalize text-ink-500">
-                        {board.sizeCategory}
-                      </span>
+                      <span className="ml-1.5 text-[13px] font-[400] capitalize" style={{ color: "var(--s-text-soft)" }}>{board.sizeCategory}</span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-footnote text-ink-500">Lighting</p>
-                    <p className="mt-1 text-subhead font-[590] text-ink-100">{lightingLabel(board.lighting)}</p>
+                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Lighting</p>
+                    <p className="mt-0.5 text-[15px] font-[600]" style={{ color: "var(--s-text)" }}>{lightingLabel(board.lighting)}</p>
                   </div>
                 </div>
 
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${board.lat},${board.lng}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-5 inline-flex items-center gap-1.5 text-footnote font-[590] text-accent transition-opacity hover:opacity-80"
-                >
-                  <MapPin className="size-3.5" strokeWidth={2.2} />
-                  See it on Google Maps
-                </a>
-              </div>
+                <div className="px-6 py-5">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${board.lat},${board.lng}`}
+                    target="_blank" rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[14px] font-[600]"
+                    style={{ color: "var(--s-accent)" }}
+                  >
+                    <MapPin className="size-3.5" strokeWidth={2.2} /> See it on Google Maps
+                  </a>
 
-              <div className="px-7 py-6">
-                <h3 className="text-title3 font-[620] text-ink-0">Check availability</h3>
-                <p className="mt-1.5 text-footnote text-ink-400">
-                  Send your details and we&rsquo;ll confirm dates and pricing.
-                </p>
-                <div className="mt-5">
-                  <EnquiryForm board={board} onDone={() => setOpen(null)} />
+                  <h3 className="mt-6 text-[17px] font-[650] tracking-[-0.01em]" style={{ color: "var(--s-text)" }}>
+                    Check availability
+                  </h3>
+                  <div className="mt-4">
+                    <EnquiryForm board={board} onDone={() => setOpen(null)} />
+                  </div>
                 </div>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-    </main>
+              </motion.aside>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
   );
 }
