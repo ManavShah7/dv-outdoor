@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ImageOff, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import type { Board } from "@/lib/types";
 import type { MaintenanceRequest, Severity } from "@/lib/mockMaintenance";
 import { cn, inr } from "@/lib/utils";
@@ -60,20 +60,27 @@ function RequestCard({
   const status = STATUS_LABEL[board.status];
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
-      <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
-        <ImageOff className="size-6 text-ink-600" strokeWidth={1.5} />
-        {request.wasRentedAtReport && (
+      {/* Severity edge instead of an empty photo well. Swap this for the real
+          listing photo once boards have images. */}
+      <div
+        className="h-1 w-full shrink-0"
+        style={{ background: SEV[request.aiSeverity].color }}
+      />
+      <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] px-4 py-2.5">
+        {request.wasRentedAtReport ? (
           <span
-            className="absolute left-3 top-3 rounded-[var(--radius-pill)] px-2 py-1 text-caption font-[620] tabular-nums"
+            className="rounded-[var(--radius-pill)] px-2 py-0.5 text-caption font-[620] tabular-nums"
             style={{
               color: SEV[request.aiSeverity].color,
-              background: `color-mix(in srgb, ${SEV[request.aiSeverity].color} 18%, #0b0e10 82%)`,
+              background: `color-mix(in srgb, ${SEV[request.aiSeverity].color} 16%, transparent)`,
             }}
           >
-            {inr(request.revenueAtRisk)}/day
+            {inr(request.revenueAtRisk)}/day at risk
           </span>
+        ) : (
+          <span className="text-caption text-ink-600">Vacant board</span>
         )}
-        <span className="absolute right-3 top-3 text-caption tabular-nums text-ink-400">
+        <span className="shrink-0 text-caption tabular-nums text-ink-500">
           {timeAgo(request.reportedAt)}
         </span>
       </div>

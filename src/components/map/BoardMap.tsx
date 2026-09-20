@@ -14,6 +14,9 @@ const SAURASHTRA = { lat: 21.98, lng: 70.55 };
    individual pins above it. Two mechanisms, one handoff. */
 const CITY_ZOOM_MAX = 9.2;
 
+/** Left padding the initial fit reserves — the sidebar only. */
+const FIT_LEFT = 352;
+
 const STATUS_COLOR: Record<Board["status"], string> = {
   available: "#30d158",
   booked: "#0a84ff",
@@ -147,6 +150,9 @@ function Layers({
   const map = useMap();
   const [zoom, setZoom] = useState(8.4);
   const fitted = useRef(false);
+  // Seeded to the fit's own left padding, not the mount-time inset, so if a
+  // panel is already open at mount the offset gets applied once too.
+  const lastInset = useRef(insetLeft);
 
   useEffect(() => {
     if (!map) return;
@@ -161,8 +167,25 @@ function Layers({
     fitted.current = true;
     const b = new google.maps.LatLngBounds();
     for (const board of boards) b.extend({ lat: board.lat, lng: board.lng });
-    map.fitBounds(b, { top: 72, right: 72, bottom: 96, left: insetLeft });
-  }, [map, boards, insetLeft]);
+    // Only the sidebar is permanent; the inspector/search panel comes and goes,
+    // so reserving its width here would permanently under-zoom the map.
+    // Left padding covers the sidebar only. The search/inspector panel is
+    // transient, so reserving its width here would permanently under-zoom the
+    // map; the toggle effect below shifts the view when it opens instead.
+    map.fitBounds(b, { top: 56, right: 56, bottom: 72, left: FIT_LEFT });
+  }, [map, boards]);
+
+  // Opening or closing a panel covers or frees part of the canvas. Shift the
+  // view by half the change so whatever you were looking at stays visible
+  // instead of sliding under the panel.
+  useEffect(() => {
+    if (!map || !fitted.current) return;
+    const delta = insetLeft - lastInset.current;
+    lastInset.current = insetLeft;
+    if (delta === 0) return;
+    const l = google.maps.event.addListenerOnce(map, "idle", () => map.panBy(delta / 2, 0));
+    return () => google.maps.event.removeListener(l);
+  }, [map, insetLeft]);
 
   // Selecting a board should take you there — otherwise the inspector and the
   // map are describing two different places.

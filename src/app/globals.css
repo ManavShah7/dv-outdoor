@@ -169,6 +169,14 @@ body {
 
 ::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
 
+/* The browser default outline is close to invisible on these dark surfaces.
+   Keyboard users get an explicit accent ring; pointer users see nothing. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-control);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Search, X } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, Search, X } from "lucide-react";
 import {
   COMPANY_PROFILES, CATEGORY_PROFILES, portfolioTotals,
   type CompanyProfile, type CategoryProfile,
@@ -13,6 +13,21 @@ import { cn, inr, fullDate } from "@/lib/utils";
 import { MonthBars, RankedBars, Stat, money } from "@/components/analytics/Charts";
 
 type Tab = "clients" | "categories";
+type SortKey = "company" | "category" | "currentBoards" | "totalBookings"
+  | "distinctBoards" | "peakConcurrentBoards" | "avgDurationMonths"
+  | "avgMonthlyRate" | "lifetimeValue";
+
+const COLUMNS: { key: SortKey; label: string; numeric: boolean }[] = [
+  { key: "company",              label: "Client",   numeric: false },
+  { key: "category",             label: "Category", numeric: false },
+  { key: "currentBoards",        label: "Now",      numeric: true },
+  { key: "totalBookings",        label: "Bookings", numeric: true },
+  { key: "distinctBoards",       label: "Boards",   numeric: true },
+  { key: "peakConcurrentBoards", label: "Peak",     numeric: true },
+  { key: "avgDurationMonths",    label: "Lease",    numeric: true },
+  { key: "avgMonthlyRate",       label: "Rate",     numeric: true },
+  { key: "lifetimeValue",        label: "Lifetime", numeric: true },
+];
 
 /* --------------------------------------------------------------- detail */
 function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void }) {
@@ -183,12 +198,19 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [openCompany, setOpenCompany] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortKey>("lifetimeValue");
+  const [dir, setDir] = useState<"asc" | "desc">("desc");
+
+  function toggleSort(k: SortKey) {
+    if (k === sort) setDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSort(k); setDir(k === "company" || k === "category" ? "asc" : "desc"); }
+  }
 
   const totals = useMemo(() => portfolioTotals(boards), [boards]);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return COMPANY_PROFILES.filter((p) => {
+    const out = COMPANY_PROFILES.filter((p) => {
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -196,7 +218,15 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
         (p.category?.toLowerCase().includes(q) ?? false)
       );
     });
-  }, [query, category]);
+    const sign = dir === "asc" ? 1 : -1;
+    return [...out].sort((a, b) => {
+      const av = a[sort], bv = b[sort];
+      if (typeof av === "string" || typeof bv === "string") {
+        return sign * String(av ?? "").localeCompare(String(bv ?? ""));
+      }
+      return sign * (Number(av ?? 0) - Number(bv ?? 0));
+    });
+  }, [query, category, sort, dir]);
 
   const open = openCompany
     ? COMPANY_PROFILES.find((p) => p.company === openCompany) ?? null
@@ -285,17 +315,32 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
                 <table className="w-full border-separate border-spacing-0">
                   <thead>
                     <tr>
-                      {["Client", "Category", "Now", "Bookings", "Boards", "Peak", "Avg lease", "Avg rate", "Lifetime"].map((h, i) => (
-                        <th
-                          key={h}
-                          className={cn(
-                            "sticky top-0 bg-chrome px-4 py-3 text-caption2 uppercase text-ink-500",
-                            i < 2 ? "text-left" : "text-right",
-                          )}
-                        >
-                          {h}
-                        </th>
-                      ))}
+                      {COLUMNS.map((c) => {
+                        const active = sort === c.key;
+                        return (
+                          <th
+                            key={c.key}
+                            className={cn(
+                              "sticky top-0 whitespace-nowrap bg-chrome px-4 py-3",
+                              c.numeric ? "text-right" : "text-left",
+                            )}
+                          >
+                            <button
+                              onClick={() => toggleSort(c.key)}
+                              className={cn(
+                                "inline-flex items-center gap-1.5 text-caption2 uppercase transition-colors",
+                                active ? "text-ink-100" : "text-ink-500 hover:text-ink-200",
+                              )}
+                            >
+                              {c.label}
+                              <ArrowUpDown
+                                className={cn("size-3", active ? "opacity-100" : "opacity-35")}
+                                strokeWidth={2.2}
+                              />
+                            </button>
+                          </th>
+                        );
+                      })}
                     </tr>
                   </thead>
                   <tbody>

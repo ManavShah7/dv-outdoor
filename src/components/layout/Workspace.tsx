@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Board } from "@/lib/types";
 import { BOARDS } from "@/lib/mockBoards";
@@ -53,6 +53,21 @@ export function Workspace({ adminName }: { adminName?: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [toast, setToast] = useState<string | null>(null);
+
+  // Escape backs out of whatever is open, innermost first. Without this the
+  // only way out of a panel is finding its close button.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      if (creating) setCreating(false);
+      else if (mode !== "idle") setMode("idle");
+      else if (openRequestId) setOpenRequestId(null);
+      else if (selectedId) setSelectedId(null);
+      else if (nav === "search" && searchOpen) setSearchOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [creating, mode, openRequestId, selectedId, nav, searchOpen]);
 
   const selected = useMemo(
     () => boards.find((b) => b.id === selectedId) ?? null,

@@ -23,27 +23,12 @@ type Counts = {
   underMaintenance: number;
 };
 
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color?: string;
-}) {
-  return (
-    <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
-      <div className="text-subhead text-ink-300">{label}</div>
-      <div
-        className="mt-1 text-display font-[680] tabular-nums"
-        style={{ color: color ?? "var(--color-ink-0)" }}
-      >
-        {value.toLocaleString("en-IN")}
-      </div>
-    </div>
-  );
-}
+const BREAKDOWN = [
+  { key: "booked" as const,           label: "Booked",      color: "var(--color-booked)" },
+  { key: "available" as const,        label: "Available",   color: "var(--color-available)" },
+  { key: "damaged" as const,          label: "Damaged",     color: "var(--color-damaged)" },
+  { key: "underMaintenance" as const, label: "Maintenance", color: "var(--color-maintenance)" },
+];
 
 export function Sidebar({
   active,
@@ -104,33 +89,24 @@ export function Sidebar({
         })}
       </nav>
 
-      {/* live counts */}
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-6">
-        <StatCard label="Total Boards"     value={counts.total} />
-        <StatCard label="Booked Boards"    value={counts.booked}    color="var(--color-booked)" />
-        <StatCard label="Available Boards" value={counts.available} color="var(--color-available)" />
+      {/* live counts — one block, always fully visible */}
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+        <div className="rounded-[var(--radius-card)] material-inset p-5 ring-1 ring-white/[0.07] ring-inset">
+          <div className="text-caption2 uppercase text-ink-500">Total boards</div>
+          <div className="mt-1 text-display font-[680] tabular-nums text-ink-0">
+            {counts.total.toLocaleString("en-IN")}
+          </div>
 
-        <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
-          <div className="text-subhead text-ink-300">Maintenance</div>
-          <div className="mt-3 flex gap-8">
-            <div>
-              <div className="text-footnote text-ink-400">Damaged</div>
-              <div
-                className="text-title1 font-[680] tabular-nums"
-                style={{ color: "var(--color-damaged)" }}
-              >
-                {counts.damaged}
+          <div className="mt-4 flex flex-col gap-2.5 border-t border-white/[0.07] pt-4">
+            {BREAKDOWN.map((b) => (
+              <div key={b.key} className="flex items-center gap-2.5">
+                <span className="size-2 shrink-0 rounded-full" style={{ background: b.color }} />
+                <span className="flex-1 text-footnote text-ink-300">{b.label}</span>
+                <span className="text-footnote font-[620] tabular-nums" style={{ color: b.color }}>
+                  {counts[b.key]}
+                </span>
               </div>
-            </div>
-            <div>
-              <div className="text-footnote text-ink-400">Under maintenance</div>
-              <div
-                className="text-title1 font-[680] tabular-nums"
-                style={{ color: "var(--color-maintenance)" }}
-              >
-                {counts.underMaintenance}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

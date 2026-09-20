@@ -1,6 +1,5 @@
 "use client";
 
-import { ImageOff } from "lucide-react";
 import type { Board } from "@/lib/types";
 import { inr, fullDate } from "@/lib/utils";
 import { statusMeta } from "@/components/ui/Primitives";
@@ -16,12 +15,12 @@ export function BoardCard({ board, onOpen }: { board: Board; onOpen: () => void 
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
-      <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
-        <ImageOff className="size-6 text-ink-600" strokeWidth={1.5} />
-        <span className="absolute left-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 font-mono text-caption tabular-nums text-ink-200">
-          {board.code}
-        </span>
-        <span className="absolute right-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 text-caption font-[620] tabular-nums text-ink-100">
+      {/* Status edge rather than an empty photo well — boards have no images
+          yet, and a 16:10 placeholder made the card 40% dead space. */}
+      <div className="h-1 w-full shrink-0" style={{ background: m.color }} />
+      <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] px-4 py-2.5">
+        <span className="font-mono text-caption tabular-nums text-ink-400">{board.code}</span>
+        <span className="text-caption font-[620] tabular-nums text-ink-100">
           {inr(board.askingRate)}
         </span>
       </div>
