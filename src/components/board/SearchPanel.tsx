@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import type { Board } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { statusMeta } from "@/components/ui/Primitives";
@@ -28,27 +28,52 @@ function sameFilter(a: QuickFilter | null, b: QuickFilter) {
   return !!a && a.kind === b.kind && a.value === b.value;
 }
 
+/** Human-readable name for an applied filter, used on the removable chip. */
+function filterLabel(f: QuickFilter) {
+  if (f.kind === "city") return f.value;
+  if (f.kind === "lighting") return f.value === "backlit" ? "Back lit" : "Front lit";
+  return {
+    available: "Available",
+    booked: "Booked",
+    damaged: "Damaged",
+    under_maintenance: "Under maintenance",
+  }[f.value];
+}
+
 export function SearchPanel({
   query,
   onQuery,
   active,
   onToggle,
+  onClearFilter,
   results,
   onSelect,
+  onClose,
 }: {
   query: string;
   onQuery: (q: string) => void;
   active: QuickFilter | null;
   onToggle: (f: QuickFilter) => void;
+  onClearFilter: () => void;
   results: Board[];
   onSelect: (b: Board) => void;
+  onClose: () => void;
 }) {
   const searching = query.trim().length > 0 || active !== null;
 
   return (
     <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden bg-chrome">
       <div className="px-8 pb-6 pt-8">
-        <h1 className="text-title2 font-[680] text-ink-0">Search</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-title2 font-[680] text-ink-0">Search</h1>
+          <button
+            onClick={onClose}
+            aria-label="Close search"
+            className="grid size-8 place-items-center rounded-full bg-chrome-raised text-ink-400 transition-colors hover:text-ink-0"
+          >
+            <X className="size-4" strokeWidth={2.2} />
+          </button>
+        </div>
         <div className="relative mt-4">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-ink-500" strokeWidth={1.9} />
           <input
@@ -56,13 +81,55 @@ export function SearchPanel({
             onChange={(e) => onQuery(e.target.value)}
             placeholder="Road, area, city or pincode"
             className={cn(
-              "h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised pl-11 pr-4",
+              "h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised pl-11",
+              query ? "pr-11" : "pr-4",
               "text-body text-ink-0 placeholder:text-ink-500",
               "ring-1 ring-chrome-line/70 ring-inset outline-none",
               "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
             )}
           />
+          {query && (
+            <button
+              onClick={() => onQuery("")}
+              aria-label="Clear search text"
+              className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-ink-700 text-ink-300 transition-colors hover:text-ink-0"
+            >
+              <X className="size-3.5" strokeWidth={2.4} />
+            </button>
+          )}
         </div>
+
+        {/* What is actually applied right now, and how to undo it. */}
+        {searching && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {active && (
+              <button
+                onClick={onClearFilter}
+                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-accent/15 py-1.5 pl-3 pr-2 text-footnote font-[590] text-accent ring-1 ring-accent/30 ring-inset transition-colors hover:bg-accent/25"
+              >
+                {filterLabel(active)}
+                <X className="size-3.5 opacity-70 group-hover:opacity-100" strokeWidth={2.6} />
+              </button>
+            )}
+            {query.trim() && (
+              <button
+                onClick={() => onQuery("")}
+                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-chrome-raised py-1.5 pl-3 pr-2 text-footnote font-[590] text-ink-200 ring-1 ring-chrome-line ring-inset transition-colors hover:bg-chrome-line"
+              >
+                &ldquo;{query.trim()}&rdquo;
+                <X className="size-3.5 opacity-70 group-hover:opacity-100" strokeWidth={2.6} />
+              </button>
+            )}
+            {active && query.trim() && (
+              <button
+                onClick={() => { onClearFilter(); onQuery(""); }}
+                className="text-footnote text-ink-500 underline-offset-2 hover:text-ink-200 hover:underline"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-8">

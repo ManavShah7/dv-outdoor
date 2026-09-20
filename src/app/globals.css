@@ -53,6 +53,12 @@
   --color-damaged:     #ff453a;
   --color-retired:     #8e8e93;
 
+  /* Field-reported urgency buckets. Distinct from board status: a board can be
+     booked AND carry a red maintenance flag at the same time. */
+  --color-sev-red:    #ff453a;
+  --color-sev-orange: #ff9f0a;
+  --color-sev-yellow: #ffd60a;
+
   /* ---- MOTION — two curves, three durations. ------------------------- */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-spring:    cubic-bezier(0.32, 0.72, 0, 1);

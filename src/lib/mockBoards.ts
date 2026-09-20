@@ -106,7 +106,11 @@ export function generateBoards(): Board[] {
         askingRate,
       };
 
-      if (status === "booked") {
+      const carriesRental =
+        status === "booked" ||
+        ((status === "damaged" || status === "under_maintenance") && r() < 0.62);
+
+      if (carriesRental) {
         const start = new Date(2026, Math.floor(r() * 9), Math.floor(r() * 27) + 1);
         const months = pick(r, [1, 1, 2, 3, 3, 6, 12]);
         const end = new Date(start);
@@ -120,7 +124,9 @@ export function generateBoards(): Board[] {
           contactPerson: pick(r, ["Manav Shah", "Rakesh Patel", "Nilesh Joshi", "Priya Mehta", "Asif Qureshi"]),
           phone: `+91 ${pick(r, [6, 7, 8, 9])}${String(Math.floor(r() * 1e9)).padStart(9, "0")}`,
         };
-      } else if (status === "available") {
+      }
+
+      if (status === "available") {
         const since = new Date(2026, Math.floor(r() * 9), Math.floor(r() * 27) + 1);
         board.availableSince = isoDate(since);
       }

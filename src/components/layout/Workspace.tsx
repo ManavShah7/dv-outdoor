@@ -9,6 +9,8 @@ import { SearchPanel, type QuickFilter } from "@/components/board/SearchPanel";
 import { BoardInspector, ManageMenu } from "@/components/board/BoardInspector";
 import { BookingFlow, type BookingDraft } from "@/components/board/BookingFlow";
 import { BoardMap } from "@/components/map/BoardMap";
+import { MaintenanceList, MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
+import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { AccentSwitcher } from "@/components/ui/AccentSwitcher";
 import { Toast } from "@/components/ui/Toast";
 
@@ -35,6 +37,10 @@ type Mode = "idle" | "managing" | "booking";
 export function Workspace() {
   const [boards, setBoards] = useState<Board[]>(BOARDS);
   const [nav, setNav] = useState<NavId>("search");
+  const [searchOpen, setSearchOpen] = useState(true);
+  const [maintOpen, setMaintOpen] = useState(true);
+  const [requests, setRequests] = useState<MaintenanceRequest[]>(MAINTENANCE);
+  const [openRequestId, setOpenRequestId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<QuickFilter | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -100,10 +106,44 @@ export function Workspace() {
     setToast(`${selected.name} booked to ${d.company.trim()}`);
   }
 
-  const panel: "detail" | "search" | "booking" | null =
+  const openRequest = useMemo(
+    () => requests.find((r) => r.id === openRequestId) ?? null,
+    [requests, openRequestId],
+  );
+
+  function openMaintenance(r: MaintenanceRequest) {
+    setOpenRequestId(r.id);
+    const b = boards.find((x) => x.id === r.boardId);
+    if (b) setSelectedId(b.id);   // fly the map to the board in question
+  }
+
+  function rateAssessment(v: "up" | "down") {
+    if (!openRequest) return;
+    setRequests((prev) =>
+      prev.map((r) => (r.id === openRequest.id ? { ...r, adminFeedback: v } : r)),
+    );
+  }
+
+  function startWork() {
+    if (!openRequest) return;
+    setRequests((prev) =>
+      prev.map((r) => (r.id === openRequest.id ? { ...r, status: "in_progress" } : r)),
+    );
+    setBoards((prev) =>
+      prev.map((b) =>
+        b.id === openRequest.boardId ? { ...b, status: "under_maintenance" } : b,
+      ),
+    );
+    const b = boards.find((x) => x.id === openRequest.boardId);
+    setToast(`${b?.name ?? "Board"} set to under maintenance`);
+  }
+
+  const panel: "detail" | "search" | "booking" | "maint-list" | "maint-detail" | null =
     mode === "booking" && selected ? "booking"
+    : nav === "maintenance" && maintOpen && openRequest ? "maint-detail"
+    : nav === "maintenance" && maintOpen ? "maint-list"
     : selected ? "detail"
-    : nav === "search" ? "search"
+    : nav === "search" && searchOpen ? "search"
     : null;
 
   return (
@@ -114,6 +154,13 @@ export function Workspace() {
           setNav(id);
           setSelectedId(null);
           setMode("idle");
+          if (id === "search") setSearchOpen(true);
+          if (id === "maintenance") {
+            setMaintOpen(true);
+            setOpenRequestId(null);
+            setFilter(null);   // the queue has its own ordering; a stale search
+            setQuery("");      // filter would hide the very board you open
+          }
         }}
         counts={counts}
       />
@@ -128,7 +175,22 @@ export function Workspace() {
             transition={{ duration: 0.34, ease: [0.32, 0.72, 0, 1] }}
             className="h-full shrink-0 overflow-hidden border-l border-chrome-line/60"
           >
-            {panel === "booking" && selected ? (
+            {panel === "maint-list" ? (
+              <MaintenanceList
+                requests={requests}
+                boards={boards}
+                onSelect={openMaintenance}
+                onClose={() => setMaintOpen(false)}
+              />
+            ) : panel === "maint-detail" && openRequest ? (
+              <MaintenanceDetail
+                request={openRequest}
+                board={boards.find((b) => b.id === openRequest.boardId)}
+                onBack={() => { setOpenRequestId(null); setSelectedId(null); }}
+                onFeedback={rateAssessment}
+                onStartWork={startWork}
+              />
+            ) : panel === "booking" && selected ? (
               <BookingFlow
                 board={selected}
                 companies={companies}
@@ -151,8 +213,10 @@ export function Workspace() {
                     cur && cur.kind === f.kind && cur.value === f.value ? null : f,
                   )
                 }
+                onClearFilter={() => setFilter(null)}
                 results={filtered}
                 onSelect={selectBoard}
+                onClose={() => setSearchOpen(false)}
               />
             )}
           </motion.div>
@@ -169,7 +233,9 @@ export function Workspace() {
             onBook={() => setMode("booking")}
             onRequestMaintenance={() => {
               setMode("idle");
-              setToast("Maintenance triage comes next.");
+              setNav("maintenance");
+              setMaintOpen(true);
+              setOpenRequestId(null);
             }}
           />
         )}
