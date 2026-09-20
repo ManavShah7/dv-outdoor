@@ -1,0 +1,127 @@
+"use client";
+
+import { Search, FolderClosed, Wrench, BarChart3, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const NAV = [
+  { id: "search",      label: "Search",      icon: Search },
+  { id: "boards",      label: "Boards",      icon: FolderClosed },
+  { id: "maintenance", label: "Maintenance", icon: Wrench },
+  { id: "analytics",   label: "Analytics",   icon: BarChart3 },
+  { id: "settings",    label: "Settings",    icon: Settings },
+] as const;
+
+export type NavId = (typeof NAV)[number]["id"];
+
+type Counts = {
+  total: number;
+  booked: number;
+  available: number;
+  damaged: number;
+  underMaintenance: number;
+};
+
+function StatCard({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color?: string;
+}) {
+  return (
+    <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-chrome-line/70 ring-inset">
+      <div className="text-subhead text-ink-300">{label}</div>
+      <div
+        className="mt-1 text-display font-[680] tabular-nums"
+        style={{ color: color ?? "var(--color-ink-0)" }}
+      >
+        {value.toLocaleString("en-IN")}
+      </div>
+    </div>
+  );
+}
+
+export function Sidebar({
+  active,
+  onNavigate,
+  counts,
+}: {
+  active: NavId;
+  onNavigate: (id: NavId) => void;
+  counts: Counts;
+}) {
+  return (
+    <aside className="flex h-full w-[328px] shrink-0 flex-col bg-chrome">
+      {/* wordmark */}
+      <div className="flex h-[108px] items-center border-b border-chrome-line/60 px-10">
+        <span className="text-title3 font-[680] tracking-[-0.02em] text-ink-0">
+          DV Outdoor
+        </span>
+      </div>
+
+      {/* navigation */}
+      <nav className="border-b border-chrome-line/60 py-4">
+        {NAV.map(({ id, label, icon: Icon }) => {
+          const isActive = active === id;
+          return (
+            <button
+              key={id}
+              onClick={() => onNavigate(id)}
+              className={cn(
+                "group relative flex h-[52px] w-full items-center gap-[22px] px-10 text-left",
+                "transition-colors duration-150",
+                isActive ? "text-ink-0" : "text-ink-300 hover:text-ink-0",
+              )}
+            >
+              {isActive && (
+                <span
+                  className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full"
+                  style={{ background: "var(--accent)" }}
+                />
+              )}
+              <Icon
+                className="size-[22px] shrink-0"
+                strokeWidth={isActive ? 2.1 : 1.8}
+                style={isActive ? { color: "var(--accent)" } : undefined}
+              />
+              <span className="text-body font-[520]">{label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* live counts */}
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-6">
+        <StatCard label="Total Boards"     value={counts.total} />
+        <StatCard label="Booked Boards"    value={counts.booked}    color="var(--color-booked)" />
+        <StatCard label="Available Boards" value={counts.available} color="var(--color-available)" />
+
+        <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-chrome-line/70 ring-inset">
+          <div className="text-subhead text-ink-300">Maintenance</div>
+          <div className="mt-3 flex gap-8">
+            <div>
+              <div className="text-footnote text-ink-400">Damaged</div>
+              <div
+                className="text-title1 font-[680] tabular-nums"
+                style={{ color: "var(--color-damaged)" }}
+              >
+                {counts.damaged}
+              </div>
+            </div>
+            <div>
+              <div className="text-footnote text-ink-400">Under maintenance</div>
+              <div
+                className="text-title1 font-[680] tabular-nums"
+                style={{ color: "var(--color-maintenance)" }}
+              >
+                {counts.underMaintenance}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
