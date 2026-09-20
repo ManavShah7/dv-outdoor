@@ -74,25 +74,25 @@
   --accent:        #0a84ff;
   --accent-hover:  #3b9bff;
   --accent-on:     #ffffff;
-  --chrome:        #15181c;   /* sidebar / inspector base */
-  --chrome-raised: #1d2126;   /* nested cards inside chrome */
-  --chrome-line:   #2b3036;
+  --chrome:        #0e1013;   /* sidebar / inspector base */
+  --chrome-raised: #16191d;   /* nested cards inside chrome */
+  --chrome-line:   #23272c;
 }
 [data-accent="teal"] {
   --accent:        #17a8a4;
   --accent-hover:  #1cc3be;
   --accent-on:     #04211f;
-  --chrome:        #0e1817;
-  --chrome-raised: #162220;
-  --chrome-line:   #22302e;
+  --chrome:        #08100f;
+  --chrome-raised: #101a19;
+  --chrome-line:   #1b2725;
 }
 [data-accent="ember"] {
   --accent:        #ff8a3d;
   --accent-hover:  #ffa163;
   --accent-on:     #231206;
-  --chrome:        #1a1613;
-  --chrome-raised: #241f1a;
-  --chrome-line:   #322a24;
+  --chrome:        #120f0c;
+  --chrome-raised: #1b1713;
+  --chrome-line:   #292320;
 }
 
 @theme inline {
@@ -131,7 +131,7 @@
   backdrop-filter: blur(20px) saturate(190%);
 }
 .material-regular {
-  background-color: color-mix(in srgb, var(--chrome) 80%, transparent);
+  background-color: color-mix(in srgb, var(--chrome) 88%, transparent);
   -webkit-backdrop-filter: blur(24px) saturate(190%);
   backdrop-filter: blur(24px) saturate(190%);
 }
@@ -140,14 +140,14 @@
    through. High opacity with heavy saturation is what produces that: the tint
    bleeds, the detail does not. */
 .material-thick {
-  background-color: color-mix(in srgb, var(--chrome) 91%, transparent);
+  background-color: color-mix(in srgb, var(--chrome) 96%, transparent);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   backdrop-filter: blur(28px) saturate(200%);
 }
 /* Cards nested inside a material panel — translucent against their parent so
    the layering stays legible instead of flattening into one slab. */
 .material-inset {
-  background-color: color-mix(in srgb, var(--chrome-raised) 55%, transparent);
+  background-color: color-mix(in srgb, var(--chrome-raised) 72%, transparent);
 }
 
 /* Google injects its own span for marker labels; force it onto our stack. */

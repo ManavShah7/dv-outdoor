@@ -4,15 +4,16 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Board } from "@/lib/types";
 import { BOARDS } from "@/lib/mockBoards";
+import { cn } from "@/lib/utils";
 import { Sidebar, type NavId } from "@/components/layout/Sidebar";
 import { SearchPanel, type QuickFilter } from "@/components/board/SearchPanel";
 import { BoardInspector, ManageMenu } from "@/components/board/BoardInspector";
 import { BookingFlow, type BookingDraft } from "@/components/board/BookingFlow";
 import { BoardMap } from "@/components/map/BoardMap";
-import { MaintenanceList, MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
+import { MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
+import { MaintenanceView } from "@/components/maintenance/MaintenanceView";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { AccentSwitcher } from "@/components/ui/AccentSwitcher";
-import { MapLegend } from "@/components/map/MapLegend";
 import { Toast } from "@/components/ui/Toast";
 
 function matches(b: Board, q: string, f: QuickFilter | null) {
@@ -39,7 +40,6 @@ export function Workspace() {
   const [boards, setBoards] = useState<Board[]>(BOARDS);
   const [nav, setNav] = useState<NavId>("search");
   const [searchOpen, setSearchOpen] = useState(true);
-  const [maintOpen, setMaintOpen] = useState(true);
   const [requests, setRequests] = useState<MaintenanceRequest[]>(MAINTENANCE);
   const [openRequestId, setOpenRequestId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -114,8 +114,6 @@ export function Workspace() {
 
   function openMaintenance(r: MaintenanceRequest) {
     setOpenRequestId(r.id);
-    const b = boards.find((x) => x.id === r.boardId);
-    if (b) setSelectedId(b.id);   // fly the map to the board in question
   }
 
   function rateAssessment(v: "up" | "down") {
@@ -139,10 +137,11 @@ export function Workspace() {
     setToast(`${b?.name ?? "Board"} set to under maintenance`);
   }
 
-  const panel: "detail" | "search" | "booking" | "maint-list" | "maint-detail" | null =
-    mode === "booking" && selected ? "booking"
-    : nav === "maintenance" && maintOpen && openRequest ? "maint-detail"
-    : nav === "maintenance" && maintOpen ? "maint-list"
+  const onMaintenance = nav === "maintenance";
+
+  const panel: "detail" | "search" | "booking" | null =
+    onMaintenance ? null
+    : mode === "booking" && selected ? "booking"
     : selected ? "detail"
     : nav === "search" && searchOpen ? "search"
     : null;
@@ -169,12 +168,7 @@ export function Workspace() {
           setSelectedId(null);
           setMode("idle");
           if (id === "search") setSearchOpen(true);
-          if (id === "maintenance") {
-            setMaintOpen(true);
-            setOpenRequestId(null);
-            setFilter(null);   // the queue has its own ordering; a stale search
-            setQuery("");      // filter would hide the very board you open
-          }
+          if (id === "maintenance") setOpenRequestId(null);
         }}
         counts={counts}
       />
@@ -190,22 +184,7 @@ export function Workspace() {
             transition={{ duration: 0.34, ease: [0.32, 0.72, 0, 1] }}
             className="pointer-events-auto h-full shrink-0 overflow-hidden"
           >
-            {panel === "maint-list" ? (
-              <MaintenanceList
-                requests={requests}
-                boards={boards}
-                onSelect={openMaintenance}
-                onClose={() => setMaintOpen(false)}
-              />
-            ) : panel === "maint-detail" && openRequest ? (
-              <MaintenanceDetail
-                request={openRequest}
-                board={boards.find((b) => b.id === openRequest.boardId)}
-                onBack={() => { setOpenRequestId(null); setSelectedId(null); }}
-                onFeedback={rateAssessment}
-                onStartWork={startWork}
-              />
-            ) : panel === "booking" && selected ? (
+            {panel === "booking" && selected ? (
               <BookingFlow
                 board={selected}
                 companies={companies}
@@ -238,7 +217,39 @@ export function Workspace() {
         )}
       </AnimatePresence>
 
-      <div className="pointer-events-none relative min-w-0 flex-1">
+      {onMaintenance && (
+        <div className="pointer-events-auto relative min-w-0 flex-1">
+          <MaintenanceView requests={requests} boards={boards} onOpen={openMaintenance} />
+
+          {openRequest && (
+            <>
+              <button
+                aria-label="Close details"
+                onClick={() => setOpenRequestId(null)}
+                className="absolute inset-0 z-20 bg-black/45"
+              />
+              <motion.div
+                initial={{ x: 32, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute inset-y-0 right-0 z-30 w-[480px] border-l border-white/[0.08] shadow-[var(--shadow-pop)]"
+              >
+                <MaintenanceDetail
+                  request={openRequest}
+                  board={boards.find((b) => b.id === openRequest.boardId)}
+                  onBack={() => setOpenRequestId(null)}
+                  onFeedback={rateAssessment}
+                  onStartWork={startWork}
+                />
+              </motion.div>
+            </>
+          )}
+
+          <Toast message={toast} onDone={() => setToast(null)} />
+        </div>
+      )}
+
+      <div className={cn("pointer-events-none relative min-w-0 flex-1", onMaintenance && "hidden")}>
         {mode === "managing" && selected && (
           <ManageMenu
             board={selected}
@@ -247,7 +258,6 @@ export function Workspace() {
             onRequestMaintenance={() => {
               setMode("idle");
               setNav("maintenance");
-              setMaintOpen(true);
               setOpenRequestId(null);
             }}
           />
@@ -264,7 +274,6 @@ export function Workspace() {
           </span>
         </div>
 
-        <MapLegend />
         <AccentSwitcher />
         <Toast message={toast} onDone={() => setToast(null)} />
       </div>

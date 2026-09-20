@@ -46,7 +46,7 @@ function rng(seed: number) {
 const ORDER: Record<Severity, number> = { yellow: 0, orange: 1, red: 2 };
 const FROM_ORDER: Severity[] = ["yellow", "orange", "red"];
 /** Prose labels — the raw enum should never reach the reasoning text. */
-const SEV_WORD: Record<Severity, string> = { red: "urgent", orange: "soon", yellow: "low" };
+const SEV_WORD: Record<Severity, string> = { red: "high urgency", orange: "urgent", yellow: "low priority" };
 
 function monthlyRate(b: Board) {
   return b.rental?.rate ?? b.askingRate;

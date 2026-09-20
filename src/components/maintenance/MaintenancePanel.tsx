@@ -1,19 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
-import { X, ThumbsUp, ThumbsDown, ArrowLeft, TriangleAlert } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ArrowLeft, TriangleAlert } from "lucide-react";
 import type { Board } from "@/lib/types";
+import { SEV } from "@/components/maintenance/MaintenanceView";
 import type { MaintenanceRequest, Severity } from "@/lib/mockMaintenance";
 import { cn, inr } from "@/lib/utils";
 import { Button, Card, Field, SectionHeader } from "@/components/ui/Primitives";
-
-export const SEV: Record<Severity, { label: string; color: string; blurb: string }> = {
-  red:    { label: "Urgent",   color: "var(--color-sev-red)",    blurb: "Fix today" },
-  orange: { label: "Soon",     color: "var(--color-sev-orange)", blurb: "Within the week" },
-  yellow: { label: "Low",      color: "var(--color-sev-yellow)", blurb: "Next scheduled visit" },
-};
-
-const ORDER: Severity[] = ["red", "orange", "yellow"];
 
 function timeAgo(iso: string) {
   const h = Math.round((Date.now() - new Date(iso).getTime()) / 3_600_000);
@@ -37,113 +29,6 @@ function SeverityChip({ s, small }: { s: Severity; small?: boolean }) {
   );
 }
 
-/* ------------------------------------------------------------------- list */
-export function MaintenanceList({
-  requests,
-  boards,
-  onSelect,
-  onClose,
-}: {
-  requests: MaintenanceRequest[];
-  boards: Board[];
-  onSelect: (r: MaintenanceRequest) => void;
-  onClose: () => void;
-}) {
-  const boardById = useMemo(
-    () => new Map(boards.map((b) => [b.id, b])),
-    [boards],
-  );
-
-  const grouped = useMemo(() => {
-    const open = requests.filter((r) => r.status !== "resolved");
-    return ORDER.map((sev) => ({
-      sev,
-      items: open
-        .filter((r) => r.aiSeverity === sev)
-        .sort((a, b) => b.aiUrgencyScore - a.aiUrgencyScore),
-    }));
-  }, [requests]);
-
-  const totalOpen = grouped.reduce((n, g) => n + g.items.length, 0);
-
-  return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden material-thick border-r border-white/[0.06]">
-      <div className="px-8 pb-5 pt-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-title2 font-[680] text-ink-0">Maintenance</h1>
-          <button
-            onClick={onClose}
-            aria-label="Close maintenance"
-            className="grid size-8 place-items-center rounded-full material-inset text-ink-400 transition-colors hover:text-ink-0"
-          >
-            <X className="size-4" strokeWidth={2.2} />
-          </button>
-        </div>
-        <p className="mt-2 text-subhead text-ink-400">
-          {totalOpen} open {totalOpen === 1 ? "request" : "requests"}
-        </p>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-8">
-        {grouped.map(({ sev, items }) => (
-          <section key={sev} className="mb-7 last:mb-0">
-            <div className="mb-3 flex items-baseline justify-between">
-              <div className="flex items-center gap-2">
-                <span className="size-2 rounded-full" style={{ background: SEV[sev].color }} />
-                <h2 className="text-caption2 uppercase text-ink-300">{SEV[sev].label}</h2>
-                <span className="text-caption2 text-ink-500">{SEV[sev].blurb}</span>
-              </div>
-              <span className="text-footnote tabular-nums text-ink-500">{items.length}</span>
-            </div>
-
-            {items.length === 0 ? (
-              <p className="rounded-[var(--radius-card)] material-inset/50 px-4 py-3 text-footnote text-ink-500">
-                Nothing in this bucket.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-1.5">
-                {items.map((r) => {
-                  const b = boardById.get(r.boardId);
-                  const disagrees = r.aiSeverity !== r.reporterSeverity;
-                  return (
-                    <button
-                      key={r.id}
-                      onClick={() => onSelect(r)}
-                      className="rounded-[var(--radius-card)] material-inset px-4 py-3.5 text-left ring-1 ring-white/[0.06] ring-inset transition-colors hover:bg-white/[0.07]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="truncate text-subhead font-[590] text-ink-0">
-                          {b?.name ?? "Unknown board"}
-                        </span>
-                        <span className="shrink-0 text-caption tabular-nums text-ink-500">
-                          {timeAgo(r.reportedAt)}
-                        </span>
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-footnote text-ink-400">{r.description}</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        {r.wasRentedAtReport && (
-                          <span className="text-caption font-[590] tabular-nums" style={{ color: SEV[sev].color }}>
-                            {inr(r.revenueAtRisk)}/day at risk
-                          </span>
-                        )}
-                        {disagrees && (
-                          <span className="text-caption text-ink-500">
-                            re-rated from {SEV[r.reporterSeverity].label.toLowerCase()}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ----------------------------------------------------------------- detail */
 export function MaintenanceDetail({
   request,
@@ -161,7 +46,7 @@ export function MaintenanceDetail({
   const disagrees = request.aiSeverity !== request.reporterSeverity;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
+    <div className="flex h-full w-full flex-col overflow-y-auto material-thick">
       <div className="flex items-start gap-2 border-b border-white/[0.07] px-8 pb-6 pt-8">
         <button
           onClick={onBack}
