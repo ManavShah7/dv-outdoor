@@ -157,6 +157,59 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ============================================================================
+   PUBLIC SITE — light. Scoped to .site so the admin tool is untouched.
+   ============================================================================ */
+.site {
+  --w-bg:        #ffffff;
+  --w-soft:      #f7f8f9;
+  --w-sunk:      #eef0f2;
+  --w-line:      #e4e7ea;
+  --w-hair:      #f0f2f4;
+  --w-text:      #0d1114;
+  --w-mid:       #454e57;
+  --w-soft-text: #767f89;
+  --w-faint:     #9aa3ac;
+  --w-accent:    #0a66d0;
+  --w-accent-2:  #0854ad;
+  --w-tint:      #eef4fd;
+  --w-free:      #12784a;
+  --w-free-tint: #e8f5ee;
+  --w-warn:      #b4451c;
+
+  color-scheme: light;
+  background: var(--w-bg);
+  color: var(--w-text);
+  font-feature-settings: "cv11";
+}
+
+.site ::selection { background: color-mix(in srgb, var(--w-accent) 22%, transparent); }
+
+/* one card treatment, used everywhere on the site */
+.w-card {
+  background: var(--w-bg);
+  border: 1px solid var(--w-line);
+  border-radius: 14px;
+}
+.w-field {
+  height: 46px;
+  width: 100%;
+  min-width: 0;
+  border-radius: 10px;
+  border: 1px solid var(--w-line);
+  background: var(--w-bg);
+  color: var(--w-text);
+  padding: 0 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.w-field::placeholder { color: var(--w-faint); }
+.w-field:focus {
+  border-color: var(--w-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-accent) 14%, transparent);
+}
+
 html { color-scheme: dark; }
 
 body {

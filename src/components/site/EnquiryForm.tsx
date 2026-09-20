@@ -3,13 +3,10 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import type { PublicBoard } from "@/lib/publicBoards";
-
-const FIELD =
-  "h-11 w-full min-w-0 rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 " +
-  "placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent";
+import { parseDateOnly } from "@/lib/utils";
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <span className="mb-1.5 block text-footnote text-ink-400">{children}</span>;
+  return <span className="mb-1.5 block text-[13px]" style={{ color: "var(--w-soft-text)" }}>{children}</span>;
 }
 
 export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: () => void }) {
@@ -17,17 +14,24 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
   const [contactPerson, setContactPerson] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [months, setMonths] = useState("3");
+  const [from, setFrom] = useState("");
+  const [till, setTill] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
+  const days =
+    from && till
+      ? Math.round((parseDateOnly(till).getTime() - parseDateOnly(from).getTime()) / 86_400_000) + 1
+      : null;
+  const datesOk = !from || !till || (days !== null && days > 0);
+
   const valid =
     companyName.trim().length >= 2 &&
     contactPerson.trim().length >= 2 &&
-    phone.replace(/\D/g, "").length >= 8;
+    phone.replace(/\D/g, "").length >= 8 &&
+    datesOk;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,8 +42,8 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         boardCode: board.code, companyName, contactPerson, phone, email, message,
-        startDate: startDate || null,
-        durationDays: Number(months) ? Number(months) * 30 : null,
+        startDate: from || null,
+        durationDays: days,
       }),
     });
     const d = await res.json();
@@ -50,21 +54,22 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
 
   if (sent) {
     return (
-      <div className="flex flex-col items-center py-10 text-center">
+      <div className="py-8 text-center">
         <span
-          className="grid size-14 place-items-center rounded-full"
-          style={{ background: "color-mix(in srgb, var(--color-available) 15%, transparent)" }}
+          className="mx-auto grid size-12 place-items-center rounded-full"
+          style={{ background: "var(--w-free-tint)" }}
         >
-          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--color-available)" }} />
+          <Check className="size-6" strokeWidth={2.6} style={{ color: "var(--w-free)" }} />
         </span>
-        <h3 className="mt-5 text-title2 font-[680] text-ink-0">Enquiry sent</h3>
-        <p className="mt-2.5 max-w-[34ch] text-subhead leading-relaxed text-ink-400">
-          We have your details for {board.code}. Someone from the office will call you today.
+        <h3 className="mt-4 text-[19px] font-[650]" style={{ color: "var(--w-text)" }}>Enquiry sent</h3>
+        <p className="mt-1.5 text-[14px]" style={{ color: "var(--w-soft-text)" }}>
+          We&rsquo;ll call you about {board.code}.
         </p>
         {onDone && (
           <button
             onClick={onDone}
-            className="mt-7 rounded-[var(--radius-pill)] px-6 py-3 text-subhead font-[590] text-ink-200 ring-1 ring-inset ring-white/[0.12] transition-colors hover:bg-white/[0.06]"
+            className="mt-5 rounded-full border px-5 py-2.5 text-[14px] font-[600]"
+            style={{ borderColor: "var(--w-line)", color: "var(--w-mid)" }}
           >
             Keep browsing
           </button>
@@ -77,67 +82,62 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
     <form onSubmit={submit} className="flex flex-col gap-4">
       <label className="block">
         <Label>Company</Label>
-        <input className={FIELD} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Your company" />
+        <input className="w-field" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
       </label>
+
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block min-w-0">
           <Label>Your name</Label>
-          <input className={FIELD} value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} placeholder="Full name" />
+          <input className="w-field" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} />
         </label>
         <label className="block min-w-0">
           <Label>Phone</Label>
-          <input className={FIELD} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 …" />
+          <input className="w-field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91" />
         </label>
       </div>
+
       <label className="block">
-        <Label>Email</Label>
-        <input className={FIELD} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Optional" />
+        <Label>Email <span style={{ color: "var(--w-faint)" }}>(optional)</span></Label>
+        <input className="w-field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <label className="block min-w-0">
-          <Label>Wanted from</Label>
-          <input className={FIELD} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <Label>From</Label>
+          <input className="w-field" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         </label>
         <label className="block min-w-0">
-          <Label>For how long</Label>
-          <select
-            value={months}
-            onChange={(e) => setMonths(e.target.value)}
-            className={FIELD + " appearance-none"}
-          >
-            {[1, 2, 3, 6, 12].map((m) => (
-              <option key={m} value={m} className="bg-ink-900 text-ink-0">
-                {m} month{m > 1 ? "s" : ""}
-              </option>
-            ))}
-          </select>
+          <Label>Till</Label>
+          <input className="w-field" type="date" value={till} onChange={(e) => setTill(e.target.value)} />
         </label>
       </div>
+      {from && till && (
+        <p className="-mt-2 text-[13px]" style={{ color: datesOk ? "var(--w-soft-text)" : "var(--w-warn)" }}>
+          {datesOk ? `${days} days` : "Till must come after From"}
+        </p>
+      )}
 
       <label className="block">
-        <Label>Anything else</Label>
+        <Label>Message <span style={{ color: "var(--w-faint)" }}>(optional)</span></Label>
         <textarea
           rows={3}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Optional"
-          className="w-full rounded-[var(--radius-control)] bg-black/30 p-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+          className="w-field"
+          style={{ height: "auto", padding: "12px 14px" }}
         />
       </label>
 
-      {error && <p className="text-footnote" style={{ color: "var(--color-damaged)" }}>{error}</p>}
+      {error && <p className="text-[14px]" style={{ color: "var(--w-warn)" }}>{error}</p>}
 
       <button
         type="submit"
         disabled={!valid || busy}
-        className="h-12 w-full rounded-[var(--radius-pill)] bg-accent text-body font-[620] text-accent-on transition-opacity disabled:opacity-35"
+        className="h-12 w-full rounded-full text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
+        style={{ background: "var(--w-accent)" }}
       >
         {busy ? "Sending…" : "Send enquiry"}
       </button>
-      <p className="text-caption text-ink-600">
-        No payment, no commitment — this just starts a conversation.
-      </p>
     </form>
   );
 }

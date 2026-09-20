@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, ImageOff, Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronsLeft, Plus, Search, SlidersHorizontal, X } from "lucide-react";
 import type { PublicBoard } from "@/lib/publicBoards";
 import { cn, inr, fullDate } from "@/lib/utils";
 import { PublicMap } from "@/components/site/PublicMap";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
-import { StreetView } from "@/components/map/StreetView";
+import { BoardVisual } from "@/components/site/BoardVisual";
 import { MapsProvider } from "@/components/map/MapsProvider";
 
 type Size = "small" | "medium" | "large";
@@ -27,10 +27,11 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-white/[0.06]">
+    <div className="border-b" style={{ borderColor: "var(--w-hair)" }}>
       <button onClick={() => setOpen((v) => !v)} className="flex w-full items-center gap-2.5 py-4 text-left">
-        <span className="text-body font-[620] text-ink-0">{title}</span>
-        <ChevronDown className={cn("size-4 text-ink-500 transition-transform", open && "rotate-180")} strokeWidth={2.2} />
+        <span className="text-[16px] font-[650]" style={{ color: "var(--w-text)" }}>{title}</span>
+        <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")}
+          style={{ color: "var(--w-faint)" }} strokeWidth={2.2} />
         {!!count && (
           <span className="ml-auto grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
             {count}
@@ -46,11 +47,12 @@ function Pill({ on, onClick, children }: { on: boolean; onClick: () => void; chi
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-control)] px-3.5 text-footnote font-[520]",
-        "ring-1 ring-inset transition-colors",
-        on ? "bg-accent text-accent-on ring-transparent" : "bg-black/25 text-ink-300 ring-white/[0.08] hover:bg-white/[0.07]",
-      )}
+      className="inline-flex h-10 items-center gap-1.5 rounded-[10px] border px-3.5 text-[14px] font-[500] transition-colors"
+      style={
+        on
+          ? { background: "var(--w-accent)", borderColor: "transparent", color: "#fff" }
+          : { background: "var(--w-bg)", borderColor: "var(--w-line)", color: "var(--w-mid)" }
+      }
     >
       {children}
       {on ? <X className="size-3.5" strokeWidth={2.6} /> : <Plus className="size-3.5" strokeWidth={2.4} />}
@@ -60,100 +62,64 @@ function Pill({ on, onClick, children }: { on: boolean; onClick: () => void; chi
 
 /* ------------------------------------------------------------ board panel */
 function BoardPanel({ board, onBack }: { board: PublicBoard; onBack: () => void }) {
-  const [view, setView] = useState<"photo" | "street">("street");
   const free = board.availability === "available";
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto material-thick border-r border-white/[0.07]">
-      {/* visual */}
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
-        {view === "street" ? (
-          <StreetView lat={board.lat} lng={board.lng} className="absolute inset-0" />
-        ) : (
-          <div className="grid size-full place-items-center bg-black/30">
-            <ImageOff className="size-7 text-ink-600" strokeWidth={1.5} />
-          </div>
-        )}
-
-        <div className="absolute left-3 top-3 z-10 flex gap-1 rounded-[var(--radius-pill)] material-thick p-1">
-          {(["street", "photo"] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={cn(
-                "rounded-[var(--radius-pill)] px-3 py-1.5 text-caption font-[590] capitalize transition-colors",
-                view === v ? "bg-white/15 text-ink-0" : "text-ink-400 hover:text-ink-100",
-              )}
-            >
-              {v === "street" ? "Street view" : "Photo"}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={onBack}
-          aria-label="Back to filters"
-          className="absolute right-3 top-3 z-10 grid size-8 place-items-center rounded-full material-thick text-ink-200 transition-colors hover:text-ink-0"
-        >
-          <X className="size-4" strokeWidth={2.2} />
-        </button>
-      </div>
+    <div className="flex h-full w-full flex-col overflow-y-auto border-r" style={{ background: "var(--w-bg)", borderColor: "var(--w-line)" }}>
+      <BoardVisual lat={board.lat} lng={board.lng} />
 
       {/* identity */}
-      <div className="border-b border-white/[0.07] px-8 py-6">
+      <div className="border-b px-8 py-6" style={{ borderColor: "var(--w-hair)" }}>
         <div className="flex items-center justify-between gap-3">
           <button onClick={onBack} className="inline-flex items-center gap-1.5 text-footnote text-ink-500 hover:text-ink-200">
             <ArrowLeft className="size-3.5" strokeWidth={2.2} /> All billboards
           </button>
-          <span className="font-mono text-caption text-ink-500">{board.code}</span>
+          <span className="font-mono text-[12px]" style={{ color: "var(--w-faint)" }}>{board.code}</span>
         </div>
-        <h1 className="mt-3 text-title2 font-[680] text-ink-0">{board.name}</h1>
-        <p className="mt-2 text-body text-ink-300">{board.address}</p>
-        <p className="mt-3 text-footnote tabular-nums text-ink-500">
+        <h1 className="mt-3 text-[24px] font-[700] tracking-[-0.02em]" style={{ color: "var(--w-text)" }}>{board.name}</h1>
+        <p className="mt-2 text-[15px]" style={{ color: "var(--w-mid)" }}>{board.address}</p>
+        <p className="mt-2 text-[13px] tabular-nums" style={{ color: "var(--w-faint)" }}>
           {board.lat.toFixed(6)}, {board.lng.toFixed(6)}
         </p>
       </div>
 
       {/* facts */}
-      <div className="grid grid-cols-2 gap-5 border-b border-white/[0.07] px-8 py-6">
+      <div className="grid grid-cols-2 gap-5 border-b px-8 py-6" style={{ borderColor: "var(--w-hair)" }}>
         <div>
-          <p className="text-footnote text-ink-400">Rate</p>
-          <p className="mt-1 text-title3 font-[680] tabular-nums text-ink-0">
+          <p className="text-[13px]" style={{ color: "var(--w-soft-text)" }}>Rate</p>
+          <p className="mt-1 text-[21px] font-[700] tabular-nums" style={{ color: "var(--w-text)" }}>
             {inr(board.askingRate)}
-            <span className="ml-1 text-footnote font-normal text-ink-500">/mo</span>
+            <span className="ml-1 text-[13px] font-normal" style={{ color: "var(--w-soft-text)" }}>/mo</span>
           </p>
         </div>
         <div>
-          <p className="text-footnote text-ink-400">Availability</p>
+          <p className="text-[13px]" style={{ color: "var(--w-soft-text)" }}>Availability</p>
           <p
-            className="mt-1 text-title3 font-[680]"
-            style={{ color: free ? "var(--color-available)" : "var(--color-booked)" }}
+            className="mt-1 text-[21px] font-[700]"
+            style={{ color: free ? "var(--w-free)" : "var(--w-mid)" }}
           >
             {free ? "Free now" : "Booked"}
           </p>
           {board.freeFrom && (
-            <p className="text-caption tabular-nums text-ink-500">opens {fullDate(board.freeFrom)}</p>
+            <p className="text-[12px] tabular-nums" style={{ color: "var(--w-faint)" }}>opens {fullDate(board.freeFrom)}</p>
           )}
         </div>
         <div>
-          <p className="text-footnote text-ink-400">Size</p>
-          <p className="mt-1 text-subhead font-[590] tabular-nums text-ink-100">
+          <p className="text-[13px]" style={{ color: "var(--w-soft-text)" }}>Size</p>
+          <p className="mt-1 text-[15px] font-[600] tabular-nums" style={{ color: "var(--w-text)" }}>
             {board.widthFt}×{board.heightFt} ft
-            <span className="ml-1.5 text-footnote font-normal capitalize text-ink-500">{board.sizeCategory}</span>
+            <span className="ml-1.5 text-[13px] font-normal capitalize" style={{ color: "var(--w-soft-text)" }}>{board.sizeCategory}</span>
           </p>
         </div>
         <div>
-          <p className="text-footnote text-ink-400">Lighting</p>
-          <p className="mt-1 text-subhead font-[590] text-ink-100">{lightingLabel(board.lighting)}</p>
+          <p className="text-[13px]" style={{ color: "var(--w-soft-text)" }}>Lighting</p>
+          <p className="mt-1 text-[15px] font-[600]" style={{ color: "var(--w-text)" }}>{lightingLabel(board.lighting)}</p>
         </div>
       </div>
 
       {/* enquiry */}
       <div className="px-8 py-6">
-        <h2 className="text-title3 font-[620] text-ink-0">Check availability</h2>
-        <p className="mt-1.5 text-footnote text-ink-400">
-          Send your details and we&rsquo;ll confirm dates and pricing.
-        </p>
+        <h2 className="text-[18px] font-[650]" style={{ color: "var(--w-text)" }}>Check availability</h2>
         <div className="mt-5">
           <EnquiryForm board={board} onDone={onBack} />
         </div>
@@ -224,7 +190,7 @@ export function InventoryBrowser({
 
   return (
     <MapsProvider>
-    <div className="relative h-[calc(100dvh-68px)] overflow-hidden">
+    <div className="site relative h-[calc(100dvh-68px)] overflow-hidden">
       {/* canvas */}
       <div className="absolute inset-0">
         <PublicMap
@@ -250,24 +216,25 @@ export function InventoryBrowser({
               {board ? (
                 <BoardPanel board={board} onBack={() => setOpen(null)} />
               ) : (
-                <div className="flex h-full w-[427px] flex-col material-thick border-r border-white/[0.07]">
-                  <div className="flex items-center gap-2 border-b border-white/[0.07] px-5 py-3.5">
+                <div className="flex h-full w-[427px] flex-col border-r" style={{ background: "var(--w-bg)", borderColor: "var(--w-line)" }}>
+                  <div className="flex items-center gap-2 border-b px-5 py-3.5" style={{ borderColor: "var(--w-line)" }}>
                     <span className="inline-flex items-center gap-2 rounded-[var(--radius-control)] px-3 py-2 text-footnote font-[590] text-ink-100 ring-1 ring-inset ring-white/[0.1]">
                       <SlidersHorizontal className="size-4" strokeWidth={2.2} />
                       Filters
                       {activeCount > 0 && (
-                        <span className="grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
+                        <span className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white" style={{ background: "var(--w-accent)" }}>
                           {activeCount}
                         </span>
                       )}
                     </span>
                     {activeCount > 0 && (
-                      <button onClick={clearAll} className="text-footnote text-ink-500 hover:text-ink-200">Clear</button>
+                      <button onClick={clearAll} className="text-[13px]" style={{ color: "var(--w-soft-text)" }}>Clear</button>
                     )}
                     <button
                       onClick={() => setPanelOpen(false)}
                       aria-label="Hide filters"
-                      className="ml-auto grid size-8 place-items-center rounded-[8px] text-ink-500 hover:text-ink-0"
+                      className="ml-auto grid size-8 place-items-center rounded-[8px]"
+                      style={{ color: "var(--w-faint)" }}
                     >
                       <ChevronsLeft className="size-[18px]" strokeWidth={2.2} />
                     </button>
@@ -302,11 +269,11 @@ export function InventoryBrowser({
                       <input
                         type="range" min={10000} max={150000} step={5000}
                         value={maxRate} onChange={(e) => setMaxRate(Number(e.target.value))}
-                        className="w-full accent-[var(--accent)]"
+                        className="w-full" style={{ accentColor: "var(--w-accent)" }}
                       />
-                      <div className="mt-2 flex justify-between text-footnote text-ink-500">
+                      <div className="mt-2 flex justify-between text-[13px]" style={{ color: "var(--w-soft-text)" }}>
                         <span>₹10,000</span>
-                        <span className="font-[620] text-ink-100">up to {inr(maxRate)}</span>
+                        <span className="font-[650]" style={{ color: "var(--w-text)" }}>up to {inr(maxRate)}</span>
                       </div>
                     </Section>
 
@@ -331,8 +298,8 @@ export function InventoryBrowser({
                     </Section>
                   </div>
 
-                  <div className="border-t border-white/[0.07] bg-black/20 px-5 py-3.5">
-                    <p className="text-footnote font-[590] tabular-nums text-ink-100">
+                  <div className="border-t px-5 py-3.5" style={{ borderColor: "var(--w-line)", background: "var(--w-soft)" }}>
+                    <p className="text-[14px] font-[600] tabular-nums" style={{ color: "var(--w-text)" }}>
                       {results.length.toLocaleString("en-IN")} site{results.length === 1 ? "" : "s"} match
                     </p>
                   </div>
@@ -346,12 +313,13 @@ export function InventoryBrowser({
           {!showPanel && (
             <button
               onClick={() => setPanelOpen(true)}
-              className="pointer-events-auto absolute left-6 top-6 z-10 inline-flex items-center gap-2 rounded-[var(--radius-control)] material-thick specular-edge px-4 py-2.5 text-footnote font-[590] text-ink-0"
+              className="pointer-events-auto absolute left-6 top-6 z-10 inline-flex items-center gap-2 rounded-[10px] border bg-white px-4 py-2.5 text-[14px] font-[600] shadow-sm"
+              style={{ borderColor: "var(--w-line)", color: "var(--w-text)" }}
             >
               <SlidersHorizontal className="size-4" strokeWidth={2.2} />
               Filters
               {activeCount > 0 && (
-                <span className="grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
+                <span className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white" style={{ background: "var(--w-accent)" }}>
                   {activeCount}
                 </span>
               )}

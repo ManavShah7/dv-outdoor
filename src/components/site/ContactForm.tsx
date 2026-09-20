@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 
-const FIELD =
-  "h-12 w-full min-w-0 rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 " +
-  "placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none " +
-  "transition-shadow focus:ring-2 focus:ring-accent";
+const FIELD = "w-field";
 
 /** General enquiry — no board attached. Same validated endpoint as the
  *  per-board form. */
@@ -42,15 +39,15 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="rounded-[var(--radius-panel)] bg-chrome-raised p-10 text-center ring-1 ring-white/[0.07] ring-inset">
+      <div className="w-card p-10 text-center">
         <span
           className="mx-auto grid size-14 place-items-center rounded-full"
-          style={{ background: "color-mix(in srgb, var(--color-available) 15%, transparent)" }}
+          style={{ background: "var(--w-free-tint)" }}
         >
-          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--color-available)" }} />
+          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--w-free)" }} />
         </span>
-        <h3 className="mt-5 text-title2 font-[680] text-ink-0">Thanks — we&rsquo;ve got it</h3>
-        <p className="mx-auto mt-2.5 max-w-[34ch] text-subhead leading-relaxed text-ink-400">
+        <h3 className="mt-5 text-[22px] font-[700] tracking-[-0.02em]" style={{ color: "var(--w-text)" }}>Thanks — we&rsquo;ve got it</h3>
+        <p className="mx-auto mt-2.5 max-w-[34ch] text-[15px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>
           Someone from our office will call you today to talk through sites and dates.
         </p>
       </div>
@@ -60,7 +57,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={submit}
-      className="rounded-[var(--radius-panel)] bg-chrome-raised p-7 ring-1 ring-white/[0.07] ring-inset sm:p-8"
+      className="w-card p-7 sm:p-8"
     >
       <div className="flex flex-col gap-4">
         <input className={FIELD} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company name" />
@@ -73,25 +70,25 @@ export function ContactForm() {
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Which cities are you looking at? Any dates in mind?"
-          className="w-full rounded-[var(--radius-control)] bg-black/30 p-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+          placeholder="Which cities, and roughly when?"
+          className="w-field"
+          style={{ height: "auto", padding: "12px 14px" }}
         />
       </div>
 
       {error && (
-        <p className="mt-4 text-footnote" style={{ color: "var(--color-damaged)" }}>{error}</p>
+        <p className="mt-4 text-[14px]" style={{ color: "var(--w-warn)" }}>{error}</p>
       )}
 
       <button
         type="submit"
         disabled={!valid || busy}
-        className="mt-5 h-12 w-full rounded-[var(--radius-pill)] bg-accent text-body font-[620] text-accent-on transition-opacity disabled:opacity-35"
+        className="mt-5 h-12 w-full rounded-full text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
+        style={{ background: "var(--w-accent)" }}
       >
         {busy ? "Sending…" : "Send enquiry"}
       </button>
-      <p className="mt-3 text-center text-caption text-ink-600">
-        No commitment. We usually reply the same day.
-      </p>
+
     </form>
   );
 }

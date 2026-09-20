@@ -13,9 +13,9 @@ export const metadata = {
 };
 
 const STEPS = [
-  { icon: Search, title: "Find your sites", body: "Filter by city, budget, size and lighting on a live map. Every site is pinned where it actually stands." },
-  { icon: PhoneCall, title: "Check availability", body: "Send an enquiry on any site. We confirm dates and pricing the same day — no broker in between." },
-  { icon: Wrench, title: "We handle the rest", body: "Printing, mounting and upkeep. Our own crews inspect every board, so your campaign never sits torn." },
+  { icon: Search, title: "Find a site", body: "Filter by city, budget, size and lighting. Every board is pinned where it actually stands." },
+  { icon: PhoneCall, title: "Send an enquiry", body: "Pick your dates. We confirm availability and price, usually the same day." },
+  { icon: Wrench, title: "We put it up", body: "Printing, mounting and upkeep. Our own crews maintain every board." },
 ];
 
 export default function LandingPage() {
@@ -26,7 +26,7 @@ export default function LandingPage() {
     .slice(0, 3);
 
   return (
-    <div className="min-h-dvh">
+    <div className="site min-h-dvh">
       <SiteHeader />
 
       {/* ------------------------------------------------------------- hero */}
@@ -37,20 +37,20 @@ export default function LandingPage() {
           className="absolute inset-0 -z-10"
           style={{
             backgroundImage:
-              "linear-gradient(118deg, #0b0e10 0%, #101a26 40%, #12293d 70%, #14384f 100%), url('/hero.jpg')",
+              "linear-gradient(118deg, #10222f 0%, #163a52 45%, #1d5677 100%), url('/hero.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundBlendMode: "multiply",
           }}
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/60 to-transparent" />
+        <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(8,14,20,.82) 0%, rgba(8,14,20,.5) 58%, rgba(8,14,20,.2) 100%)" }} />
 
         <div className="mx-auto max-w-[1180px] px-6 py-24 sm:py-32">
           <div className="max-w-[640px]">
-            <h1 className="text-[clamp(2.4rem,5.5vw,3.9rem)] font-[680] leading-[1.06] tracking-[-0.035em] text-ink-0">
+            <h1 className="text-[clamp(2.4rem,5.5vw,3.9rem)] font-[700] leading-[1.06] tracking-[-0.035em] text-white">
               Billboard advertising across Gujarat, made simple
             </h1>
-            <p className="mt-6 max-w-[52ch] text-[clamp(1.02rem,1.6vw,1.2rem)] leading-relaxed text-ink-200">
+            <p className="mt-6 max-w-[52ch] text-[clamp(1.02rem,1.6vw,1.2rem)] leading-relaxed text-white/85">
               {stats.boards} hoardings in {stats.cities} cities, owned and maintained by us.
               See what&rsquo;s free on a live map, pick your sites, and deal directly with the
               owner — no broker, no markup.
@@ -59,14 +59,15 @@ export default function LandingPage() {
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
                 href="/boards"
-                className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-accent px-7 py-3.5 text-body font-[620] text-accent-on transition-colors hover:bg-accent-hover"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[16px] font-[600]"
+                style={{ color: "var(--w-text)" }}
               >
                 Browse {stats.available} available billboards
                 <ArrowRight className="size-[18px]" strokeWidth={2.4} />
               </Link>
               <Link
                 href="#contact"
-                className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] px-7 py-3.5 text-body font-[590] text-ink-100 ring-1 ring-inset ring-white/20 transition-colors hover:bg-white/[0.08]"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[16px] font-[600] text-white ring-1 ring-inset ring-white/35 transition-colors hover:bg-white/10"
               >
                 <PhoneCall className="size-[17px]" strokeWidth={2.2} />
                 Contact us directly
@@ -77,12 +78,12 @@ export default function LandingPage() {
       </section>
 
       {/* ---------------------------------------------------------- trusted */}
-      <section className="border-y border-white/[0.07] py-12">
+      <section className="border-y py-12" style={{ borderColor: "var(--w-line)" }}>
         <div className="mx-auto max-w-[1180px] px-6">
-          <p className="text-center text-subhead font-[590] text-ink-100">Trusted by leading brands</p>
+          <p className="text-center text-[15px] font-[600]" style={{ color: "var(--w-text)" }}>Trusted by leading brands</p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
             {brands.map((b) => (
-              <span key={b} className="text-title3 font-[680] tracking-[-0.02em] text-ink-500">
+              <span key={b} className="text-[19px] font-[700] tracking-[-0.02em]" style={{ color: "var(--w-faint)" }}>
                 {b}
               </span>
             ))}
@@ -101,10 +102,10 @@ export default function LandingPage() {
               { n: stats.available, l: "Free this month" },
             ].map((s) => (
               <div key={s.l}>
-                <dt className="text-[clamp(2rem,4vw,2.75rem)] font-[680] tabular-nums tracking-[-0.03em] text-accent">
+                <dt className="text-[clamp(2rem,4vw,2.75rem)] font-[700] tabular-nums tracking-[-0.03em]" style={{ color: "var(--w-accent)" }}>
                   {s.n}
                 </dt>
-                <dd className="mt-1 text-subhead text-ink-500">{s.l}</dd>
+                <dd className="mt-1 text-[15px]" style={{ color: "var(--w-soft-text)" }}>{s.l}</dd>
               </div>
             ))}
           </dl>
@@ -112,9 +113,9 @@ export default function LandingPage() {
       </section>
 
       {/* -------------------------------------------------------------- how */}
-      <section id="how" className="scroll-mt-20 border-t border-white/[0.07] py-20">
+      <section id="how" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
         <div className="mx-auto max-w-[1180px] px-6">
-          <h2 className="max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] leading-[1.12] tracking-[-0.03em] text-ink-0">
+          <h2 className="max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] leading-[1.12] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
             Three steps from map to live campaign
           </h2>
           <div className="mt-12 grid gap-10 sm:grid-cols-3">
@@ -122,13 +123,13 @@ export default function LandingPage() {
               <div key={title}>
                 <span
                   className="grid size-12 place-items-center rounded-[var(--radius-card)]"
-                  style={{ background: "color-mix(in srgb, var(--accent) 14%, transparent)" }}
+                  style={{ background: "var(--w-tint)" }}
                 >
-                  <Icon className="size-[22px] text-accent" strokeWidth={2} />
+                  <Icon className="size-[22px]" strokeWidth={2} style={{ color: "var(--w-accent)" }} />
                 </span>
-                <p className="mt-5 text-caption2 uppercase text-accent">Step {i + 1}</p>
-                <h3 className="mt-1.5 text-title3 font-[620] text-ink-0">{title}</h3>
-                <p className="mt-2.5 text-subhead leading-relaxed text-ink-400">{body}</p>
+                <p className="mt-5 text-[12px] font-[700] uppercase tracking-wide" style={{ color: "var(--w-accent)" }}>Step {i + 1}</p>
+                <h3 className="mt-1.5 text-[19px] font-[650] tracking-[-0.01em]" style={{ color: "var(--w-text)" }}>{title}</h3>
+                <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>{body}</p>
               </div>
             ))}
           </div>
@@ -136,35 +137,35 @@ export default function LandingPage() {
       </section>
 
       {/* --------------------------------------------------------- coverage */}
-      <section id="coverage" className="scroll-mt-20 border-t border-white/[0.07] py-20">
+      <section id="coverage" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
         <div className="mx-auto max-w-[1180px] px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] tracking-[-0.03em] text-ink-0">
+              <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
                 Where we are
               </h2>
-              <p className="mt-2 max-w-[54ch] text-subhead text-ink-500">{PUBLIC_CITIES.join(" · ")}</p>
+              <p className="mt-2 max-w-[54ch] text-[15px]" style={{ color: "var(--w-soft-text)" }}>{PUBLIC_CITIES.join(" · ")}</p>
             </div>
-            <Link href="/boards" className="inline-flex items-center gap-1.5 text-subhead font-[590] text-accent">
+            <Link href="/boards" className="inline-flex items-center gap-1.5 text-[15px] font-[600]" style={{ color: "var(--w-accent)" }}>
               Open the full map
               <ArrowRight className="size-4" strokeWidth={2.4} />
             </Link>
           </div>
 
-          <div className="mt-8 overflow-hidden rounded-[var(--radius-panel)] ring-1 ring-white/[0.08]">
+          <div className="mt-8 overflow-hidden rounded-[16px] border" style={{ borderColor: "var(--w-line)" }}>
             <CoverageMap />
           </div>
         </div>
       </section>
 
       {/* -------------------------------------------------------- available */}
-      <section className="border-t border-white/[0.07] py-20">
+      <section className="py-20">
         <div className="mx-auto max-w-[1180px] px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[680] tracking-[-0.03em] text-ink-0">
+            <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
               Free right now
             </h2>
-            <Link href="/boards" className="inline-flex items-center gap-1.5 text-subhead font-[590] text-accent">
+            <Link href="/boards" className="inline-flex items-center gap-1.5 text-[15px] font-[600]" style={{ color: "var(--w-accent)" }}>
               All {stats.available} sites
               <ArrowRight className="size-4" strokeWidth={2.4} />
             </Link>
@@ -175,26 +176,26 @@ export default function LandingPage() {
               <Link
                 key={b.code}
                 href={`/boards?board=${b.code}`}
-                className="rounded-[var(--radius-card)] bg-chrome-raised p-6 ring-1 ring-white/[0.07] ring-inset transition-colors hover:bg-white/[0.05]"
+                className="w-card p-6 transition-shadow hover:shadow-[0_8px_28px_-14px_rgba(13,17,20,.22)]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-caption text-ink-500">{b.code}</span>
+                  <span className="font-mono text-[12px]" style={{ color: "var(--w-faint)" }}>{b.code}</span>
                   <span
                     className="rounded-[var(--radius-pill)] px-2.5 py-1 text-caption font-[620]"
-                    style={{ color: "var(--color-available)", background: "color-mix(in srgb, var(--color-available) 15%, transparent)" }}
+                    style={{ color: "var(--w-free)", background: "var(--w-free-tint)" }}
                   >
                     Available
                   </span>
                 </div>
-                <h3 className="mt-4 text-title3 font-[620] leading-snug text-ink-0">{b.name}</h3>
-                <p className="mt-1.5 flex items-center gap-1.5 text-footnote text-ink-400">
+                <h3 className="mt-4 text-[19px] font-[650] leading-snug tracking-[-0.01em]" style={{ color: "var(--w-text)" }}>{b.name}</h3>
+                <p className="mt-1.5 flex items-center gap-1.5 text-[14px]" style={{ color: "var(--w-soft-text)" }}>
                   <MapPin className="size-3.5" strokeWidth={2} />
                   {b.area}, {b.city}
                 </p>
-                <p className="mt-5 flex items-baseline gap-2 border-t border-white/[0.07] pt-4">
-                  <span className="text-body font-[620] tabular-nums text-ink-0">{inr(b.askingRate)}</span>
-                  <span className="text-footnote text-ink-500">/ month</span>
-                  <span className="ml-auto text-footnote tabular-nums text-ink-500">{b.widthFt}×{b.heightFt} ft</span>
+                <p className="mt-5 flex items-baseline gap-2 border-t pt-4" style={{ borderColor: "var(--w-hair)" }}>
+                  <span className="text-[18px] font-[700] tabular-nums" style={{ color: "var(--w-text)" }}>{inr(b.askingRate)}</span>
+                  <span className="text-[14px]" style={{ color: "var(--w-soft-text)" }}>/ month</span>
+                  <span className="ml-auto text-[13px] tabular-nums" style={{ color: "var(--w-faint)" }}>{b.widthFt}×{b.heightFt} ft</span>
                 </p>
               </Link>
             ))}
@@ -203,20 +204,20 @@ export default function LandingPage() {
       </section>
 
       {/* ---------------------------------------------------------- contact */}
-      <section id="contact" className="scroll-mt-20 border-t border-white/[0.07] py-20">
+      <section id="contact" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
         <div className="mx-auto grid max-w-[1180px] gap-12 px-6 lg:grid-cols-[1fr_minmax(0,460px)]">
           <div>
-            <h2 className="max-w-[16ch] text-[clamp(1.9rem,4vw,2.9rem)] font-[680] leading-[1.1] tracking-[-0.03em] text-ink-0">
+            <h2 className="max-w-[16ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] leading-[1.12] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
               Tell us the city. We&rsquo;ll tell you what&rsquo;s free.
             </h2>
-            <p className="mt-5 max-w-[46ch] text-body leading-relaxed text-ink-400">
-              Not sure which sites you need? Send us the cities and dates you&rsquo;re
-              thinking about and we&rsquo;ll put together options — with photos, footfall
-              and pricing.
+            <p className="mt-5 max-w-[46ch] text-[16px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>
+              Send us the cities and dates you have in mind and we&rsquo;ll come back with
+              options and pricing.
             </p>
             <Link
               href="/boards"
-              className="mt-8 inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-accent px-6 py-3 text-subhead font-[590] text-accent-on transition-colors hover:bg-accent-hover"
+              className="mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-[15px] font-[600] text-white"
+              style={{ background: "var(--w-accent)" }}
             >
               Browse billboards
               <ArrowRight className="size-4" strokeWidth={2.4} />

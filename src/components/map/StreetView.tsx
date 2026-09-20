@@ -72,9 +72,9 @@ export function StreetView({
   if (state === "none") {
     return (
       <div className={className}>
-        <div className="flex size-full flex-col items-center justify-center gap-2 bg-black/30">
-          <EyeOff className="size-6 text-ink-600" strokeWidth={1.6} />
-          <p className="text-footnote text-ink-500">No Street View here</p>
+        <div className="flex size-full flex-col items-center justify-center gap-2 bg-black/20 backdrop-blur-[1px]">
+          <EyeOff className="size-6 text-white/55" strokeWidth={1.6} />
+          <p className="text-[13px] text-white/70">No Street View here</p>
         </div>
       </div>
     );
@@ -84,7 +84,7 @@ export function StreetView({
     <div className={className}>
       <div ref={host} className="size-full" />
       {state === "checking" && (
-        <div className="absolute inset-0 animate-pulse bg-chrome-raised" />
+        <div className="absolute inset-0 animate-pulse" style={{ background: "rgba(120,130,140,.18)" }} />
       )}
     </div>
   );

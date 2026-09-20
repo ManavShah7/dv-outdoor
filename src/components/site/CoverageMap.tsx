@@ -55,7 +55,7 @@ export function CoverageMap() {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!key) {
-    return <div className="h-[420px] w-full animate-pulse bg-chrome-raised" />;
+    return <div className="h-[420px] w-full animate-pulse" style={{ background: "var(--w-sunk)" }} />;
   }
 
   return (
