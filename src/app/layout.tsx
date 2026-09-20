@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-/* Instrument Sans rather than the -apple-system stack: SF Pro only renders on
-   Apple devices, and DV's clients in Gujarat are largely on Android and
-   Windows. Slightly narrow, confident letterforms that hold up at 13px in
-   dense tables, with real tabular figures for the money columns. */
-const sans = Instrument_Sans({
+/* Inter rather than the -apple-system stack: SF Pro only renders on Apple
+   devices, and DV's clients in Gujarat are largely on Android and Windows.
+   Metrically near-identical to SF, so the design does not shift across them. */
+const sans = Inter({
   subsets: ["latin"],
-  variable: "--font-instrument",
+  variable: "--font-inter",
   display: "swap",
 });
 

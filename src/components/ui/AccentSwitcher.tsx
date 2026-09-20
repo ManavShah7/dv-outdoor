@@ -19,7 +19,7 @@ export function AccentSwitcher() {
   }, [accent]);
 
   return (
-    <div className="absolute bottom-6 left-6 z-10 flex items-center gap-1 rounded-[var(--radius-pill)] material-thick specular-edge p-1.5">
+    <div className="pointer-events-auto absolute bottom-6 left-6 z-10 flex items-center gap-1 rounded-[var(--radius-pill)] material-thick specular-edge p-1.5">
       {ACCENTS.map((a) => (
         <button
           key={a.id}

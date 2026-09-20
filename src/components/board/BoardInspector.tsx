@@ -145,7 +145,7 @@ export function ManageMenu({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 8, scale: 0.98 }}
         transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-        className="absolute left-8 top-1/2 z-20 w-[340px] -translate-y-1/2 rounded-[var(--radius-panel)] material-thick specular-edge p-6"
+        className="pointer-events-auto absolute left-8 top-1/2 z-20 w-[340px] -translate-y-1/2 rounded-[var(--radius-panel)] material-thick specular-edge p-6"
       >
         <div className="flex items-start justify-between">
           <h3 className="text-title3 font-[620] text-ink-0">Manage board</h3>

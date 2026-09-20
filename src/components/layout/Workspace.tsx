@@ -12,6 +12,7 @@ import { BoardMap } from "@/components/map/BoardMap";
 import { MaintenanceList, MaintenanceDetail } from "@/components/maintenance/MaintenancePanel";
 import { MAINTENANCE, type MaintenanceRequest } from "@/lib/mockMaintenance";
 import { AccentSwitcher } from "@/components/ui/AccentSwitcher";
+import { MapLegend } from "@/components/map/MapLegend";
 import { Toast } from "@/components/ui/Toast";
 
 function matches(b: Board, q: string, f: QuickFilter | null) {
@@ -237,7 +238,7 @@ export function Workspace() {
         )}
       </AnimatePresence>
 
-      <div className="relative min-w-0 flex-1">
+      <div className="pointer-events-none relative min-w-0 flex-1">
         {mode === "managing" && selected && (
           <ManageMenu
             board={selected}
@@ -263,6 +264,7 @@ export function Workspace() {
           </span>
         </div>
 
+        <MapLegend />
         <AccentSwitcher />
         <Toast message={toast} onDone={() => setToast(null)} />
       </div>

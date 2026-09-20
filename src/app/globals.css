@@ -106,7 +106,7 @@
   /* Inter for the public portal and anything a client sees — SF Pro only
      renders on Apple devices, and DV's clients are largely Android/Windows.
      Metrically near-identical, so the design does not shift. */
-  --font-sans: var(--font-instrument), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* ---- ELEVATION — chrome sits ON the map, so shadows are directional. */
@@ -126,27 +126,35 @@
    backdrop-filter declaration written inside @utility, emitting an empty rule.
    The blur simply never applies and nothing warns you. */
 .material-thin {
-  background-color: color-mix(in srgb, var(--chrome) 52%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
+  background-color: color-mix(in srgb, var(--chrome) 68%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  backdrop-filter: blur(20px) saturate(190%);
 }
 .material-regular {
-  background-color: color-mix(in srgb, var(--chrome) 66%, transparent);
-  -webkit-backdrop-filter: blur(32px) saturate(140%);
-  backdrop-filter: blur(32px) saturate(140%);
+  background-color: color-mix(in srgb, var(--chrome) 80%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  backdrop-filter: blur(24px) saturate(190%);
 }
-/* Sidebars and inspectors. Dense text has to stay readable over a bright map:
-   the blur is what buys that, by destroying the competing detail behind it —
-   which is why it can sit this translucent and still read cleanly. */
+/* Sidebars and inspectors. Reads as a solid dark slab that *picks up* colour
+   from whatever is underneath as you drag the map — not as a window you see
+   through. High opacity with heavy saturation is what produces that: the tint
+   bleeds, the detail does not. */
 .material-thick {
-  background-color: color-mix(in srgb, var(--chrome) 78%, transparent);
-  -webkit-backdrop-filter: blur(48px) saturate(135%);
-  backdrop-filter: blur(48px) saturate(135%);
+  background-color: color-mix(in srgb, var(--chrome) 91%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(28px) saturate(200%);
 }
 /* Cards nested inside a material panel — translucent against their parent so
    the layering stays legible instead of flattening into one slab. */
 .material-inset {
   background-color: color-mix(in srgb, var(--chrome-raised) 55%, transparent);
+}
+
+/* Google injects its own span for marker labels; force it onto our stack. */
+.dv-city-label {
+  font-family: var(--font-sans) !important;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 html { color-scheme: dark; }

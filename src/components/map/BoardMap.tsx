@@ -21,29 +21,112 @@ const STATUS_COLOR: Record<Board["status"], string> = {
   damaged: "#ff453a",
 };
 
-function pinIcon(color: string, selected: boolean) {
-  const r = selected ? 9 : 6.5;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">
-    <circle cx="17" cy="17" r="${r + 4}" fill="${color}" fill-opacity="${selected ? 0.28 : 0.16}"/>
-    <circle cx="17" cy="17" r="${r}" fill="${color}" stroke="#fff" stroke-width="${selected ? 3 : 2}"/>
-  </svg>`;
+/* Order matters: the donut reads clockwise from the top, worst-news last, so a
+   city with a damaged board always shows that slice in the same place. */
+const STATUS_ORDER: Board["status"][] = ["available", "booked", "under_maintenance", "damaged"];
+
+function svgUrl(svg: string) {
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+/* ---------------------------------------------------------------- board pin
+   A teardrop rather than a centred dot: the tip sits on the exact coordinate,
+   so a pin points at its board instead of covering it — which matters when
+   the whole promise of this product is that the location is pin-accurate.
+   Size encodes the board's size category, the centre dot marks backlit. */
+const PIN_SCALE: Record<NonNullable<Board["sizeCategory"]>, number> = {
+  small: 0.82,
+  medium: 1,
+  large: 1.22,
+};
+
+function pinIcon(board: Board, selected: boolean) {
+  const color = STATUS_COLOR[board.status];
+  const k = (PIN_SCALE[board.sizeCategory ?? "medium"] ?? 1) * (selected ? 1.34 : 1);
+  const w = Math.round(26 * k);
+  const h = Math.round(34 * k);
+  const pad = selected ? 16 : 6;
+  const W = w + pad * 2;
+  const H = h + pad * 2;
+
+  const halo = selected
+    ? `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w / 2 + 9}" fill="${color}" fill-opacity="0.22"/>`
+    : "";
+
+  // backlit boards carry a bright centre; frontlit and unlit stay hollow
+  const core =
+    board.lighting === "backlit"
+      ? `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w * 0.17}" fill="#fff"/>`
+      : `<circle cx="${W / 2}" cy="${pad + w / 2}" r="${w * 0.17}" fill="#fff" fill-opacity="0.34"/>`;
+
   return {
-    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    scaledSize: new google.maps.Size(34, 34),
-    anchor: new google.maps.Point(17, 17),
+    url: svgUrl(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+        <ellipse cx="${W / 2}" cy="${pad + h - 1}" rx="${w * 0.2}" ry="${w * 0.07}" fill="#000" fill-opacity="0.22"/>
+        ${halo}
+        <g transform="translate(${pad} ${pad}) scale(${w / 24} ${h / 32})">
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.373 18.627 0 12 0z"
+                fill="${color}" stroke="#fff" stroke-width="${selected ? 3.2 : 2.4}" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"/>
+        </g>
+        ${core}
+      </svg>`,
+    ),
+    // anchor on the tip, not the centre
+    anchor: new google.maps.Point(W / 2, pad + h),
+    scaledSize: new google.maps.Size(W, H),
   };
 }
 
-function cityIcon(count: number) {
-  const d = count > 120 ? 62 : count > 60 ? 54 : count > 25 ? 46 : 40;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${d + 16}" height="${d + 16}" viewBox="0 0 ${d + 16} ${d + 16}">
-    <circle cx="${(d + 16) / 2}" cy="${(d + 16) / 2}" r="${d / 2 + 7}" fill="#0a84ff" fill-opacity="0.16"/>
-    <circle cx="${(d + 16) / 2}" cy="${(d + 16) / 2}" r="${d / 2}" fill="#0a84ff" stroke="#fff" stroke-width="2.5"/>
-  </svg>`;
+/* -------------------------------------------------------------- city donut
+   Zoomed out, a flat count tells you how many boards a city has but nothing
+   about their state. A proportional ring answers "how much of Rajkot is
+   actually earning?" without a click. */
+function donutSegment(
+  cx: number, cy: number, rOuter: number, rInner: number, a0: number, a1: number,
+) {
+  const pt = (r: number, a: number) =>
+    [cx + r * Math.sin(a), cy - r * Math.cos(a)].map((n) => n.toFixed(2));
+  const large = a1 - a0 > Math.PI ? 1 : 0;
+  const [x1, y1] = pt(rOuter, a0);
+  const [x2, y2] = pt(rOuter, a1);
+  const [x3, y3] = pt(rInner, a1);
+  const [x4, y4] = pt(rInner, a0);
+  return `M${x1} ${y1}A${rOuter} ${rOuter} 0 ${large} 1 ${x2} ${y2}L${x3} ${y3}A${rInner} ${rInner} 0 ${large} 0 ${x4} ${y4}Z`;
+}
+
+function cityIcon(counts: Record<Board["status"], number>, total: number) {
+  const d = total > 120 ? 74 : total > 60 ? 64 : total > 25 ? 56 : 48;
+  const S = d + 12;
+  const c = S / 2;
+  const rOuter = d / 2;
+  const rInner = d / 2 - Math.max(5, d * 0.115);
+
+  let a = 0;
+  const segs = STATUS_ORDER.map((st) => {
+    const n = counts[st];
+    if (!n) return "";
+    const sweep = (n / total) * Math.PI * 2;
+    // a single status filling the whole ring cannot be drawn as one arc
+    const path =
+      n === total
+        ? `<circle cx="${c}" cy="${c}" r="${(rOuter + rInner) / 2}" fill="none" stroke="${STATUS_COLOR[st]}" stroke-width="${rOuter - rInner}"/>`
+        : `<path d="${donutSegment(c, c, rOuter, rInner, a, a + sweep)}" fill="${STATUS_COLOR[st]}"/>`;
+    a += sweep;
+    return path;
+  }).join("");
+
   return {
-    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    scaledSize: new google.maps.Size(d + 16, d + 16),
-    anchor: new google.maps.Point((d + 16) / 2, (d + 16) / 2),
+    url: svgUrl(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+        <circle cx="${c}" cy="${c}" r="${rOuter + 4}" fill="#0b0e10" fill-opacity="0.18"/>
+        <circle cx="${c}" cy="${c}" r="${rInner + 0.5}" fill="#12161a" fill-opacity="0.94"/>
+        ${segs}
+        <circle cx="${c}" cy="${c}" r="${rOuter}" fill="none" stroke="#fff" stroke-opacity="0.22" stroke-width="1"/>
+      </svg>`,
+    ),
+    anchor: new google.maps.Point(c, c),
+    scaledSize: new google.maps.Size(S, S),
   };
 }
 
@@ -91,9 +174,20 @@ function Layers({
   }, [map, selectedId, boards, insetLeft]);
 
   const cityCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const b of boards) counts.set(b.city, (counts.get(b.city) ?? 0) + 1);
-    return CITY_CENTRES.map((c) => ({ ...c, count: counts.get(c.city) ?? 0 })).filter((c) => c.count > 0);
+    const byCity = new Map<string, Record<Board["status"], number>>();
+    for (const b of boards) {
+      let rec = byCity.get(b.city);
+      if (!rec) {
+        rec = { available: 0, booked: 0, under_maintenance: 0, damaged: 0 };
+        byCity.set(b.city, rec);
+      }
+      rec[b.status] += 1;
+    }
+    return CITY_CENTRES.map((c) => {
+      const rec = byCity.get(c.city);
+      const total = rec ? Object.values(rec).reduce((a, n) => a + n, 0) : 0;
+      return { ...c, counts: rec, total };
+    }).filter((c) => c.total > 0 && c.counts);
   }, [boards]);
 
   if (!map) return null;
@@ -105,14 +199,15 @@ function Layers({
           <Marker
             key={c.city}
             position={{ lat: c.lat, lng: c.lng }}
-            icon={cityIcon(c.count)}
+            icon={cityIcon(c.counts!, c.total)}
             label={{
-              text: String(c.count),
+              text: String(c.total),
               color: "#ffffff",
-              fontSize: "15px",
-              fontWeight: "700",
+              fontSize: c.total > 99 ? "15px" : "16px",
+              fontWeight: "650",
+              className: "dv-city-label",
             }}
-            title={`${c.city} — ${c.count} boards`}
+            title={`${c.city} — ${c.total} boards · ${c.counts!.available} available, ${c.counts!.booked} booked, ${c.counts!.damaged + c.counts!.under_maintenance} needing work`}
             onClick={() => map?.panTo({ lat: c.lat, lng: c.lng })}
             zIndex={10}
           />
@@ -127,7 +222,7 @@ function Layers({
         <Marker
           key={b.id}
           position={{ lat: b.lat, lng: b.lng }}
-          icon={pinIcon(STATUS_COLOR[b.status], b.id === selectedId)}
+          icon={pinIcon(b, b.id === selectedId)}
           onClick={() => onSelect(b)}
           zIndex={b.id === selectedId ? 999 : 1}
         />
