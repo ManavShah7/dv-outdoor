@@ -23,23 +23,21 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b" style={{ borderColor: "var(--s-line-soft)" }}>
+    <div className="border-b border-white/[0.06]">
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2.5 py-4 text-left"
       >
-        <span className="text-[16px] font-[600] tracking-[-0.01em]" style={{ color: "var(--s-text)" }}>
+        <span className="text-body font-[620] text-ink-0">
           {title}
         </span>
         <ChevronDown
-          className={cn("size-4 transition-transform", open && "rotate-180")}
+          className={cn("size-4 text-ink-500 transition-transform", open && "rotate-180")}
           strokeWidth={2.2}
-          style={{ color: "var(--s-text-soft)" }}
         />
         {!!count && (
           <span
-            className="ml-auto grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white"
-            style={{ background: "var(--s-good)" }}
+            className="ml-auto grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on"
           >
             {count}
           </span>
@@ -59,12 +57,13 @@ function Pill({
   return (
     <button
       onClick={onClick}
-      className="inline-flex h-10 items-center gap-1.5 rounded-[10px] border px-3.5 text-[14px] font-[500] transition-colors"
-      style={
+      className={cn(
+        "inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-control)] px-3.5 text-footnote font-[520]",
+        "ring-1 ring-inset transition-colors",
         on
-          ? { background: "var(--s-good)", borderColor: "transparent", color: "#fff" }
-          : { background: "var(--s-bg)", borderColor: "var(--s-line)", color: "var(--s-text-soft)" }
-      }
+          ? "bg-accent text-accent-on ring-transparent"
+          : "bg-black/25 text-ink-300 ring-white/[0.08] hover:bg-white/[0.07]",
+      )}
     >
       {children}
       {on ? <X className="size-3.5" strokeWidth={2.6} /> : <Plus className="size-3.5" strokeWidth={2.4} />}
@@ -119,7 +118,7 @@ export function InventoryBrowser({
   }
 
   return (
-    <div className="site flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col">
       <div className="flex min-h-0 flex-1">
         {/* ------------------------------------------------- filter panel */}
         <AnimatePresence initial={false}>
@@ -129,37 +128,33 @@ export function InventoryBrowser({
               animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-              className="shrink-0 overflow-hidden border-r"
-              style={{ borderColor: "var(--s-line)", background: "var(--s-bg)" }}
+              className="shrink-0 overflow-hidden border-r border-white/[0.07] material-thick"
             >
               <div className="flex h-[calc(100dvh-68px)] w-[380px] flex-col">
                 {/* toolbar */}
-                <div className="flex items-center gap-2 border-b px-5 py-3.5" style={{ borderColor: "var(--s-line)" }}>
+                <div className="flex items-center gap-2 border-b border-white/[0.07] px-5 py-3.5">
                   <span
-                    className="inline-flex items-center gap-2 rounded-[10px] border px-3 py-2 text-[14px] font-[600]"
-                    style={{ borderColor: "var(--s-line)", color: "var(--s-text)" }}
+                    className="inline-flex items-center gap-2 rounded-[var(--radius-control)] px-3 py-2 text-footnote font-[590] text-ink-100 ring-1 ring-inset ring-white/[0.1]"
                   >
                     <SlidersHorizontal className="size-4" strokeWidth={2.2} />
                     Filters
                     {activeCount > 0 && (
                       <span
-                        className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white"
-                        style={{ background: "var(--s-good)" }}
+                        className="grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on"
                       >
                         {activeCount}
                       </span>
                     )}
                   </span>
                   {activeCount > 0 && (
-                    <button onClick={clearAll} className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>
+                    <button onClick={clearAll} className="text-footnote text-ink-500 hover:text-ink-200">
                       Clear
                     </button>
                   )}
                   <button
                     onClick={() => setPanelOpen(false)}
                     aria-label="Hide filters"
-                    className="ml-auto grid size-8 place-items-center rounded-[8px]"
-                    style={{ color: "var(--s-text-soft)" }}
+                    className="ml-auto grid size-8 place-items-center rounded-[8px] text-ink-500 hover:text-ink-0"
                   >
                     <ChevronsLeft className="size-[18px]" strokeWidth={2.2} />
                   </button>
@@ -168,13 +163,12 @@ export function InventoryBrowser({
                 <div className="min-h-0 flex-1 overflow-y-auto px-5">
                   {/* search */}
                   <div className="relative py-4">
-                    <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2" strokeWidth={2} style={{ color: "var(--s-text-soft)" }} />
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-ink-500" strokeWidth={2} />
                     <input
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search for city or road"
-                      className="h-12 w-full rounded-[12px] border pl-11 pr-4 text-[15px] outline-none"
-                      style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", color: "var(--s-text)" }}
+                      className="h-12 w-full rounded-[var(--radius-control)] bg-black/30 pl-11 pr-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
                     />
                   </div>
 
@@ -199,11 +193,11 @@ export function InventoryBrowser({
                       type="range" min={10000} max={150000} step={5000}
                       value={maxRate}
                       onChange={(e) => setMaxRate(Number(e.target.value))}
-                      className="w-full accent-[var(--s-good)]"
+                      className="w-full accent-[var(--accent)]"
                     />
-                    <div className="mt-2 flex justify-between text-[14px]" style={{ color: "var(--s-text-soft)" }}>
+                    <div className="mt-2 flex justify-between text-footnote text-ink-500">
                       <span>₹10,000</span>
-                      <span className="font-[600]" style={{ color: "var(--s-text)" }}>
+                      <span className="font-[620] text-ink-100">
                         up to {inr(maxRate)}
                       </span>
                     </div>
@@ -231,8 +225,8 @@ export function InventoryBrowser({
                 </div>
 
                 {/* results */}
-                <div className="border-t px-5 py-3.5" style={{ borderColor: "var(--s-line)", background: "var(--s-bg-soft)" }}>
-                  <p className="text-[14px] font-[600] tabular-nums" style={{ color: "var(--s-text)" }}>
+                <div className="border-t border-white/[0.07] bg-black/20 px-5 py-3.5">
+                  <p className="text-footnote font-[590] tabular-nums text-ink-100">
                     {results.length.toLocaleString("en-IN")} site{results.length === 1 ? "" : "s"} match
                   </p>
                 </div>
@@ -248,13 +242,12 @@ export function InventoryBrowser({
           {!panelOpen && (
             <button
               onClick={() => setPanelOpen(true)}
-              className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-[12px] border bg-white px-4 py-2.5 text-[14px] font-[600] shadow-sm"
-              style={{ borderColor: "var(--s-line)", color: "var(--s-text)" }}
+              className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-[var(--radius-control)] material-thick specular-edge px-4 py-2.5 text-footnote font-[590] text-ink-0"
             >
               <SlidersHorizontal className="size-4" strokeWidth={2.2} />
               Filters
               {activeCount > 0 && (
-                <span className="grid size-5 place-items-center rounded-full text-[11px] font-[700] text-white" style={{ background: "var(--s-good)" }}>
+                <span className="grid size-5 place-items-center rounded-full bg-accent text-[11px] font-[700] text-accent-on">
                   {activeCount}
                 </span>
               )}
@@ -269,16 +262,13 @@ export function InventoryBrowser({
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 30, opacity: 0 }}
                 transition={{ duration: 0.26, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute right-4 top-4 bottom-4 z-20 w-[400px] max-w-[calc(100%-2rem)] overflow-y-auto rounded-[18px] border bg-white shadow-[0_12px_48px_-16px_rgba(16,24,32,0.32)]"
-                style={{ borderColor: "var(--s-line)" }}
+                className="absolute right-4 top-4 bottom-4 z-20 w-[400px] max-w-[calc(100%-2rem)] overflow-y-auto rounded-[var(--radius-panel)] material-thick specular-edge ring-1 ring-white/[0.08]"
               >
-                <div className="flex items-start justify-between gap-3 border-b px-6 pb-5 pt-6" style={{ borderColor: "var(--s-line-soft)" }}>
+                <div className="flex items-start justify-between gap-3 border-b border-white/[0.07] px-6 pb-5 pt-6">
                   <div className="min-w-0">
-                    <span className="font-mono text-[12px]" style={{ color: "var(--s-text-soft)" }}>{board.code}</span>
-                    <h2 className="mt-1 text-[22px] font-[700] leading-tight tracking-[-0.02em]" style={{ color: "var(--s-text)" }}>
-                      {board.name}
-                    </h2>
-                    <p className="mt-1.5 flex items-start gap-1.5 text-[14px]" style={{ color: "var(--s-text-soft)" }}>
+                    <span className="font-mono text-caption text-ink-500">{board.code}</span>
+                    <h2 className="mt-1 text-title2 font-[680] leading-tight text-ink-0">{board.name}</h2>
+                    <p className="mt-1.5 flex items-start gap-1.5 text-footnote text-ink-400">
                       <MapPin className="mt-0.5 size-3.5 shrink-0" strokeWidth={2} />
                       {board.address}
                     </p>
@@ -286,42 +276,41 @@ export function InventoryBrowser({
                   <button
                     onClick={() => setOpen(null)}
                     aria-label="Close"
-                    className="grid size-8 shrink-0 place-items-center rounded-full"
-                    style={{ background: "var(--s-bg-sunk)", color: "var(--s-text-mid)" }}
+                    className="grid size-8 shrink-0 place-items-center rounded-full bg-black/35 text-ink-400 hover:text-ink-0"
                   >
                     <X className="size-4" strokeWidth={2.2} />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-5 border-b px-6 py-5" style={{ borderColor: "var(--s-line-soft)" }}>
+                <div className="grid grid-cols-2 gap-5 border-b border-white/[0.07] px-6 py-5">
                   <div>
-                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Rate</p>
-                    <p className="mt-0.5 text-[20px] font-[700] tabular-nums" style={{ color: "var(--s-text)" }}>
+                    <p className="text-footnote text-ink-500">Rate</p>
+                    <p className="mt-0.5 text-title3 font-[680] tabular-nums text-ink-0">
                       {inr(board.askingRate)}
-                      <span className="ml-1 text-[13px] font-[400]" style={{ color: "var(--s-text-soft)" }}>/mo</span>
+                      <span className="ml-1 text-footnote font-normal text-ink-500">/mo</span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Availability</p>
-                    <p className="mt-0.5 text-[20px] font-[700]" style={{ color: board.availability === "available" ? "var(--s-good)" : "var(--s-text-mid)" }}>
+                    <p className="text-footnote text-ink-500">Availability</p>
+                    <p className="mt-0.5 text-title3 font-[680]" style={{ color: board.availability === "available" ? "var(--color-available)" : "var(--color-booked)" }}>
                       {board.availability === "available" ? "Free now" : "Booked"}
                     </p>
                     {board.freeFrom && (
-                      <p className="text-[12px] tabular-nums" style={{ color: "var(--s-text-soft)" }}>
+                      <p className="text-caption tabular-nums text-ink-500">
                         opens {fullDate(board.freeFrom)}
                       </p>
                     )}
                   </div>
                   <div>
-                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Size</p>
-                    <p className="mt-0.5 text-[15px] font-[600] tabular-nums" style={{ color: "var(--s-text)" }}>
+                    <p className="text-footnote text-ink-500">Size</p>
+                    <p className="mt-0.5 text-subhead font-[590] tabular-nums text-ink-100">
                       {board.widthFt}×{board.heightFt} ft
-                      <span className="ml-1.5 text-[13px] font-[400] capitalize" style={{ color: "var(--s-text-soft)" }}>{board.sizeCategory}</span>
+                      <span className="ml-1.5 text-footnote font-normal capitalize text-ink-500">{board.sizeCategory}</span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-[13px]" style={{ color: "var(--s-text-soft)" }}>Lighting</p>
-                    <p className="mt-0.5 text-[15px] font-[600]" style={{ color: "var(--s-text)" }}>{lightingLabel(board.lighting)}</p>
+                    <p className="text-footnote text-ink-500">Lighting</p>
+                    <p className="mt-0.5 text-subhead font-[590] text-ink-100">{lightingLabel(board.lighting)}</p>
                   </div>
                 </div>
 
@@ -329,15 +318,12 @@ export function InventoryBrowser({
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${board.lat},${board.lng}`}
                     target="_blank" rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[14px] font-[600]"
-                    style={{ color: "var(--s-accent)" }}
+                    className="inline-flex items-center gap-1.5 text-footnote font-[590] text-accent"
                   >
                     <MapPin className="size-3.5" strokeWidth={2.2} /> See it on Google Maps
                   </a>
 
-                  <h3 className="mt-6 text-[17px] font-[650] tracking-[-0.01em]" style={{ color: "var(--s-text)" }}>
-                    Check availability
-                  </h3>
+                  <h3 className="mt-6 text-title3 font-[620] text-ink-0">Check availability</h3>
                   <div className="mt-4">
                     <EnquiryForm board={board} onDone={() => setOpen(null)} />
                   </div>

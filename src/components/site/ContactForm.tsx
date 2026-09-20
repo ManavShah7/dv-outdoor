@@ -4,18 +4,12 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 
 const FIELD =
-  "h-12 w-full min-w-0 rounded-[10px] border px-4 text-[15px] outline-none transition-shadow";
+  "h-12 w-full min-w-0 rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 " +
+  "placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none " +
+  "transition-shadow focus:ring-2 focus:ring-accent";
 
-function fieldStyle() {
-  return {
-    borderColor: "var(--s-line)",
-    background: "var(--s-bg)",
-    color: "var(--s-text)",
-  } as React.CSSProperties;
-}
-
-/** General "contact us" — no specific board attached. Posts to the same
- *  validated lead endpoint the per-board enquiry uses. */
+/** General enquiry — no board attached. Same validated endpoint as the
+ *  per-board form. */
 export function ContactForm() {
   const [companyName, setCompanyName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
@@ -48,20 +42,15 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div
-        className="rounded-[18px] border p-10 text-center"
-        style={{ borderColor: "var(--s-line)", background: "var(--s-bg)" }}
-      >
+      <div className="rounded-[var(--radius-panel)] bg-chrome-raised p-10 text-center ring-1 ring-white/[0.07] ring-inset">
         <span
           className="mx-auto grid size-14 place-items-center rounded-full"
-          style={{ background: "color-mix(in srgb, var(--s-good) 12%, transparent)" }}
+          style={{ background: "color-mix(in srgb, var(--color-available) 15%, transparent)" }}
         >
-          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--s-good)" }} />
+          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--color-available)" }} />
         </span>
-        <h3 className="mt-5 text-[24px] font-[700] tracking-[-0.02em]" style={{ color: "var(--s-text)" }}>
-          Thanks — we&rsquo;ve got it
-        </h3>
-        <p className="mx-auto mt-2.5 max-w-[34ch] text-[15px] leading-relaxed" style={{ color: "var(--s-text-soft)" }}>
+        <h3 className="mt-5 text-title2 font-[680] text-ink-0">Thanks — we&rsquo;ve got it</h3>
+        <p className="mx-auto mt-2.5 max-w-[34ch] text-subhead leading-relaxed text-ink-400">
           Someone from our office will call you today to talk through sites and dates.
         </p>
       </div>
@@ -71,54 +60,36 @@ export function ContactForm() {
   return (
     <form
       onSubmit={submit}
-      className="rounded-[18px] border p-7 sm:p-8"
-      style={{ borderColor: "var(--s-line)", background: "var(--s-bg)", boxShadow: "0 1px 2px rgba(16,24,32,0.04), 0 12px 32px -12px rgba(16,24,32,0.10)" }}
+      className="rounded-[var(--radius-panel)] bg-chrome-raised p-7 ring-1 ring-white/[0.07] ring-inset sm:p-8"
     >
       <div className="flex flex-col gap-4">
-        <input
-          className={FIELD} style={fieldStyle()}
-          value={companyName} onChange={(e) => setCompanyName(e.target.value)}
-          placeholder="Company name"
-        />
+        <input className={FIELD} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company name" />
         <div className="grid gap-4 sm:grid-cols-2">
-          <input
-            className={FIELD} style={fieldStyle()}
-            value={contactPerson} onChange={(e) => setContactPerson(e.target.value)}
-            placeholder="Your name"
-          />
-          <input
-            className={FIELD} style={fieldStyle()}
-            value={phone} onChange={(e) => setPhone(e.target.value)}
-            placeholder="Phone number"
-          />
+          <input className={FIELD} value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} placeholder="Your name" />
+          <input className={FIELD} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone number" />
         </div>
-        <input
-          className={FIELD} style={fieldStyle()} type="email"
-          value={email} onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email (optional)"
-        />
+        <input className={FIELD} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email (optional)" />
         <textarea
           rows={4}
-          className="w-full rounded-[10px] border p-4 text-[15px] outline-none"
-          style={fieldStyle()}
-          value={message} onChange={(e) => setMessage(e.target.value)}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           placeholder="Which cities are you looking at? Any dates in mind?"
+          className="w-full rounded-[var(--radius-control)] bg-black/30 p-4 text-subhead text-ink-0 placeholder:text-ink-600 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
         />
       </div>
 
       {error && (
-        <p className="mt-4 text-[14px]" style={{ color: "#c62828" }}>{error}</p>
+        <p className="mt-4 text-footnote" style={{ color: "var(--color-damaged)" }}>{error}</p>
       )}
 
       <button
         type="submit"
         disabled={!valid || busy}
-        className="mt-5 h-13 w-full rounded-full py-3.5 text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
-        style={{ background: "var(--s-accent)" }}
+        className="mt-5 h-12 w-full rounded-[var(--radius-pill)] bg-accent text-body font-[620] text-accent-on transition-opacity disabled:opacity-35"
       >
         {busy ? "Sending…" : "Send enquiry"}
       </button>
-      <p className="mt-3 text-center text-[13px]" style={{ color: "var(--s-text-soft)" }}>
+      <p className="mt-3 text-center text-caption text-ink-600">
         No commitment. We usually reply the same day.
       </p>
     </form>

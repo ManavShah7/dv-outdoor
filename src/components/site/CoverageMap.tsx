@@ -68,7 +68,7 @@ export function CoverageMap() {
           clickableIcons={false}
           keyboardShortcuts={false}
           styles={[
-            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
             { featureType: "transit", stylers: [{ visibility: "off" }] },
             { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
           ]}
