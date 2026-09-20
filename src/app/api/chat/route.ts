@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { TOOLS, runTool, type AgentAction } from "@/lib/agentTools";
+import { requireAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -23,6 +24,15 @@ Changing data:
 type Body = { messages: Anthropic.MessageParam[] };
 
 export async function POST(req: Request) {
+  // The assistant reads the whole inventory and the client ledger, and its
+  // write tools can drive a booking to completion. Admin-only, same bar as
+  // every other route that touches this data.
+  try {
+    await requireAdmin();
+  } catch {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
     return Response.json({ error: "ANTHROPIC_API_KEY is not set." }, { status: 500 });
