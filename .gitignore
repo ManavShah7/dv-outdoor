@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local screenshots
 /.screenshots
+
+# business data — the repo is public, this must never be committed
+/private/
+.screenshots/
