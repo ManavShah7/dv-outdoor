@@ -39,7 +39,7 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="tile p-12 text-center">
+      <div className="p-12 text-center">
         <span
           className="mx-auto grid size-14 place-items-center rounded-full"
           style={{ background: "#e8f5ee" }}
@@ -57,7 +57,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={submit}
-      className="tile p-8"
+      className="p-8"
     >
       <div className="flex flex-col gap-4">
         <input className={FIELD} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company name" />

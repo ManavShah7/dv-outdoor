@@ -3,27 +3,41 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Apple's scroll-linked reveal, as measured off apple.com/apple-music and
- * /airpods-5 (see ~/.claude/refs/apple-motion-2026.md).
+ * Apple's scroll-linked reveal, measured off apple.com (see
+ * ~/.claude/refs/apple-motion-2026.md).
  *
- * Two parts, and the second is the whole trick:
- *
- *  1. Scroll maps to progress *linearly* — no easing curve at all. The element
- *     starts moving when its top is at 108% of viewport height and finishes at
- *     68%, a window of 40vh.
- *
+ *  1. Scroll → progress is *linear*, no easing. Starts when the element's top
+ *     is at 108% of viewport height, done at 68% — a 40vh window.
  *  2. The rendered value chases that target with exponential decay rather than
- *     playing a transition: `current += (target - current) * 0.15` every frame.
- *     Park the scroll mid-way and it keeps easing in. That is why it feels
- *     attached to your hand instead of played back at you, and why a fast
- *     flick settles gracefully instead of snapping.
+ *     a transition: current += (target - current) * 0.15 per frame. Park the
+ *     scroll mid-way and it keeps easing in. That is the whole trick.
  *
- * Opacity rides the same progress, so it is exactly `1 - y/amplitude`.
+ * Opacity rides the same progress. Stagger comes from varying `amplitude`
+ * between neighbours, which stays correct at any scroll speed — unlike a
+ * transition-delay.
  *
- * `amplitude` is the stagger device: neighbours with different travel arrive at
- * different times from the same trigger point, which stays correct at any
- * scroll speed — a transition-delay does not.
+ * One shared rAF loop drives every element on the page; a loop per component
+ * would mean a dozen independent tickers running forever.
  */
+type Entry = { el: HTMLElement; amp: number; cur: number };
+
+const entries = new Set<Entry>();
+let raf = 0;
+
+function tick() {
+  const vh = window.innerHeight;
+  for (const e of entries) {
+    const top = e.el.getBoundingClientRect().top;
+    const progress = Math.min(1, Math.max(0, (1.08 * vh - top) / (0.4 * vh)));
+    const target = (1 - progress) * e.amp;
+    e.cur += (target - e.cur) * 0.15;
+    if (Math.abs(e.cur - target) < 0.01) e.cur = target;
+    e.el.style.transform = e.cur === 0 ? "none" : `translateY(${e.cur.toFixed(2)}px)`;
+    e.el.style.opacity = String(1 - e.cur / e.amp);
+  }
+  raf = entries.size ? requestAnimationFrame(tick) : 0;
+}
+
 export function Reveal({
   children,
   amplitude = 30,
@@ -33,7 +47,7 @@ export function Reveal({
   children: React.ReactNode;
   amplitude?: number;
   className?: string;
-  as?: "div" | "section" | "li" | "header";
+  as?: "div" | "section" | "li" | "header" | "figure";
 }) {
   const ref = useRef<HTMLElement>(null);
 
@@ -42,33 +56,16 @@ export function Reveal({
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    let current = amplitude;
-    let raf = 0;
-    let running = true;
-
+    const entry: Entry = { el, amp: amplitude, cur: amplitude };
     el.style.transform = `translateY(${amplitude}px)`;
     el.style.opacity = "0";
+    entries.add(entry);
+    if (!raf) raf = requestAnimationFrame(tick);
 
-    const tick = () => {
-      if (!running) return;
-      const vh = window.innerHeight;
-      const top = el.getBoundingClientRect().top;
-      // linear scroll → progress, 108vh down to 68vh
-      const progress = Math.min(1, Math.max(0, (1.08 * vh - top) / (0.4 * vh)));
-      const target = (1 - progress) * amplitude;
-
-      // damped follower — ~0.15 per frame at 60fps, time constant ~100ms
-      current += (target - current) * 0.15;
-      if (Math.abs(current - target) < 0.01) current = target;
-
-      el.style.transform = `translateY(${current.toFixed(2)}px)`;
-      el.style.opacity = String(1 - current / amplitude);
-
-      raf = requestAnimationFrame(tick);
+    return () => {
+      entries.delete(entry);
+      if (!entries.size && raf) { cancelAnimationFrame(raf); raf = 0; }
     };
-
-    raf = requestAnimationFrame(tick);
-    return () => { running = false; cancelAnimationFrame(raf); };
   }, [amplitude]);
 
   return (
