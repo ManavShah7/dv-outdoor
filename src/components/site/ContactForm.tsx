@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 
-const FIELD = "w-field";
+const FIELD = "field";
 
 /** General enquiry — no board attached. Same validated endpoint as the
  *  per-board form. */
@@ -39,15 +39,15 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="w-card p-10 text-center">
+      <div className="tile p-12 text-center">
         <span
           className="mx-auto grid size-14 place-items-center rounded-full"
-          style={{ background: "var(--w-free-tint)" }}
+          style={{ background: "#e8f5ee" }}
         >
-          <Check className="size-7" strokeWidth={2.6} style={{ color: "var(--w-free)" }} />
+          <Check className="size-7" strokeWidth={2.6} style={{ color: "#12784a" }} />
         </span>
-        <h3 className="mt-5 text-[22px] font-[700] tracking-[-0.02em]" style={{ color: "var(--w-text)" }}>Thanks — we&rsquo;ve got it</h3>
-        <p className="mx-auto mt-2.5 max-w-[34ch] text-[15px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>
+        <h3 className="t-title mt-5">Thanks — we&rsquo;ve got it</h3>
+        <p className="t-body mx-auto mt-3 max-w-[34ch]" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
           Someone from our office will call you today to talk through sites and dates.
         </p>
       </div>
@@ -57,7 +57,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={submit}
-      className="w-card p-7 sm:p-8"
+      className="tile p-8"
     >
       <div className="flex flex-col gap-4">
         <input className={FIELD} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company name" />
@@ -71,20 +71,19 @@ export function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Which cities, and roughly when?"
-          className="w-field"
-          style={{ height: "auto", padding: "12px 14px" }}
+          className="field"
+          style={{ height: "auto", padding: "14px 16px" }}
         />
       </div>
 
       {error && (
-        <p className="mt-4 text-[14px]" style={{ color: "var(--w-warn)" }}>{error}</p>
+        <p className="t-small mt-4" style={{ color: "#b4451c" }}>{error}</p>
       )}
 
       <button
         type="submit"
         disabled={!valid || busy}
-        className="mt-5 h-12 w-full rounded-full text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
-        style={{ background: "var(--w-accent)" }}
+        className="btn mt-6 w-full justify-center disabled:opacity-40"
       >
         {busy ? "Sending…" : "Send enquiry"}
       </button>

@@ -158,56 +158,121 @@
 }
 
 /* ============================================================================
-   PUBLIC SITE — light. Scoped to .site so the admin tool is untouched.
+   PUBLIC SITE
+   Values transcribed from apple.com's shipped CSS (see ~/.claude/refs/
+   apple-design-system.md). Three token layers: components never touch a raw
+   hex. Scoped to .site so the admin tool is untouched.
    ============================================================================ */
 .site {
-  --w-bg:        #ffffff;
-  --w-soft:      #f7f8f9;
-  --w-sunk:      #eef0f2;
-  --w-line:      #e4e7ea;
-  --w-hair:      #f0f2f4;
-  --w-text:      #0d1114;
-  --w-mid:       #454e57;
-  --w-soft-text: #767f89;
-  --w-faint:     #9aa3ac;
-  --w-accent:    #0a66d0;
-  --w-accent-2:  #0854ad;
-  --w-tint:      #eef4fd;
-  --w-free:      #12784a;
-  --w-free-tint: #e8f5ee;
-  --w-warn:      #b4451c;
+  /* layer 2 — semantic. glyph = foreground, fill = background. */
+  --sk-glyph:                    #000;
+  --sk-glyph-gray:               #1d1d1f;
+  --sk-glyph-gray-secondary:     #6e6e73;
+  --sk-glyph-gray-secondary-alt: #424245;
+  --sk-glyph-gray-tertiary:      #86868b;
+  --sk-glyph-blue:               #0066cc;
+
+  --sk-fill:                     #fff;
+  --sk-fill-secondary:           #fafafc;
+  --sk-fill-tertiary:            #f5f5f7;
+  --sk-fill-gray-tertiary:       #d2d2d7;
+  --sk-fill-gray-quaternary:     #e8e8ed;
+  --sk-fill-blue:                #0071e3;
+  --sk-fill-blue-hover:          #0077ed;
+
+  /* over photography */
+  --sk-glyph-alpha:              rgba(255,255,255,.92);
+  --sk-glyph-alpha-secondary:    rgba(255,255,255,.72);
+
+  --section-padding-block: 120px;
+  --grid: 980px;
 
   color-scheme: light;
-  background: var(--w-bg);
-  color: var(--w-text);
-  font-feature-settings: "cv11";
+  background: var(--sk-fill);
+  color: var(--sk-glyph-gray);
+  -webkit-font-smoothing: antialiased;
 }
 
-.site ::selection { background: color-mix(in srgb, var(--w-accent) 22%, transparent); }
+@media (max-width: 1068px) { .site { --section-padding-block: 100px; --grid: 692px; } }
+@media (max-width: 734px)  { .site { --section-padding-block: 80px;  --grid: 87.5%; } }
+@media (min-width: 1920px) { .site { --grid: 1260px; } }
 
-/* one card treatment, used everywhere on the site */
-.w-card {
-  background: var(--w-bg);
-  border: 1px solid var(--w-line);
-  border-radius: 14px;
+.site .grid-w { width: var(--grid); margin-inline: auto; }
+@media (max-width: 926px) { .site .grid-w { width: 87.5vw; } }
+
+.site .sec { padding-block: var(--section-padding-block); }
+
+/* ---- type ramp: Apple's exact size / line-height / tracking pairs -------- */
+.t-hero      { font-size: 128px; line-height: 1;      font-weight: 600; letter-spacing: -.002em; }
+.t-headline  { font-size: 56px;  line-height: 1;      font-weight: 700; letter-spacing: -.005em; }
+.t-eyebrow   { font-size: 28px;  line-height: 1.1429; font-weight: 600; letter-spacing: .007em; }
+.t-title     { font-size: 24px;  line-height: 1.1667; font-weight: 600; letter-spacing: .009em; }
+.t-intro     { font-size: 21px;  line-height: 1.381;  font-weight: 400; letter-spacing: .011em; }
+.t-body      { font-size: 17px;  line-height: 1.4706; font-weight: 400; letter-spacing: -.022em; }
+.t-small     { font-size: 14px;  line-height: 1.4286; font-weight: 400; letter-spacing: -.016em; }
+.t-caption   { font-size: 12px;  line-height: 1.3334; font-weight: 400; letter-spacing: -.01em; }
+
+@media (max-width: 1068px) {
+  .t-hero     { font-size: 80px;  line-height: 1.05;   letter-spacing: -.015em; }
+  .t-headline { font-size: 48px;  line-height: 1.0835; }
+  .t-eyebrow  { font-size: 24px;  line-height: 1.1667; letter-spacing: .009em; }
 }
-.w-field {
-  height: 46px;
-  width: 100%;
-  min-width: 0;
-  border-radius: 10px;
-  border: 1px solid var(--w-line);
-  background: var(--w-bg);
-  color: var(--w-text);
-  padding: 0 14px;
-  font-size: 15px;
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
+@media (max-width: 734px) {
+  .t-hero     { font-size: 48px;  line-height: 1.0835; letter-spacing: -.003em; }
+  .t-headline { font-size: 40px;  line-height: 1.1;    letter-spacing: 0em; }
+  .t-eyebrow  { font-size: 21px;  line-height: 1.1905; letter-spacing: .011em; }
+  .t-intro    { font-size: 19px;  line-height: 1.2105; letter-spacing: .012em; }
 }
-.w-field::placeholder { color: var(--w-faint); }
-.w-field:focus {
-  border-color: var(--w-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-accent) 14%, transparent);
+
+/* em-relative rhythm, so gaps rescale with the type that carries them */
+.site h1 + *, .site h2 + *, .site h3 + * { margin-top: .8em; }
+.site .t-headline + .t-intro { margin-top: 1.2em; }
+
+/* ---- surfaces: flat tint, big radius, no shadow -------------------------- */
+.tile {
+  background: var(--sk-fill-tertiary);
+  border-radius: 30px;
+  overflow: hidden;
+}
+@media (max-width: 734px) { .tile { border-radius: 20px; } }
+
+/* ---- buttons: pill, colour-only hover ----------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 17px; line-height: 1.1765; letter-spacing: -.022em; font-weight: 400;
+  padding: 18px 31px; border-radius: 980px;
+  background: var(--sk-fill-blue); color: #fff;
+  transition: background-color .2s cubic-bezier(.45,0,.2,1);
+}
+.btn:hover { background: var(--sk-fill-blue-hover); }
+.btn-quiet {
+  background: transparent; color: var(--sk-glyph-blue);
+  box-shadow: inset 0 0 0 1px var(--sk-fill-gray-tertiary);
+}
+.btn-quiet:hover { background: var(--sk-fill-tertiary); }
+.btn-over {
+  background: rgba(255,255,255,.18); color: #fff;
+  backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+}
+.btn-over:hover { background: rgba(255,255,255,.28); }
+
+.site .field {
+  height: 48px; width: 100%; min-width: 0;
+  border-radius: 12px; border: 1px solid var(--sk-fill-gray-tertiary);
+  background: var(--sk-fill); color: var(--sk-glyph-gray);
+  padding: 0 16px; font-size: 17px; letter-spacing: -.022em; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.site .field::placeholder { color: var(--sk-glyph-gray-tertiary); }
+.site .field:focus {
+  border-color: var(--sk-fill-blue);
+  box-shadow: 0 0 0 4px rgba(0,113,227,.16);
+}
+
+/* ---- motion: gated, so reduced-motion gets the finished page ------------- */
+.reveal { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transform: none !important; opacity: 1 !important; }
 }
 
 html { color-scheme: dark; }

@@ -1,230 +1,205 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, Search, Wrench, PhoneCall } from "lucide-react";
-import { publicStats, liveBrandNames, PUBLIC_BOARDS, PUBLIC_CITIES } from "@/lib/publicBoards";
+import { publicStats, liveBrandNames, PUBLIC_CITIES } from "@/lib/publicBoards";
+import { DECK_BOARDS, titleCase } from "@/lib/junagadhBoards";
 import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
-import { CoverageMap } from "@/components/site/CoverageMap";
 import { ContactForm } from "@/components/site/ContactForm";
-import { inr } from "@/lib/utils";
+import { Reveal } from "@/components/site/Reveal";
 
 export const metadata = {
   title: "DV Outdoor — Billboard advertising across Gujarat",
   description:
-    "Hoardings, unipoles and gantries across Saurashtra and Gujarat. See what's free on a live map, pick your sites, and book directly with the owner.",
+    "Hoardings, unipoles and gantries across Saurashtra and Gujarat. See what's free, pick your sites, book directly with the owner.",
 };
 
-const STEPS = [
-  { icon: Search, title: "Find a site", body: "Filter by city, budget, size and lighting. Every board is pinned where it actually stands." },
-  { icon: PhoneCall, title: "Send an enquiry", body: "Pick your dates. We confirm availability and price, usually the same day." },
-  { icon: Wrench, title: "We put it up", body: "Printing, mounting and upkeep. Our own crews maintain every board." },
-];
+const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
 
 export default function LandingPage() {
   const stats = publicStats();
-  const brands = liveBrandNames(7);
-  const featured = PUBLIC_BOARDS.filter((b) => b.availability === "available")
-    .sort((a, b) => b.askingRate - a.askingRate)
-    .slice(0, 3);
+  const brands = liveBrandNames(6);
+  const hero = DECK_BOARDS[0];
+  const featured = DECK_BOARDS.slice(1, 4);
+  const strip = DECK_BOARDS.slice(4, 10);
 
   return (
-    <div className="site min-h-dvh">
+    <div className="site">
       <SiteHeader />
 
-      {/* ------------------------------------------------------------- hero */}
+      {/* ----------------------------------------------------------- hero */}
       <section className="relative isolate overflow-hidden">
-        {/* Drop a real photo of one of your boards at public/hero.jpg and it
-            takes over from the gradient automatically. */}
+        {hero?.photo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={hero.photo} alt="" className="absolute inset-0 -z-10 size-full object-cover" />
+        )}
         <div
           className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage:
-              "linear-gradient(118deg, #10222f 0%, #163a52 45%, #1d5677 100%), url('/hero.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundBlendMode: "multiply",
-          }}
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.34) 45%, rgba(0,0,0,.66) 100%)" }}
         />
-        <div className="absolute inset-0 -z-10" style={{ background: "linear-gradient(90deg, rgba(8,14,20,.82) 0%, rgba(8,14,20,.5) 58%, rgba(8,14,20,.2) 100%)" }} />
 
-        <div className="mx-auto max-w-[1180px] px-6 py-24 sm:py-32">
-          <div className="max-w-[640px]">
-            <h1 className="text-[clamp(2.4rem,5.5vw,3.9rem)] font-[700] leading-[1.06] tracking-[-0.035em] text-white">
-              Billboard advertising across Gujarat, made simple
+        <div className="grid-w flex min-h-[86vh] flex-col justify-end pb-[120px] pt-[200px]">
+          <Reveal amplitude={40}>
+            <h1 className="t-hero" style={{ color: "#fff" }}>
+              Gujarat, on
+              <br />
+              every corner.
             </h1>
-            <p className="mt-6 max-w-[52ch] text-[clamp(1.02rem,1.6vw,1.2rem)] leading-relaxed text-white/85">
-              {stats.boards} hoardings in {stats.cities} cities, owned and maintained by us.
-              See what&rsquo;s free on a live map, pick your sites, and deal directly with the
-              owner — no broker, no markup.
+            <p className="t-intro mt-6 max-w-[34ch]" style={{ color: "var(--sk-glyph-alpha)" }}>
+              {stats.boards} hoardings across {stats.cities} cities — ours, maintained by us,
+              rented directly to you.
             </p>
-
-            <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link
-                href="/boards"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[16px] font-[600]"
-                style={{ color: "var(--w-text)" }}
-              >
-                Browse {stats.available} available billboards
-                <ArrowRight className="size-[18px]" strokeWidth={2.4} />
-              </Link>
-              <Link
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[16px] font-[600] text-white ring-1 ring-inset ring-white/35 transition-colors hover:bg-white/10"
-              >
-                <PhoneCall className="size-[17px]" strokeWidth={2.2} />
-                Contact us directly
-              </Link>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Link href="/boards" className="btn">See what&rsquo;s free</Link>
+              <Link href="#contact" className="btn btn-over">Talk to us</Link>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ---------------------------------------------------------- trusted */}
-      <section className="border-y py-12" style={{ borderColor: "var(--w-line)" }}>
-        <div className="mx-auto max-w-[1180px] px-6">
-          <p className="text-center text-[15px] font-[600]" style={{ color: "var(--w-text)" }}>Trusted by leading brands</p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
-            {brands.map((b) => (
-              <span key={b} className="text-[19px] font-[700] tracking-[-0.02em]" style={{ color: "var(--w-faint)" }}>
-                {b}
-              </span>
-            ))}
-          </div>
+      {/* -------------------------------------------------------- trusted */}
+      <section className="sec" style={{ background: "var(--sk-fill)" }}>
+        <div className="grid-w">
+          <Reveal>
+            <p className="t-small text-center" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+              Trusted by leading brands
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-14 gap-y-7">
+              {brands.map((b) => (
+                <span key={b} className="t-title" style={{ color: "var(--sk-fill-gray-tertiary)" }}>
+                  {b}
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ------------------------------------------------------------ stats */}
-      <section className="py-16">
-        <div className="mx-auto max-w-[1180px] px-6">
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
+      {/* ---------------------------------------------------------- stats */}
+      <section className="sec pt-0">
+        <div className="grid-w">
+          <Reveal as="section">
+            <h2 className="t-headline max-w-[15ch]">Scale you can actually see.</h2>
+          </Reveal>
+          <dl className="mt-[60px] grid grid-cols-2 gap-x-10 gap-y-12 md:grid-cols-4">
             {[
               { n: stats.boards.toLocaleString("en-IN"), l: "Sites owned" },
               { n: stats.cities, l: "Cities covered" },
               { n: stats.liveBrands, l: "Brands running now" },
               { n: stats.available, l: "Free this month" },
-            ].map((s) => (
-              <div key={s.l}>
-                <dt className="text-[clamp(2rem,4vw,2.75rem)] font-[700] tabular-nums tracking-[-0.03em]" style={{ color: "var(--w-accent)" }}>
-                  {s.n}
-                </dt>
-                <dd className="mt-1 text-[15px]" style={{ color: "var(--w-soft-text)" }}>{s.l}</dd>
-              </div>
+            ].map((s, i) => (
+              <Reveal key={s.l} amplitude={30 + (i % 2) * 20}>
+                <dt className="t-headline tabular-nums">{s.n}</dt>
+                <dd className="t-small mt-2" style={{ color: "var(--sk-glyph-gray-secondary)" }}>{s.l}</dd>
+              </Reveal>
             ))}
           </dl>
         </div>
       </section>
 
-      {/* -------------------------------------------------------------- how */}
-      <section id="how" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
-        <div className="mx-auto max-w-[1180px] px-6">
-          <h2 className="max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] leading-[1.12] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
-            Three steps from map to live campaign
-          </h2>
-          <div className="mt-12 grid gap-10 sm:grid-cols-3">
-            {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <div key={title}>
-                <span
-                  className="grid size-12 place-items-center rounded-[var(--radius-card)]"
-                  style={{ background: "var(--w-tint)" }}
-                >
-                  <Icon className="size-[22px]" strokeWidth={2} style={{ color: "var(--w-accent)" }} />
-                </span>
-                <p className="mt-5 text-[12px] font-[700] uppercase tracking-wide" style={{ color: "var(--w-accent)" }}>Step {i + 1}</p>
-                <h3 className="mt-1.5 text-[19px] font-[650] tracking-[-0.01em]" style={{ color: "var(--w-text)" }}>{title}</h3>
-                <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>{body}</p>
-              </div>
+      {/* ------------------------------------------------------- featured */}
+      <section className="sec" style={{ background: "var(--sk-fill-tertiary)" }}>
+        <div className="grid-w">
+          <Reveal as="section">
+            <p className="t-small" style={{ color: "var(--sk-glyph-gray-secondary)" }}>Available now</p>
+            <h2 className="t-headline mt-2 max-w-[16ch]">Junagadh, this month.</h2>
+          </Reveal>
+
+          <ul className="mt-[60px] grid gap-6 md:grid-cols-3">
+            {featured.map((b, i) => (
+              <Reveal key={b.code} as="li" amplitude={i === 1 ? 80 : 50}>
+                <Link href={`/boards?board=${b.code}`} className="group block">
+                  <div className="tile" style={{ background: "var(--sk-fill)" }}>
+                    <div className="aspect-[4/3] overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={b.photo!}
+                        alt=""
+                        className="size-full object-cover transition-transform duration-[600ms] group-hover:scale-[1.03]"
+                        style={{ transitionTimingFunction: "cubic-bezier(0,0,.5,1)" }}
+                      />
+                    </div>
+                    <div className="p-7">
+                      <p className="t-caption" style={{ color: "var(--sk-glyph-gray-tertiary)" }}>{b.code}</p>
+                      <h3 className="t-title mt-1.5">{titleCase(b.location ?? "")}</h3>
+                      <p className="t-small mt-2" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+                        {b.widthFt}×{b.heightFt} ft
+                        {b.lighting === "backlit" && " · Back-lit"}
+                      </p>
+                      <p className="t-body mt-5">
+                        {inr(b.askingRate ?? 0)}
+                        <span style={{ color: "var(--sk-glyph-gray-secondary)" }}> / month</span>
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
-          </div>
-        </div>
-      </section>
+          </ul>
 
-      {/* --------------------------------------------------------- coverage */}
-      <section id="coverage" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
-        <div className="mx-auto max-w-[1180px] px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
-                Where we are
-              </h2>
-              <p className="mt-2 max-w-[54ch] text-[15px]" style={{ color: "var(--w-soft-text)" }}>{PUBLIC_CITIES.join(" · ")}</p>
-            </div>
-            <Link href="/boards" className="inline-flex items-center gap-1.5 text-[15px] font-[600]" style={{ color: "var(--w-accent)" }}>
-              Open the full map
-              <ArrowRight className="size-4" strokeWidth={2.4} />
-            </Link>
-          </div>
-
-          <div className="mt-8 overflow-hidden rounded-[16px] border" style={{ borderColor: "var(--w-line)" }}>
-            <CoverageMap />
-          </div>
-        </div>
-      </section>
-
-      {/* -------------------------------------------------------- available */}
-      <section className="py-20">
-        <div className="mx-auto max-w-[1180px] px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
-              Free right now
-            </h2>
-            <Link href="/boards" className="inline-flex items-center gap-1.5 text-[15px] font-[600]" style={{ color: "var(--w-accent)" }}>
-              All {stats.available} sites
-              <ArrowRight className="size-4" strokeWidth={2.4} />
-            </Link>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {featured.map((b) => (
-              <Link
-                key={b.code}
-                href={`/boards?board=${b.code}`}
-                className="w-card p-6 transition-shadow hover:shadow-[0_8px_28px_-14px_rgba(13,17,20,.22)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[12px]" style={{ color: "var(--w-faint)" }}>{b.code}</span>
-                  <span
-                    className="rounded-[var(--radius-pill)] px-2.5 py-1 text-caption font-[620]"
-                    style={{ color: "var(--w-free)", background: "var(--w-free-tint)" }}
-                  >
-                    Available
-                  </span>
-                </div>
-                <h3 className="mt-4 text-[19px] font-[650] leading-snug tracking-[-0.01em]" style={{ color: "var(--w-text)" }}>{b.name}</h3>
-                <p className="mt-1.5 flex items-center gap-1.5 text-[14px]" style={{ color: "var(--w-soft-text)" }}>
-                  <MapPin className="size-3.5" strokeWidth={2} />
-                  {b.area}, {b.city}
-                </p>
-                <p className="mt-5 flex items-baseline gap-2 border-t pt-4" style={{ borderColor: "var(--w-hair)" }}>
-                  <span className="text-[18px] font-[700] tabular-nums" style={{ color: "var(--w-text)" }}>{inr(b.askingRate)}</span>
-                  <span className="text-[14px]" style={{ color: "var(--w-soft-text)" }}>/ month</span>
-                  <span className="ml-auto text-[13px] tabular-nums" style={{ color: "var(--w-faint)" }}>{b.widthFt}×{b.heightFt} ft</span>
-                </p>
+          <Reveal>
+            <div className="mt-12 text-center">
+              <Link href="/boards" className="btn btn-quiet">
+                Browse all {stats.available} available sites
               </Link>
-            ))}
-          </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ---------------------------------------------------------- contact */}
-      <section id="contact" className="scroll-mt-20 py-20" style={{ background: "var(--w-soft)" }}>
-        <div className="mx-auto grid max-w-[1180px] gap-12 px-6 lg:grid-cols-[1fr_minmax(0,460px)]">
-          <div>
-            <h2 className="max-w-[16ch] text-[clamp(1.8rem,3.6vw,2.6rem)] font-[700] leading-[1.12] tracking-[-0.03em]" style={{ color: "var(--w-text)" }}>
-              Tell us the city. We&rsquo;ll tell you what&rsquo;s free.
-            </h2>
-            <p className="mt-5 max-w-[46ch] text-[16px] leading-relaxed" style={{ color: "var(--w-soft-text)" }}>
-              Send us the cities and dates you have in mind and we&rsquo;ll come back with
-              options and pricing.
+      {/* ----------------------------------------------------------- strip */}
+      <section className="sec">
+        <div className="grid-w">
+          <Reveal as="section">
+            <h2 className="t-headline max-w-[18ch]">Every site, photographed from the road.</h2>
+            <p className="t-intro mt-[1.2em] max-w-[44ch]" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+              Not a floor plan or a dot on a map. The actual approach, the actual traffic,
+              the actual sightline.
             </p>
-            <Link
-              href="/boards"
-              className="mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-[15px] font-[600] text-white"
-              style={{ background: "var(--w-accent)" }}
-            >
-              Browse billboards
-              <ArrowRight className="size-4" strokeWidth={2.4} />
-            </Link>
-          </div>
+          </Reveal>
+        </div>
 
-          <ContactForm />
+        <div className="mt-[60px] flex gap-5 overflow-x-auto px-[max(1.5rem,calc((100vw-var(--grid))/2))] pb-4">
+          {strip.map((b, i) => (
+            <Reveal key={b.code} amplitude={i % 2 ? 80 : 50} className="shrink-0">
+              <div className="tile w-[380px]">
+                <div className="aspect-[3/2]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={b.photo!} alt="" className="size-full object-cover" />
+                </div>
+              </div>
+              <p className="t-small mt-3" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+                {titleCase(b.location ?? "")}
+              </p>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* -------------------------------------------------------- coverage */}
+      <section className="sec" style={{ background: "var(--sk-fill-tertiary)" }}>
+        <div className="grid-w">
+          <Reveal as="section">
+            <h2 className="t-headline max-w-[14ch]">Where we are.</h2>
+            <p className="t-intro mt-[1.2em] max-w-[46ch]" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+              {PUBLIC_CITIES.join(" · ")}
+            </p>
+            <div className="mt-10">
+              <Link href="/boards" className="btn">Open the map</Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* --------------------------------------------------------- contact */}
+      <section id="contact" className="sec scroll-mt-16">
+        <div className="grid-w grid gap-14 lg:grid-cols-[1fr_minmax(0,420px)]">
+          <Reveal as="section">
+            <h2 className="t-headline max-w-[13ch]">Tell us the city.</h2>
+            <p className="t-intro mt-[1.2em] max-w-[40ch]" style={{ color: "var(--sk-glyph-gray-secondary)" }}>
+              We&rsquo;ll come back with what&rsquo;s free, what it costs, and photos of each one.
+            </p>
+          </Reveal>
+          <Reveal amplitude={60}>
+            <ContactForm />
+          </Reveal>
         </div>
       </section>
 
