@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { assetUrl } from "@/lib/assets";
+import { LiveStreetView } from "@/components/times/LiveStreetView";
+import { LiveHeatmap } from "@/components/times/LiveHeatmap";
 
 /**
  * The Times Media landing page, band by band, from the 1900-wide frame.
@@ -124,7 +126,9 @@ export function StreetView() {
         </p>
       </div>
       <div className="tm-split__fig">
-        <Shot src={assetUrl("site/hero.jpg")} alt="The approach to a board, seen from the road" />
+        {/* a real panorama, not a picture of one — the band claims you can
+            see it live, and dragging it is the proof */}
+        <LiveStreetView lat={21.5222} lng={70.4579} caption="Motibaug Road, Junagadh" />
       </div>
     </section>
   );
@@ -137,8 +141,7 @@ export function Reach() {
         Know your reach before you commit.{" "}<br className="tm-br" />View real traffic data around it.
       </h2>
       <div className="tm-reach__fig">
-        {/* eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage */}
-        <img src={assetUrl("site/heat-rajkot.png")} alt="Population density across Rajkot, with the densest areas in red" />
+        <LiveHeatmap lat={22.3039} lng={70.8022} zoom={12} />
       </div>
     </section>
   );

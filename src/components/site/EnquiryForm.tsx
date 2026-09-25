@@ -6,7 +6,7 @@ import type { PublicBoard } from "@/lib/publicBoards";
 import { parseDateOnly } from "@/lib/utils";
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <span className="mb-1.5 block text-[13px]" style={{ color: "var(--w-soft-text)" }}>{children}</span>;
+  return <span className="tmui-lab">{children}</span>;
 }
 
 export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: () => void }) {
@@ -55,64 +55,56 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
   if (sent) {
     return (
       <div className="py-8 text-center">
-        <span
-          className="mx-auto grid size-12 place-items-center rounded-full"
-          style={{ background: "var(--w-free-tint)" }}
-        >
-          <Check className="size-6" strokeWidth={2.6} style={{ color: "var(--w-free)" }} />
+        <span className="mx-auto grid size-11 place-items-center"
+              style={{ background: "var(--ink)", color: "var(--paper)" }}>
+          <Check className="size-5" strokeWidth={3} />
         </span>
-        <h3 className="mt-4 text-[19px] font-[650]" style={{ color: "var(--w-text)" }}>Enquiry sent</h3>
-        <p className="mt-1.5 text-[14px]" style={{ color: "var(--w-soft-text)" }}>
+        <h3 className="tmui-caps mt-4" style={{ fontSize: 15, fontWeight: 700 }}>Enquiry sent</h3>
+        <p className="tmui-note mt-2" style={{ opacity: .65 }}>
           We&rsquo;ll call you about {board.code}.
         </p>
         {onDone && (
-          <button
-            onClick={onDone}
-            className="mt-5 rounded-full border px-5 py-2.5 text-[14px] font-[600]"
-            style={{ borderColor: "var(--w-line)", color: "var(--w-mid)" }}
-          >
-            Keep browsing
-          </button>
+          <button onClick={onDone} className="tmui-ghost mt-5">Keep browsing</button>
         )}
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4">
+    <form onSubmit={submit} className="tmui-form">
       <label className="block">
         <Label>Company</Label>
-        <input className="w-field" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+        <input className="tmui-in" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
       </label>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="tmui-row">
         <label className="block min-w-0">
           <Label>Your name</Label>
-          <input className="w-field" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} />
+          <input className="tmui-in" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} />
         </label>
         <label className="block min-w-0">
           <Label>Phone</Label>
-          <input className="w-field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91" />
+          <input className="tmui-in" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91" />
         </label>
       </div>
 
       <label className="block">
         <Label>Email <span style={{ color: "var(--w-faint)" }}>(optional)</span></Label>
-        <input className="w-field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="tmui-in" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="tmui-row">
         <label className="block min-w-0">
           <Label>From</Label>
-          <input className="w-field" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <input className="tmui-in" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         </label>
         <label className="block min-w-0">
           <Label>Till</Label>
-          <input className="w-field" type="date" value={till} onChange={(e) => setTill(e.target.value)} />
+          <input className="tmui-in" type="date" value={till} onChange={(e) => setTill(e.target.value)} />
         </label>
       </div>
       {from && till && (
-        <p className="-mt-2 text-[13px]" style={{ color: datesOk ? "var(--w-soft-text)" : "var(--w-warn)" }}>
+        <p className="tmui-note -mt-1" style={{ opacity: datesOk ? .6 : 1, fontWeight: datesOk ? 500 : 700 }}>
           {datesOk ? `${days} days` : "Till must come after From"}
         </p>
       )}
@@ -123,20 +115,14 @@ export function EnquiryForm({ board, onDone }: { board: PublicBoard; onDone?: ()
           rows={3}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-field"
-          style={{ height: "auto", padding: "12px 14px" }}
+          className="tmui-in"
         />
       </label>
 
-      {error && <p className="text-[14px]" style={{ color: "var(--w-warn)" }}>{error}</p>}
+      {error && <p className="tmui-note" style={{ fontWeight: 700 }}>{error}</p>}
 
-      <button
-        type="submit"
-        disabled={!valid || busy}
-        className="h-12 w-full rounded-full text-[16px] font-[600] text-white transition-opacity disabled:opacity-40"
-        style={{ background: "var(--w-accent)" }}
-      >
-        {busy ? "Sending…" : "Send enquiry"}
+      <button type="submit" disabled={!valid || busy} className="tmui-cta mt-1 w-full">
+        {busy ? "Sending" : "Send enquiry"}
       </button>
     </form>
   );
