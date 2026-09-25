@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { TrafficCone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Board } from "@/lib/types";
 import type { Enquiry } from "@/lib/enquiries.db";
@@ -60,6 +61,7 @@ export function Workspace({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [toast, setToast] = useState<string | null>(null);
+  const [traffic, setTraffic] = useState(false);
   const router = useRouter();
 
   /**
@@ -274,6 +276,7 @@ export function Workspace({
           selectedId={selected?.id}
           onSelect={selectBoard}
           insetLeft={panel ? 328 + 427 + 24 : 328 + 24}
+          traffic={traffic}
         />
       </div>
 
@@ -431,6 +434,21 @@ export function Workspace({
             }}
           />
         )}
+
+        {/* a map layer, not a filter — it changes nothing about which boards
+            are listed, so it sits on the canvas */}
+        <button
+          onClick={() => setTraffic((v) => !v)}
+          aria-pressed={traffic}
+          className={cn(
+            "pointer-events-auto absolute right-6 top-6 z-10 inline-flex h-10 items-center gap-2",
+            "rounded-[var(--radius-control)] px-4 text-footnote font-[590] ring-1 ring-inset transition-colors",
+            traffic ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-white/[0.12]",
+          )}
+        >
+          <TrafficCone className="size-4" strokeWidth={2.2} />
+          Live traffic
+        </button>
 
         <ChatWidget onActions={applyAgentActions} />
         <Toast message={toast} onDone={() => setToast(null)} />

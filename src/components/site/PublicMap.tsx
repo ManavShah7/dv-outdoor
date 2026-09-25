@@ -131,6 +131,34 @@ const MONO: google.maps.MapTypeStyle[] = [
   { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ saturation: -100 }, { lightness: -20 }] },
 ];
 
+/**
+ * Google's own live traffic, drawn by Google on a Google map.
+ *
+ * This is the only legal way to put it here: the terms forbid caching the
+ * data or deriving your own layer from it, but the rendered TrafficLayer is a
+ * supported feature. It is genuinely live — green free-flowing through to
+ * dark red — and it is genuinely patchy outside the big cities. Measured one
+ * night: Ahmedabad 7.4% of the view painted, Rajkot 4.4%, Junagadh 1.0%,
+ * Veraval 0.7%. So it is a toggle that is off by default, not a promise.
+ *
+ * Note this shows congestion, not volume. A jammed road has fewer vehicles
+ * per hour passing the board than a free-flowing one — useful context for
+ * where a driver is sitting still, not a measure of audience.
+ */
+function Traffic({ on }: { on: boolean }) {
+  const map = useMap();
+  const layer = useRef<google.maps.TrafficLayer | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+    if (!layer.current) layer.current = new google.maps.TrafficLayer();
+    layer.current.setMap(on ? map : null);
+    return () => layer.current?.setMap(null);
+  }, [map, on]);
+
+  return null;
+}
+
 function Layers({
   boards, selected, onSelect, insetLeft,
 }: {
@@ -246,10 +274,10 @@ function Layers({
 }
 
 export function PublicMap({
-  boards, selected, onSelect, insetLeft = 0,
+  boards, selected, onSelect, insetLeft = 0, traffic = false,
 }: {
   boards: PublicBoard[]; selected: string | null;
-  onSelect: (code: string) => void; insetLeft?: number;
+  onSelect: (code: string) => void; insetLeft?: number; traffic?: boolean;
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!key) {
@@ -273,6 +301,7 @@ export function PublicMap({
         style={{ width: "100%", height: "100%" }}
       >
         <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} />
+        <Traffic on={traffic} />
       </GoogleMap>
   );
 }

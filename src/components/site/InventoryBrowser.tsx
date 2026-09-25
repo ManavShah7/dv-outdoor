@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronsLeft, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
 import { MapsProvider } from "@/components/map/MapsProvider";
 import { PublicMap } from "@/components/site/PublicMap";
 import { BoardVisual } from "@/components/site/BoardVisual";
@@ -152,6 +152,7 @@ export function InventoryBrowser({
   const [lights, setLights] = useState<Light[]>([]);
   const [maxRate, setMaxRate] = useState(RATE_MAX);
   const [open, setOpen] = useState<string | null>(initialBoard);
+  const [traffic, setTraffic] = useState(false);
 
   // On a phone the rail is wider than the screen, so it stops being a rail and
   // becomes a sheet over the map — and the map, not the filters, is what you
@@ -213,6 +214,7 @@ export function InventoryBrowser({
             selected={open}
             onSelect={setOpen}
             insetLeft={showPanel && !narrow ? PANEL_W + 24 : 24}
+            traffic={traffic}
           />
         </div>
 
@@ -318,6 +320,39 @@ export function InventoryBrowser({
           </AnimatePresence>
 
           <div className="pointer-events-none relative min-w-0 flex-1">
+            {/* A map layer, not a filter — it changes nothing about which
+                boards are listed, so it sits on the map rather than in the
+                rail with Size and Lighting. */}
+            <button
+              onClick={() => setTraffic((v) => !v)}
+              aria-pressed={traffic}
+              className="tmui-ghost pointer-events-auto absolute right-6 top-6 z-10"
+              style={traffic ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
+            >
+              <TrafficCone className="size-4" strokeWidth={2.4} />
+              Live traffic
+            </button>
+
+            {/* The roads borrow the same green and red the pins use for free
+                and booked, which would otherwise read as one scale. Saying
+                what is what costs a line and removes the ambiguity. */}
+            {traffic && (
+              <div
+                className="tmui-caps pointer-events-none absolute right-6 top-[68px] z-10 flex flex-col gap-1.5 border p-3"
+                style={{ background: "#fff", borderColor: "var(--ink)", fontSize: 10.5, fontWeight: 600 }}
+              >
+                <span className="flex items-center gap-2">
+                  <span style={{ width: 16, height: 3, background: "#16e098" }} /> Roads flowing
+                </span>
+                <span className="flex items-center gap-2">
+                  <span style={{ width: 16, height: 3, background: "#e93a3a" }} /> Roads jammed
+                </span>
+                <span className="mt-1 flex items-center gap-2" style={{ opacity: .6 }}>
+                  <span style={{ width: 9, height: 9, borderRadius: 999, background: "#0f9d3a", border: "1px solid #000" }} /> Pins are boards
+                </span>
+              </div>
+            )}
+
             {!showPanel && (
               <button onClick={() => setPanelOverride(true)}
                       className="tmui-ghost pointer-events-auto absolute left-6 top-6 z-10"

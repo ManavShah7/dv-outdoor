@@ -234,17 +234,36 @@ function Layers({
   );
 }
 
+/**
+ * Google's own live traffic, drawn by Google. The terms forbid caching it or
+ * deriving a layer from it; the rendered TrafficLayer is supported. Useful
+ * here when someone on the phone asks what the road is actually like.
+ */
+function Traffic({ on }: { on: boolean }) {
+  const map = useMap();
+  const layer = useRef<google.maps.TrafficLayer | null>(null);
+  useEffect(() => {
+    if (!map) return;
+    if (!layer.current) layer.current = new google.maps.TrafficLayer();
+    layer.current.setMap(on ? map : null);
+    return () => layer.current?.setMap(null);
+  }, [map, on]);
+  return null;
+}
+
 export function BoardMap({
   boards,
   selectedId,
   onSelect,
   insetLeft = 0,
+  traffic = false,
 }: {
   boards: Board[];
   selectedId?: string;
   onSelect: (b: Board) => void;
   /** width of the floating chrome covering the left of the canvas */
   insetLeft?: number;
+  traffic?: boolean;
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -274,6 +293,7 @@ export function BoardMap({
           style={{ width: "100%", height: "100%" }}
         >
           <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} />
+          <Traffic on={traffic} />
         </GoogleMap>
       </div>
   );
