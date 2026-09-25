@@ -1,5 +1,6 @@
 import type { Board } from "./types";
 import { BOARDS } from "./mockBoards";
+import { boardPhotoUrl, VOICE_SAMPLE_URL } from "./assets";
 
 export type Severity = "red" | "orange" | "yellow";
 
@@ -19,6 +20,9 @@ export type MaintenanceRequest = {
   wasRentedAtReport: boolean;
   status: "open" | "in_progress" | "resolved";
   adminFeedback?: "up" | "down";
+  /** what the crew attached at the board */
+  photos: string[];
+  voiceNote: { url: string; seconds: number; language: string } | null;
 };
 
 const REPORTERS = ["Jignesh Vala", "Ramesh Solanki", "Dinesh Chavda", "Suresh Makwana", "Imran Shaikh"];
@@ -144,6 +148,12 @@ export function generateMaintenance(): MaintenanceRequest[] {
       revenueAtRisk: b.rental ? Math.round(monthlyRate(b) / 30) : 0,
       wasRentedAtReport: !!b.rental,
       status: b.status === "under_maintenance" ? "in_progress" : "open",
+      // the crew photograph the fault; roughly half also leave a spoken note
+      photos: [boardPhotoUrl(`JUN-${String((i % 26) + 1).padStart(3, "0")}`)],
+      voiceNote:
+        r() < 0.55
+          ? { url: VOICE_SAMPLE_URL(), seconds: 8 + Math.floor(r() * 22), language: "Gujarati" }
+          : null,
     };
   });
 }

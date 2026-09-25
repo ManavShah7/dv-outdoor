@@ -8,17 +8,27 @@ import type { Board } from "@/lib/types";
 import { inr, fullDate, daysUntil, cn } from "@/lib/utils";
 import { Button, Card, Field, SectionHeader, StatusLabel } from "@/components/ui/Primitives";
 import { BoardQr } from "@/components/boards/BoardQr";
+import { boardPhotoUrl } from "@/lib/assets";
 
-function Visual({ lat, lng }: { lat: number; lng: number }) {
+function Visual({ code, lat, lng }: { code: string; lat: number; lng: number }) {
   const [view, setView] = useState<"street" | "photo">("street");
+  const [noPhoto, setNoPhoto] = useState(false);
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden">
       {view === "street" ? (
         <StreetView lat={lat} lng={lng} className="absolute inset-0" />
-      ) : (
+      ) : noPhoto ? (
         <div className="flex size-full items-center justify-center material-inset">
           <ImageOff className="size-7 text-ink-600" strokeWidth={1.5} />
         </div>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage
+        <img
+          src={boardPhotoUrl(code)}
+          alt=""
+          onError={() => setNoPhoto(true)}
+          className="absolute inset-0 size-full object-cover"
+        />
       )}
       <div className="absolute left-3 top-3 z-10 flex gap-1 rounded-[var(--radius-pill)] material-thick p-1">
         {(["street", "photo"] as const).map((v) => (
@@ -54,7 +64,7 @@ export function BoardInspector({
   return (
     <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
       <div className="relative">
-        <Visual lat={board.lat} lng={board.lng} />
+        <Visual code={board.code} lat={board.lat} lng={board.lng} />
         <button
           onClick={onClose}
           aria-label="Close"

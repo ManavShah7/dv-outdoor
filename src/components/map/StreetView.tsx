@@ -11,9 +11,8 @@ type State = "checking" | "ok" | "none";
  *
  * Coverage in rural Saurashtra is patchy, so this checks for imagery before
  * rendering and says so plainly when there is none — better than handing
- * someone a grey box and letting them assume the app is broken. The search
- * radius is generous because the nearest captured road is often not the exact
- * pole location.
+ * someone a grey box and letting them assume the app is broken. It also
+ * prefers Google's road capture over nearby user photospheres; see find().
  */
 export function StreetView({
   lat,
@@ -35,9 +34,53 @@ export function StreetView({
     let alive = true;
 
     const svc = new google.maps.StreetViewService();
-    svc.getPanorama({ location: { lat, lng }, radius: 120 }, (data, status) => {
+
+    /** One lookup. Resolves null unless something was actually captured here. */
+    const at = (la: number, ln: number, radius: number) =>
+      new Promise<google.maps.StreetViewPanoramaData | null>((res) =>
+        svc.getPanorama(
+          { location: { lat: la, lng: ln }, radius, source: google.maps.StreetViewSource.OUTDOOR },
+          (data, status) =>
+            res(
+              status === google.maps.StreetViewStatus.OK && data?.location?.latLng ? data : null,
+            ),
+        ),
+      );
+
+    /** Google's own car-captured imagery, as opposed to a user photosphere. */
+    const isRoad = (d: google.maps.StreetViewPanoramaData) => /Google/i.test(d.copyright ?? "");
+
+    /**
+     * Boards are pinned at the pole, which is often a shopfront or an office —
+     * and the nearest panorama there is frequently somebody's uploaded interior.
+     * A black or indoor pane reads as a broken app, so walk outward in rings
+     * until we hit real road coverage, and only settle for a photosphere if
+     * there is genuinely no captured road nearby.
+     */
+    async function find() {
+      const here = await at(lat, lng, 60);
+      if (here && isRoad(here)) return here;
+
+      const perDeg = 111_320;
+      const lngScale = Math.cos((lat * Math.PI) / 180) || 1;
+      for (const metres of [50, 110, 200]) {
+        for (let deg = 0; deg < 360; deg += 45) {
+          if (!alive) return null;
+          const rad = (deg * Math.PI) / 180;
+          const hit = await at(
+            lat + (metres / perDeg) * Math.cos(rad),
+            lng + ((metres / perDeg) * Math.sin(rad)) / lngScale,
+            60,
+          );
+          if (hit && isRoad(hit)) return hit;
+        }
+      }
+      return here ?? (await at(lat, lng, 200));
+    }
+
+    find().then((data) => {
       if (!alive || !host.current) return;
-      if (status !== google.maps.StreetViewStatus.OK || !data?.location?.latLng) {
+      if (!data?.location?.latLng) {
         setState("none");
         return;
       }

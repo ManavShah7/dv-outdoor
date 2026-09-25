@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Camera, Check, MapPin, X } from "lucide-react";
+import { VoiceNote } from "@/components/field/VoiceNote";
 import type { Board } from "@/lib/types";
 import type { Severity } from "@/lib/mockMaintenance";
 import { cn } from "@/lib/utils";
@@ -151,6 +152,11 @@ export function FieldReport({ board, agentName }: { board: Board; agentName: str
             ))}
           </div>
         )}
+      </div>
+
+      {/* spoken note — for crew who would rather talk than type */}
+      <div className="mt-4">
+        <VoiceNote />
       </div>
 
       {/* optional note */}

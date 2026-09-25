@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { publicStats, liveBrandNames, PUBLIC_CITIES } from "@/lib/publicBoards";
-import { DECK_BOARDS, titleCase } from "@/lib/junagadhBoards";
+import { getDeckBoards, titleCase } from "@/lib/junagadhBoards";
 import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
 import { ContactForm } from "@/components/site/ContactForm";
 import { CoverageMap } from "@/components/site/CoverageMap";
@@ -14,10 +14,10 @@ export const metadata = {
 
 const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
 
-export default function LandingPage() {
+export default async function LandingPage() {
   const stats = publicStats();
   const brands = liveBrandNames(6);
-  const b = DECK_BOARDS;
+  const b = await getDeckBoards();
 
   return (
     <div className="site">

@@ -47,3 +47,5 @@ next-env.d.ts
 /private/
 .screenshots/
 /public/boards/
+/public/audio/
+!.env.example

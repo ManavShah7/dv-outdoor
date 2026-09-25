@@ -1,6 +1,7 @@
 "use client";
 
-import { ThumbsUp, ThumbsDown, ArrowLeft, TriangleAlert } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ArrowLeft, TriangleAlert, Play } from "lucide-react";
+import { Waveform } from "@/components/field/VoiceNote";
 import type { Board } from "@/lib/types";
 import { SEV } from "@/components/maintenance/MaintenanceView";
 import type { MaintenanceRequest, Severity } from "@/lib/mockMaintenance";
@@ -73,6 +74,48 @@ export function MaintenanceDetail({
             <div className="text-footnote text-ink-400">Description</div>
             <p className="mt-1 text-body text-ink-0">{request.description}</p>
           </div>
+          {request.photos.length > 0 && (
+            <div>
+              <div className="text-footnote text-ink-400">Photos from the board</div>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {request.photos.map((src) => (
+                  <div key={src} className="aspect-[4/3] overflow-hidden rounded-[var(--radius-control)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="size-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {request.voiceNote && (
+            <div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-footnote text-ink-400">Voice note</span>
+                <span className="text-caption text-ink-500">{request.voiceNote.language}</span>
+              </div>
+              <div className="mt-2 flex items-center gap-3 rounded-[var(--radius-control)] bg-black/25 px-3 py-2.5 ring-1 ring-white/[0.07] ring-inset">
+                <button
+                  aria-label="Play voice note"
+                  onClick={(e) => {
+                    const a = e.currentTarget.parentElement?.querySelector("audio");
+                    if (!a) return;
+                    if (a.paused) void a.play();
+                    else a.pause();
+                  }}
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-on"
+                >
+                  <Play className="size-4 translate-x-[1px]" strokeWidth={2.4} />
+                </button>
+                <Waveform seed={request.voiceNote.seconds} className="h-6 flex-1" />
+                <span className="shrink-0 text-footnote tabular-nums text-ink-300">
+                  0:{String(request.voiceNote.seconds).padStart(2, "0")}
+                </span>
+                <audio src={request.voiceNote.url} className="hidden" />
+              </div>
+            </div>
+          )}
+
           <div>
             <div className="text-footnote text-ink-400">Crew severity</div>
             <div className="mt-1.5"><SeverityChip s={request.reporterSeverity} /></div>

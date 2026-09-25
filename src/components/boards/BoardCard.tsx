@@ -1,9 +1,9 @@
 "use client";
 
-import { ImageOff } from "lucide-react";
 import type { Board } from "@/lib/types";
 import { inr, fullDate } from "@/lib/utils";
 import { statusMeta } from "@/components/ui/Primitives";
+import { BoardPhoto } from "@/components/boards/BoardPhoto";
 
 function lightingLabel(l: Board["lighting"]) {
   return l === "backlit" ? "Back-Lit" : l === "frontlit" ? "Front-Lit" : "Non-Lit";
@@ -17,7 +17,7 @@ export function BoardCard({ board, onOpen }: { board: Board; onOpen: () => void 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
       <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
-        <ImageOff className="size-6 text-ink-600" strokeWidth={1.5} />
+        <BoardPhoto code={board.code} />
         <span className="absolute left-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 font-mono text-caption tabular-nums text-ink-200">
           {board.code}
         </span>

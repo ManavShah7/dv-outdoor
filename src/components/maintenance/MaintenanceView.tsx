@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ImageOff, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import type { Board } from "@/lib/types";
 import type { MaintenanceRequest, Severity } from "@/lib/mockMaintenance";
+import { BoardPhoto } from "@/components/boards/BoardPhoto";
 import { cn, inr } from "@/lib/utils";
 
 export const SEV: Record<Severity, { label: string; color: string }> = {
@@ -61,7 +62,7 @@ function RequestCard({
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
       <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
-        <ImageOff className="size-6 text-ink-600" strokeWidth={1.5} />
+        <BoardPhoto code={board.code} override={request.photos[0]} />
         {request.wasRentedAtReport && (
           <span
             className="absolute left-3 top-3 rounded-[var(--radius-pill)] px-2 py-1 text-caption font-[620] tabular-nums"
