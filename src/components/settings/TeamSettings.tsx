@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Check, Copy, Link2, Mail, MessageCircle, Plus, Trash2, X } from "lucide-react";
 import { cn, fullDate } from "@/lib/utils";
+import { siteOrigin } from "@/lib/hosts";
 
 type Person = {
   id: string; email: string; full_name: string | null; phone: string | null;
@@ -81,7 +82,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
     const d = await res.json();
     if (!res.ok) { setInviteErr(d.error ?? "Could not create the invite."); return; }
     setFreshLink({
-      url: `${window.location.origin}/invite/${d.invite.token}`,
+      url: `${siteOrigin()}/invite/${d.invite.token}`,
       name: d.invite.full_name,
       phone: d.invite.phone,
       email: d.invite.email,
@@ -205,7 +206,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
                     </p>
                   </div>
                   <button
-                    onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/invite/${i.token}`); }}
+                    onClick={() => { navigator.clipboard.writeText(`${siteOrigin()}/invite/${i.token}`); }}
                     className="shrink-0 rounded-[7px] bg-white/[0.08] px-3 py-1.5 text-caption font-[590] text-ink-200 hover:bg-white/[0.14]"
                   >
                     Copy link
