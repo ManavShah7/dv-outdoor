@@ -152,8 +152,17 @@ function Traffic({ on }: { on: boolean }) {
   useEffect(() => {
     if (!map) return;
     if (!layer.current) layer.current = new google.maps.TrafficLayer();
-    layer.current.setMap(on ? map : null);
-    return () => layer.current?.setMap(null);
+    const l = layer.current;
+    l.setMap(on ? map : null);
+    if (!on) return;
+
+    // Measured: left alone on a still map the layer fetches its tiles once
+    // and never again — 18 requests at load and zero over the next six
+    // minutes. Someone who opens the map and leaves it would be reading
+    // whatever the roads were doing when the page loaded. Detaching and
+    // reattaching is what forces a fresh fetch.
+    const id = setInterval(() => { l.setMap(null); l.setMap(map); }, 120_000);
+    return () => { clearInterval(id); l.setMap(null); };
   }, [map, on]);
 
   return null;
