@@ -54,6 +54,11 @@ export function toPublic(b: Board): PublicBoard {
   };
 }
 
+/**
+ * The generated array, kept only for the places that have not moved to the
+ * database yet (the field pages and the agent tools). Anything a client sees
+ * comes from getPublicBoards() so that an edit in the office shows up.
+ */
 export const PUBLIC_BOARDS: PublicBoard[] = BOARDS.map(toPublic);
 
 export const PUBLIC_CITIES = [...new Set(PUBLIC_BOARDS.map((b) => b.city))].sort();

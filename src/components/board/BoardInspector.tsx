@@ -176,11 +176,13 @@ export function ManageMenu({
   board,
   onDismiss,
   onBook,
+  onRelease,
   onRequestMaintenance,
 }: {
   board: Board;
   onDismiss: () => void;
   onBook: () => void;
+  onRelease: () => void;
   onRequestMaintenance: () => void;
 }) {
   return (
@@ -204,17 +206,24 @@ export function ManageMenu({
         </div>
 
         <div className="mt-5 flex flex-col gap-2.5">
-          {board.status !== "booked" && (
+          {board.status !== "booked" ? (
             <Button variant="primary" onClick={onBook}>
               Mark as booked
+            </Button>
+          ) : (
+            /* Without this the lease never ends, the board stays booked for
+               good, and the public site keeps telling clients it is taken. */
+            <Button variant="primary" onClick={onRelease}>
+              End the lease
             </Button>
           )}
           <Button onClick={onRequestMaintenance}>Request maintenance</Button>
         </div>
 
-        {board.status === "booked" && (
+        {board.status === "booked" && board.rental && (
           <p className="mt-4 text-footnote text-ink-500">
-            Already booked. End the current lease before rebooking.
+            {board.rental.company} until {fullDate(board.rental.endDate)}. Ending
+            the lease frees it on the public site straight away.
           </p>
         )}
       </motion.div>

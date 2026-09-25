@@ -1,4 +1,4 @@
-import { PUBLIC_BOARDS, PUBLIC_CITIES } from "@/lib/publicBoards";
+import { getPublicBoards } from "@/lib/boards.db";
 import { text } from "@/components/times/fonts";
 import { SiteHeader } from "@/components/site/SiteChrome";
 import { InventoryBrowser } from "@/components/site/InventoryBrowser";
@@ -8,18 +8,26 @@ export const metadata = {
   description: "Browse every hoarding, unipole and gantry The Times Media owns across Saurashtra.",
 };
 
+/**
+ * Read fresh on every request. A board that the office marked booked ten
+ * minutes ago must not still be advertised as free — that is a phone call
+ * about a site someone cannot have.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function PublicBoardsPage({
   searchParams,
 }: {
   searchParams: Promise<{ board?: string; city?: string }>;
 }) {
   const { board, city } = await searchParams;
+  const { boards, cities } = await getPublicBoards();
   return (
     <div className={`tmui ${text.variable}`}>
       <SiteHeader />
       <InventoryBrowser
-        boards={PUBLIC_BOARDS}
-        cities={PUBLIC_CITIES}
+        boards={boards}
+        cities={cities}
         initialBoard={board ?? null}
         initialCity={city ?? null}
       />

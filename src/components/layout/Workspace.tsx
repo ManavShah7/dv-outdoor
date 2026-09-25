@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import type { Board } from "@/lib/types";
-import { BOARDS } from "@/lib/mockBoards";
 import { cn } from "@/lib/utils";
 import { Sidebar, type NavId } from "@/components/layout/Sidebar";
 import { SearchPanel, type QuickFilter } from "@/components/board/SearchPanel";
@@ -42,8 +42,12 @@ function matches(b: Board, q: string, f: QuickFilter | null) {
 
 type Mode = "idle" | "managing" | "booking";
 
-export function Workspace({ adminName }: { adminName?: string }) {
-  const [boards, setBoards] = useState<Board[]>(BOARDS);
+export function Workspace({
+  adminName, initialBoards,
+}: {
+  adminName?: string; initialBoards: Board[];
+}) {
+  const [boards, setBoards] = useState<Board[]>(initialBoards);
   const [nav, setNav] = useState<NavId>("search");
   const [searchOpen, setSearchOpen] = useState(true);
   const [requests, setRequests] = useState<MaintenanceRequest[]>(MAINTENANCE);
@@ -54,6 +58,34 @@ export function Workspace({ adminName }: { adminName?: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [toast, setToast] = useState<string | null>(null);
+  const router = useRouter();
+
+  /**
+   * Write it down, then re-read.
+   *
+   * The optimistic update stays — the office should not wait on a round trip
+   * to see its own click — but the server is the thing that decides. On
+   * failure the refresh puts the real state back and says why, which matters
+   * most for double-booking: the partial unique index, not this component, is
+   * what stops two clients being sold the same board.
+   */
+  async function persist(body: Record<string, unknown>, failure: string) {
+    try {
+      const res = await fetch("/api/boards", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null);
+        setToast(d?.error ?? failure);
+      }
+    } catch {
+      setToast(failure);
+    } finally {
+      router.refresh();
+    }
+  }
 
   const selected = useMemo(
     () => boards.find((b) => b.id === selectedId) ?? null,
@@ -98,6 +130,8 @@ export function Workspace({ adminName }: { adminName?: string }) {
         setBoards((prev) =>
           prev.map((b) => (b.code === a.code ? { ...b, status: a.status } : b)),
         );
+        void persist({ code: a.code, action: "set_status", status: a.status },
+                     `Could not set ${a.code} to ${a.status}.`);
         note = `${a.code} set to ${a.status.replace(/_/g, " ")}`;
       } else if (a.kind === "book_board") {
         setBoards((prev) =>
@@ -119,6 +153,11 @@ export function Workspace({ adminName }: { adminName?: string }) {
                 }
               : b,
           ),
+        );
+        void persist(
+          { code: a.code, action: "book", company: a.company, rate: a.rate,
+            startDate: a.startDate, endDate: a.endDate, printedBy: a.printedBy },
+          `Could not book ${a.code}.`,
         );
         note = `${a.code} booked to ${a.company}`;
       }
@@ -148,8 +187,27 @@ export function Workspace({ adminName }: { adminName?: string }) {
           : b,
       ),
     );
+    void persist(
+      { code: selected.code, action: "book", company: d.company.trim(), rate: Number(d.rate),
+        startDate: d.startDate, endDate: d.endDate, printedBy: d.printedBy },
+      `Could not book ${selected.name}.`,
+    );
     setMode("idle");
     setToast(`${selected.name} booked to ${d.company.trim()}`);
+  }
+
+  function releaseBoard() {
+    if (!selected) return;
+    setBoards((prev) =>
+      prev.map((b) =>
+        b.id === selected.id
+          ? { ...b, status: "available", rental: undefined, availableSince: new Date().toISOString().slice(0, 10) }
+          : b,
+      ),
+    );
+    void persist({ code: selected.code, action: "release" }, `Could not free ${selected.name}.`);
+    setMode("idle");
+    setToast(`${selected.name} is free again`);
   }
 
   const openRequest = useMemo(
@@ -179,6 +237,8 @@ export function Workspace({ adminName }: { adminName?: string }) {
       ),
     );
     const b = boards.find((x) => x.id === openRequest.boardId);
+    if (b) void persist({ code: b.code, action: "set_status", status: "under_maintenance" },
+                        `Could not set ${b.code} to under maintenance.`);
     setToast(`${b?.name ?? "Board"} set to under maintenance`);
   }
 
@@ -353,6 +413,7 @@ export function Workspace({ adminName }: { adminName?: string }) {
             board={selected}
             onDismiss={() => setMode("idle")}
             onBook={() => setMode("booking")}
+            onRelease={() => releaseBoard()}
             onRequestMaintenance={() => {
               setMode("idle");
               setNav("maintenance");

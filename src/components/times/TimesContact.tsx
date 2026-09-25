@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SALES_EMAIL } from "@/lib/sales";
 
 /**
  * Not in the artwork — the frame ends on the heatmap and never reaches a
@@ -45,6 +46,12 @@ export function TimesContact() {
         <p className="tm-t25 tm-caps tm-split__body">
           We come back the same day with what is free, what it costs and a photo
           of every site.
+        </p>
+        <p className="tm-t25 tm-caps" style={{ marginTop: "calc(30 * var(--u))" }}>
+          Or write to{" "}
+          <a href={`mailto:${SALES_EMAIL}`} style={{ textDecoration: "underline", textUnderlineOffset: "0.25em" }}>
+            {SALES_EMAIL}
+          </a>
         </p>
       </div>
 

@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { sendMail } from "@/lib/mail";
 import { BOARDS } from "@/lib/mockBoards";
 
 /**
@@ -49,6 +50,32 @@ export async function POST(req: Request) {
   } catch {
     return Response.json({ error: "Could not send that. Please call us instead." }, { status: 500 });
   }
+
+  // The lead is saved either way; the mail is a nudge, not the record. A
+  // mailer that is down must never cost us the enquiry, so this is awaited
+  // for its log but its result does not change the answer.
+  await sendMail({
+    subject: board
+      ? `Enquiry — ${board.code}, ${board.name} — ${companyName}`
+      : `Enquiry — ${companyName}`,
+    replyTo: email ?? undefined,
+    text: [
+      `${contactPerson} at ${companyName}`,
+      `Phone: ${phone}`,
+      email ? `Email: ${email}` : null,
+      "",
+      board ? `Board: ${board.code} — ${board.name}` : "No specific board",
+      board ? `Address: ${board.address}` : null,
+      startDate ? `Wants it from: ${startDate}` : null,
+      durationDays ? `For: ${durationDays} days` : null,
+      "",
+      message ? `They said:\n${message}` : "No message.",
+      "",
+      "— sent by timesmedia.online",
+    ]
+      .filter((l) => l !== null)
+      .join("\n"),
+  });
 
   return Response.json({ ok: true });
 }

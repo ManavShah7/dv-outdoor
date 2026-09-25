@@ -8,14 +8,13 @@ import type { PublicBoard } from "@/lib/publicBoards";
 const CITY_ZOOM_MAX = 9.2;
 
 /**
- * The public map speaks the brand's language: black, white, hairlines.
- *
- * Availability is carried by fill rather than hue — a free board is solid
- * black and a booked one is hollow — so the thing a client is looking for is
- * the loud one, and the map still reads for anyone who cannot separate green
- * from blue. The admin map keeps its colours; that is a working tool for two
- * people, not the shopfront.
+ * Green is free, red is taken — the one convention a client does not have to
+ * be taught. The basemap stays desaturated so these two are the only colour
+ * on it, and both keep a dark outline so they still separate for anyone who
+ * cannot tell green from red.
  */
+const FREE = "#0f9d3a";
+const TAKEN = "#d8232a";
 const INK = "#000000";
 const PAPER = "#ffffff";
 
@@ -27,7 +26,7 @@ const PIN_SCALE: Record<string, number> = { small: 0.82, medium: 1, large: 1.22 
 
 function pinIcon(b: PublicBoard, selected: boolean) {
   const free = b.availability === "available";
-  const fill = free ? INK : PAPER;
+  const fill = free ? FREE : TAKEN;
   const line = INK;
   const k = (PIN_SCALE[b.sizeCategory ?? "medium"] ?? 1) * (selected ? 1.34 : 1);
   const w = Math.round(26 * k);
@@ -46,7 +45,7 @@ function pinIcon(b: PublicBoard, selected: boolean) {
   const core =
     b.lighting === "none"
       ? ""
-      : `<circle cx="${W / 2}" cy="${cy}" r="${w * 0.15}" fill="${free ? PAPER : INK}"/>`;
+      : `<circle cx="${W / 2}" cy="${cy}" r="${w * 0.15}" fill="${PAPER}"/>`;
 
   return {
     url: svgUrl(
@@ -87,7 +86,7 @@ function cityIcon(free: number, booked: number, scale = 1) {
     .map(([k, n]) => {
       if (!n) return "";
       const sweep = (n / total) * Math.PI * 2;
-      const paint = k === "available" ? PAPER : INK;
+      const paint = k === "available" ? FREE : TAKEN;
       const path =
         n === total
           ? `<circle cx="${c}" cy="${c}" r="${(rO + rI) / 2}" fill="none" stroke="${paint}" stroke-width="${rO - rI}"/>`
