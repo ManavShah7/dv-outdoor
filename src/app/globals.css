@@ -293,3 +293,234 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =====================================================================
+   The Times Media — the public brand.
+   ---------------------------------------------------------------------
+   Reproduced from Manav's 1900-wide Figma frame. Everything is expressed
+   in design pixels: `--u` is one pixel of that frame, so a value measured
+   off the artwork can be written down unchanged. Above 1900 the page
+   stops growing; below it the whole composition scales as one piece,
+   which is what keeps a hairline grid looking drawn rather than
+   assembled.
+
+   Where the artwork disagreed with itself the page follows one value —
+   the stats cells were centred three different ways, the filter labels
+   sat at x=67.5/69/70.5/84.5. Those are nudges, not intent.
+   ===================================================================== */
+.tm {
+  --u: calc(min(100vw, 1900px) / 1900);
+
+  --ink: #000;
+  --red: #e00b2e;
+  --paper: #fff;
+  --field: #f8f8f8;
+  --rule: 3;                      /* design px */
+
+  /* set by next/font in components/times/fonts.ts — see the note there
+     about the licensed faces the artwork actually uses */
+  --display: var(--tm-display), "Arial Black", system-ui, sans-serif;
+  --text: var(--tm-text), ui-sans-serif, system-ui, sans-serif;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* On a phone the 1900 frame would shrink type to nothing, so the page
+   re-bases onto a 520-wide frame and the sections stack. Same numbers,
+   different reference width. */
+@media (max-width: 1023px) {
+  .tm { --u: calc(min(100vw, 560px) / 520); --rule: 2; }
+  .tm-t60 { font-size: calc(46 * var(--u)); line-height: calc(54 * var(--u)); }
+  .tm-t41 { font-size: calc(34 * var(--u)); line-height: calc(41 * var(--u)); }
+  .tm-t31 { font-size: calc(28 * var(--u)); line-height: calc(34 * var(--u)); }
+}
+
+.tm-frame { width: 100%; max-width: 1900px; margin-inline: auto; }
+
+/* --- rules ---------------------------------------------------------- */
+.tm-rt { border-top:    calc(var(--rule) * var(--u)) solid var(--ink); }
+.tm-rb { border-bottom: calc(var(--rule) * var(--u)) solid var(--ink); }
+.tm-rl { border-left:   calc(var(--rule) * var(--u)) solid var(--ink); }
+.tm-rr { border-right:  calc(var(--rule) * var(--u)) solid var(--ink); }
+
+/* --- type ----------------------------------------------------------- */
+/* cap heights measured off the frame; Modica and Jam are both cap 0.70em,
+   so size = cap / 0.70 and the numbers below are those sizes. */
+.tm-display { font-family: var(--display); font-weight: 900; text-transform: uppercase; }
+
+.tm-t60 { font-size: calc(60 * var(--u)); line-height: calc(74 * var(--u)); }
+.tm-t45 { font-size: calc(45 * var(--u)); line-height: calc(55.5 * var(--u)); }
+.tm-t41 { font-size: calc(41 * var(--u)); line-height: calc(50 * var(--u)); }
+.tm-t31 { font-size: calc(31 * var(--u)); line-height: calc(30 * var(--u)); }
+.tm-t30 { font-size: calc(30 * var(--u)); line-height: 1.2; }
+
+.tm-red { color: var(--red); }
+
+/* --- controls ------------------------------------------------------- */
+.tm-pill {
+  display: inline-flex; align-items: center; justify-content: space-between;
+  gap: calc(20 * var(--u));
+  height: calc(67.5 * var(--u));
+  padding-inline: calc(18 * var(--u));
+  border: calc(var(--rule) * var(--u)) solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  background: var(--field);
+  font-family: var(--text); font-weight: 600;
+  font-size: calc(30 * var(--u)); line-height: 1;
+  color: var(--ink); cursor: pointer;
+  transition: background-color .12s linear, color .12s linear;
+}
+.tm-pill[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tm-pill[aria-pressed="true"] .tm-plus { transform: rotate(45deg); }
+.tm-plus { font-weight: 700; transition: transform .16s cubic-bezier(.26,.67,.48,.91); }
+
+.tm-field {
+  width: 100%; height: calc(96.5 * var(--u));
+  border: calc(var(--rule) * var(--u)) solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  background: var(--field);
+  font-family: var(--text); font-weight: 600;
+  font-size: calc(30 * var(--u)); color: var(--ink);
+  text-align: center; outline: none;
+}
+.tm-field::placeholder { color: var(--ink); opacity: 1; }
+.tm-field:focus { box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--red); }
+
+.tm-cta {
+  display: grid; place-content: center; text-align: center; font-weight: 900;
+  width: calc(364.5 * var(--u)); height: calc(131.5 * var(--u));
+  background: var(--red); color: var(--ink);
+  font-family: var(--display); text-transform: uppercase;
+  font-size: calc(47 * var(--u)); line-height: calc(45 * var(--u));
+  transition: background-color .12s linear, color .12s linear;
+}
+.tm-cta:hover { background: var(--ink); color: var(--red); }
+
+.tm-link { font-family: var(--display); font-weight: 900; text-transform: uppercase; font-size: calc(41 * var(--u)); }
+.tm-link:hover { color: var(--red); }
+
+/* --- sections ------------------------------------------------------- */
+/* Every row is a band with a rule under it; the vertical splits are the
+   measured x positions of the frame. Under 1024 each split collapses to
+   a stack and its rule turns horizontal. */
+
+.tm-nav { display: flex; flex-direction: column; }
+.tm-nav__mark { display: flex; flex-direction: column; justify-content: center;
+  padding-left: calc(74 * var(--u)); padding-block: calc(34 * var(--u)); }
+.tm-nav__links { display: flex; flex: 1; flex-wrap: wrap; align-items: center;
+  justify-content: center; gap: calc(82 * var(--u)); padding-block: calc(26 * var(--u)); }
+
+.tm-hero { display: flex; flex-direction: column-reverse; }
+.tm-hero__copy { display: flex; flex-direction: column; justify-content: center;
+  padding: calc(60 * var(--u)) calc(60 * var(--u)) calc(60 * var(--u)) calc(165 * var(--u)); }
+.tm-hero__shot { position: relative; aspect-ratio: 1070 / 806; overflow: hidden; }
+.tm-hero__shot img, .tm-hero__shot video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.tm-cta-row { display: flex; }
+.tm-cta-row__box { display: flex; align-items: center;
+  padding: calc(82 * var(--u)) 0 calc(78 * var(--u)) calc(109 * var(--u)); }
+
+.tm-convey { display: grid; place-items: center; text-align: center;
+  padding-block: calc(205 * var(--u)) calc(195 * var(--u)); }
+
+.tm-stats { display: grid; grid-template-columns: 1fr; }
+.tm-stats__cell { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; padding-block: calc(100 * var(--u)); }
+.tm-stats__n { font-family: var(--display); font-weight: 900; color: var(--red);
+  font-size: calc(60 * var(--u)); line-height: 1; }
+.tm-stats__l { font-family: var(--display); font-weight: 900; text-transform: uppercase;
+  font-size: calc(41 * var(--u)); line-height: 1; margin-top: calc(21 * var(--u)); }
+
+.tm-props { display: grid; grid-template-columns: 1fr; }
+.tm-props__cell { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+  padding: calc(240 * var(--u)) calc(70 * var(--u)) calc(270 * var(--u)); }
+.tm-props__body { margin-top: calc(38 * var(--u)); max-width: calc(590 * var(--u)); }
+
+.tm-finder { display: flex; flex-direction: column; }
+.tm-finder__panel { display: flex; flex-direction: column; min-height: 0; }
+.tm-finder__band { padding: calc(48 * var(--u)) calc(70 * var(--u)); }
+.tm-finder__label { font-family: var(--text); font-weight: 700;
+  font-size: calc(30 * var(--u)); line-height: 1; }
+.tm-finder__pills { display: flex; flex-wrap: wrap;
+  gap: calc(24.5 * var(--u)) calc(31.5 * var(--u)); margin-top: calc(28 * var(--u)); }
+.tm-finder__map { position: relative; min-height: calc(760 * var(--u)); flex: 1; }
+
+@media (min-width: 1024px) {
+  .tm-nav { flex-direction: row; height: calc(219.5 * var(--u)); }
+  .tm-nav__mark { width: calc(559 * var(--u)); flex-shrink: 0;
+    border-right: calc(var(--rule) * var(--u)) solid var(--ink); border-bottom: 0; }
+
+  .tm-hero { flex-direction: row; height: calc(805.5 * var(--u)); }
+  .tm-hero__copy { width: calc(830 * var(--u)); flex-shrink: 0; padding-right: calc(40 * var(--u)); }
+  .tm-hero__shot { flex: 1; aspect-ratio: auto; }
+
+  .tm-cta-row__box { width: calc(584 * var(--u)); flex-shrink: 0;
+    border-right: calc(var(--rule) * var(--u)) solid var(--ink); }
+  .tm-cta-row__rest { flex: 1; }
+
+  .tm-stats { grid-template-columns: repeat(3, 1fr); }
+  .tm-stats__cell + .tm-stats__cell {
+    border-left: calc(var(--rule) * var(--u)) solid var(--ink); border-top: 0; }
+
+  .tm-props { grid-template-columns: repeat(2, 1fr); }
+  .tm-props__cell + .tm-props__cell {
+    border-left: calc(var(--rule) * var(--u)) solid var(--ink); border-top: 0; }
+
+  /* the frame cuts the rail off mid-section, which is the design saying
+     the rail scrolls and the map holds its height */
+  .tm-finder { flex-direction: row; height: calc(1373 * var(--u)); }
+  .tm-finder__panel { width: calc(773 * var(--u)); flex-shrink: 0; overflow-y: auto;
+    border-right: calc(var(--rule) * var(--u)) solid var(--ink); }
+  .tm-finder__map { min-height: 0; }
+}
+
+@media (max-width: 1023px) {
+  .tm-nav__mark,
+  .tm-stats__cell + .tm-stats__cell,
+  .tm-props__cell + .tm-props__cell {
+    border-top: calc(var(--rule) * var(--u)) solid var(--ink);
+  }
+  .tm-nav__mark { border-top: 0; border-bottom: calc(var(--rule) * var(--u)) solid var(--ink); }
+  .tm-t45 { font-size: calc(36 * var(--u)); line-height: calc(44 * var(--u)); }
+  .tm-link { font-size: calc(26 * var(--u)); }
+  .tm-nav__links { gap: calc(0 * var(--u)) calc(36 * var(--u)); padding-block: calc(30 * var(--u)); }
+  .tm-nav__mark { padding-left: calc(40 * var(--u)); padding-block: calc(30 * var(--u)); }
+  .tm-nav__mark .tm-display span + span { padding-left: calc(46 * var(--u)) !important; }
+  .tm-hero__copy { padding: calc(70 * var(--u)) calc(50 * var(--u)); }
+  .tm-cta { width: calc(300 * var(--u)); height: calc(110 * var(--u)); font-size: calc(38 * var(--u)); line-height: calc(38 * var(--u)); }
+  .tm-finder__band { padding: calc(44 * var(--u)) calc(50 * var(--u)); }
+  .tm-finder__map { min-height: calc(620 * var(--u)); }
+  .tm-contact__copy, .tm-contact__form { padding-inline: calc(50 * var(--u)); }
+  .tm-foot { padding: calc(70 * var(--u)) calc(50 * var(--u)); }
+  .tm-props__cell { padding-block: calc(120 * var(--u)); }
+  .tm-convey { padding-block: calc(120 * var(--u)); }
+  .tm-cta-row__box { padding: calc(60 * var(--u)) 0 calc(60 * var(--u)) calc(60 * var(--u)); }
+}
+
+/* Contact and footer are additions — the frame stopped inside the filter
+   rail, but the two CTAs on the page have to land somewhere. Same grid. */
+.tm-contact { display: grid; grid-template-columns: 1fr; }
+.tm-contact__copy { padding: calc(150 * var(--u)) calc(70 * var(--u)); }
+.tm-contact__form { padding: calc(150 * var(--u)) calc(70 * var(--u)); }
+.tm-contact__grid { display: flex; flex-direction: column; gap: calc(26 * var(--u)); }
+.tm-contact__send { width: 100%; }
+
+.tm-foot { display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: calc(30 * var(--u));
+  padding: calc(80 * var(--u)) calc(70 * var(--u)); }
+.tm-foot__links { display: flex; gap: calc(50 * var(--u)); }
+.tm-foot__links a:hover { color: var(--red); }
+
+@media (min-width: 1024px) {
+  .tm-contact { grid-template-columns: calc(950 * var(--u)) 1fr; }
+  .tm-contact__copy { padding-left: calc(165 * var(--u)); }
+  .tm-contact__form { border-left: calc(var(--rule) * var(--u)) solid var(--ink); }
+}
+@media (max-width: 1023px) {
+  .tm-contact__copy { padding-block: calc(110 * var(--u)) calc(50 * var(--u)); }
+  .tm-contact__form { padding-block: calc(20 * var(--u)) calc(110 * var(--u)); }
+}
