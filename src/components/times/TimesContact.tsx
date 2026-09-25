@@ -3,13 +3,12 @@
 import { useState } from "react";
 
 /**
- * Not in the artwork — the frame was cropped part-way through the filter
- * rail and never reached a contact section. But ENQUIRE NOW and the CONTACT
- * link both have to land somewhere, so this is built in the same grid and
- * type as the rest and kept deliberately plain.
+ * Not in the artwork — the frame ends on the heatmap and never reaches a
+ * contact section. But a billboard company's site with no way to reach it
+ * isn't finished, so this is built in the same grid and type and kept plain.
  *
- * Posts to the same /api/enquiry the board browser uses, so a lead from the
- * landing page lands in the office queue like any other.
+ * Posts to the same /api/enquiry the board browser uses, so a lead from here
+ * lands in the office queue like any other.
  */
 export function TimesContact() {
   const [companyName, setCompany] = useState("");
@@ -40,36 +39,32 @@ export function TimesContact() {
   }
 
   return (
-    <section id="contact" className="tm-contact tm-rb">
+    <section id="contact" className="tm-dark tm-contact tm-rt">
       <div className="tm-contact__copy">
-        <h2 className="tm-display tm-t60">
-          Tell us the<br /><span className="tm-red">city.</span>
-        </h2>
-        <p className="tm-t31" style={{ marginTop: "calc(40 * var(--u))" }}>
-          We come back the same day with what is free, what it costs and a
-          photo of every site.
+        <h2 className="tm-t41 tm-caps">Tell us the city.</h2>
+        <p className="tm-t25 tm-caps tm-split__body">
+          We come back the same day with what is free, what it costs and a photo
+          of every site.
         </p>
       </div>
 
       <div className="tm-contact__form">
         {sent ? (
-          <p className="tm-display tm-t41">
-            Got it. <span className="tm-red">We will call you today.</span>
-          </p>
+          <p className="tm-t41 tm-caps">We will call you today.</p>
         ) : (
           <form onSubmit={submit} className="tm-contact__grid">
-            <input className="tm-field" placeholder="Company name" value={companyName}
+            <input className="tm-input" placeholder="Company name" value={companyName}
                    onChange={(e) => setCompany(e.target.value)} aria-label="Company name" />
-            <input className="tm-field" placeholder="Your name" value={contactPerson}
+            <input className="tm-input" placeholder="Your name" value={contactPerson}
                    onChange={(e) => setPerson(e.target.value)} aria-label="Your name" />
-            <input className="tm-field" placeholder="Phone number" value={phone} inputMode="tel"
+            <input className="tm-input" placeholder="Phone number" value={phone} inputMode="tel"
                    onChange={(e) => setPhone(e.target.value)} aria-label="Phone number" />
-            <input className="tm-field" placeholder="Which cities, and roughly when?" value={message}
+            <input className="tm-input" placeholder="Which cities, and roughly when?" value={message}
                    onChange={(e) => setMessage(e.target.value)} aria-label="Which cities, and roughly when" />
-            <button type="submit" disabled={!valid || busy} className="tm-cta tm-contact__send">
-              {busy ? "Sending" : "Send"}
+            <button type="submit" disabled={!valid || busy} className="tm-send tm-caps">
+              {busy ? "Sending" : "Send enquiry"}
             </button>
-            {error && <p className="tm-t31 tm-red">{error}</p>}
+            {error && <p className="tm-t25">{error}</p>}
           </form>
         )}
       </div>
