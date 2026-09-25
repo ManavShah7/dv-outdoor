@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, FolderClosed, Wrench, BarChart3, Settings, LogOut } from "lucide-react";
+import { Search, FolderClosed, Inbox, Wrench, BarChart3, Settings, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { id: "search",      label: "Search",      icon: Search },
   { id: "boards",      label: "Boards",      icon: FolderClosed },
+  { id: "enquiries",   label: "Enquiries",   icon: Inbox },
   { id: "maintenance", label: "Maintenance", icon: Wrench },
   { id: "analytics",   label: "Analytics",   icon: BarChart3 },
   { id: "settings",    label: "Settings",    icon: Settings },
@@ -16,6 +17,8 @@ const NAV = [
 export type NavId = (typeof NAV)[number]["id"];
 
 type Counts = {
+  /** leads nobody has picked up yet — the one number worth a badge */
+  newEnquiries: number;
   total: number;
   booked: number;
   available: number;
@@ -69,7 +72,7 @@ export function Sidebar({
       {/* wordmark */}
       <div className="flex h-[108px] items-center border-b border-white/[0.07] px-10">
         <span className="text-title3 font-[680] tracking-[-0.02em] text-ink-0">
-          DV Outdoor
+          The Times Media
         </span>
       </div>
 
@@ -99,6 +102,14 @@ export function Sidebar({
                 style={isActive ? { color: "var(--accent)" } : undefined}
               />
               <span className="text-body font-[520]">{label}</span>
+              {id === "enquiries" && counts.newEnquiries > 0 && (
+                <span
+                  className="ml-auto mr-1 grid min-w-5 place-items-center rounded-full px-1.5 text-caption font-[700] tabular-nums"
+                  style={{ background: "var(--color-sev-red)", color: "#0b0e10" }}
+                >
+                  {counts.newEnquiries}
+                </span>
+              )}
             </button>
           );
         })}

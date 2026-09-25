@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendMail } from "@/lib/mail";
-import { BOARDS } from "@/lib/mockBoards";
 
 /**
  * Public enquiry ("check availability"). Writes a lead — never inventory.
@@ -29,19 +28,30 @@ export async function POST(req: Request) {
     return Response.json({ error: "Message is too long." }, { status: 400 });
   }
 
-  const board = boardCode ? BOARDS.find((b) => b.code === boardCode) : null;
+  // Boards live in Postgres now, so an enquiry points at the row rather than
+  // mentioning the code in its message and hoping somebody reads it. Declared
+  // out here because the notification below needs it too.
+  let board: { id: string; code: string; name: string; address: string | null } | null = null;
 
   try {
     const db = createAdminClient();
+    if (boardCode) {
+      const { data } = await db
+        .from("boards")
+        .select("id,code,name,address")
+        .eq("code", boardCode)
+        .maybeSingle();
+      board = data;
+    }
+
     const { error } = await db.from("client_requests").insert({
-      board_id: null, // boards aren't in the database yet; the code is in the message
+      board_id: board?.id ?? null,
       company_name: companyName,
       contact_person: contactPerson,
       phone,
       email,
-      message: [board ? `Board: ${board.code} — ${board.name}, ${board.address}` : null, message]
-        .filter(Boolean)
-        .join("\n\n") || null,
+      // the board is a column now, so the message is just what they wrote
+      message: message || null,
       requested_start_date: startDate,
       requested_duration_days: durationDays,
       source: "client_portal",
