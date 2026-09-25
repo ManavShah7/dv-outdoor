@@ -1,77 +1,43 @@
 # Deploying to timesmedia.online
 
-The repo is public and builds clean from a fresh clone. Everything below is
-dashboard work — there is no Vercel CLI session on this machine.
+**Status: everything is done except one DNS record, which needs your Namecheap
+login.**
 
-## 1. Import the project
+Done already:
 
-Vercel → **Add New… → Project** → import `ManavShah7/dv-outdoor`.
+- Vercel project `timesmedia` created under `manavshah7s-projects`, built and
+  deployed to production from `main`.
+- All six environment variables set on production, preview and development,
+  with `NEXT_PUBLIC_SITE_URL=https://timesmedia.online`.
+- `timesmedia.online` and `www.timesmedia.online` attached to the project.
+- SSO protection checked: it is `all_except_custom_domains`, so the live domain
+  is public and only the `*.vercel.app` URL sits behind Vercel auth.
+- Google Maps key locked to the domain (it was completely unrestricted, i.e.
+  anyone could have billed against it).
 
-Framework preset is detected as Next.js. Leave the build and output settings
-alone.
+## The one thing left — point DNS
 
-## 2. Environment variables — do this *before* the first build
+Namecheap → Domain List → timesmedia.online → **Advanced DNS**. Delete the
+parking records and add:
 
-The `NEXT_PUBLIC_*` values are inlined at build time, so a build that runs
-without them ships a broken bundle and you have to redeploy.
+| Type  | Host | Value          | TTL       |
+|-------|------|----------------|-----------|
+| A     | `@`  | `76.76.21.21`  | Automatic |
+| CNAME | `www`| `cname.vercel-dns.com.` | Automatic |
 
-Open `~/dv-outdoor/.env.local`, copy the whole file, and paste it into Vercel's
-bulk "paste .env" box on the Environment Variables screen. Then change one line:
+Vercel confirmed those values itself. Leave the nameservers alone — the domain
+is on Namecheap's own (`dns1/dns2.registrar-servers.com`), which is fine.
 
-```
-NEXT_PUBLIC_SITE_URL=https://timesmedia.online
-```
-
-`.env.example` lists every key and what it is for. `SUPABASE_SERVICE_ROLE_KEY`
-and `ANTHROPIC_API_KEY` are server-only — they must not get a `NEXT_PUBLIC_`
-prefix.
-
-## 3. Domain
-
-Vercel → project → **Settings → Domains** → add `timesmedia.online`, then
-`www.timesmedia.online` (set it to redirect to the apex).
-
-Vercel prints the exact records to create. At Namecheap → Domain List →
-timesmedia.online → **Advanced DNS**, delete the parking records and add what
-Vercel printed. As of now that is normally:
-
-| Type  | Host | Value                   |
-|-------|------|-------------------------|
-| A     | `@`  | `76.76.21.21`           |
-| CNAME | `www`| `cname.vercel-dns.com.` |
-
-Use Vercel's values over these if they differ. The domain is on Namecheap's
-default nameservers (`dns1/dns2.registrar-servers.com`), so Advanced DNS is the
-right place — do not switch nameservers.
-
-Propagation is usually minutes. Check with `dig +short timesmedia.online`.
-
-## 4. Google Maps key
-
-The map is the product; if this is wrong the whole admin side is a grey box.
-
-Google Cloud console → APIs & Services → Credentials → the browser key →
-**Application restrictions → HTTP referrers**, and add:
+Propagation is usually a few minutes. Check with:
 
 ```
-https://timesmedia.online/*
-https://*.timesmedia.online/*
-http://localhost:3000/*
+dig +short timesmedia.online     # want 76.76.21.21
+curl -sI https://timesmedia.online | head -1
 ```
 
-Without a restriction the key is public in the JS bundle and anyone can bill
-against it. With the wrong restriction the map silently fails to load.
+Vercel issues the certificate automatically once the record resolves.
 
-## 5. Supabase
-
-- **Authentication → URL Configuration** → set Site URL to
-  `https://timesmedia.online` and add it to redirect URLs. Sign-in is
-  email+password and invites are a custom token flow, so nothing depends on
-  this today — but password reset will.
-- The `dv-assets` storage bucket must stay **public-read**. The board photos,
-  the deck and the audio are served from it; see `src/lib/assets.ts`.
-
-## 6. Before you tell anyone the address
+## Before you tell anyone the address
 
 - **Change the admin password.** `admin@gmail.com` / `admin123` is currently a
   working superuser on a public URL. Supabase → Authentication → Users →
@@ -80,7 +46,8 @@ against it. With the wrong restriction the map silently fails to load.
   Bharat Solanki".
 - **Rotate the Anthropic key.** It was pasted into a chat during development.
   `/api/chat` is admin-gated so it is not open to the internet, but the key
-  itself should not be trusted any more.
+  itself should not be trusted any more. Rotate it in the Anthropic console,
+  then `vercel env rm ANTHROPIC_API_KEY production` and add the new one.
 - **The QR codes encode `NEXT_PUBLIC_SITE_URL`.** Do not print any until the
   domain resolves, or every sticker points at localhost.
 
@@ -97,3 +64,16 @@ Flagged and kept deliberately — listed here so nobody is surprised later.
 - **The field report does not reach the database.** "Send to office" sets local
   state; the maintenance queue reads mock data.
 - **The voice note plays a generated tone**, not a recording.
+
+## Reference
+
+- Redeploy: pushing to `main` deploys automatically. Manually:
+  `npx vercel --prod` from the repo.
+- Change an env var: `npx vercel env rm NAME production`, then
+  `npx vercel env add NAME production`. `NEXT_PUBLIC_*` values are inlined at
+  build time, so redeploy after changing one.
+- Board photos, the imported deck and the audio live in the `dv-assets`
+  Supabase Storage bucket, not in the repo — it is public and that is the
+  family's business data. Re-upload after importing a new city:
+  `node scripts/upload-assets.mjs`. See `src/lib/assets.ts`.
+- `.env.example` lists every key and what it is for.
