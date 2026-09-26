@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronsLeft, MapPin, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
 import { MapsProvider } from "@/components/map/MapsProvider";
 import { PublicMap } from "@/components/site/PublicMap";
 import { BoardVisual } from "@/components/site/BoardVisual";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { boardPhotoUrl } from "@/lib/assets";
 import type { PublicBoard } from "@/lib/publicBoards";
+import type { Hotspot } from "@/lib/hotspots.db";
 import { inr, fullDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -138,12 +139,13 @@ function BoardPanel({
 }
 
 export function InventoryBrowser({
-  boards, cities, initialBoard, initialCity,
+  boards, cities, initialBoard, initialCity, hotspots = [],
 }: {
   boards: PublicBoard[];
   cities: string[];
   initialBoard: string | null;
   initialCity: string | null;
+  hotspots?: Hotspot[];
 }) {
   const [query, setQuery] = useState("");
   const [selectedCities, setSelectedCities] = useState<string[]>(initialCity ? [initialCity] : []);
@@ -153,6 +155,8 @@ export function InventoryBrowser({
   const [maxRate, setMaxRate] = useState(RATE_MAX);
   const [open, setOpen] = useState<string | null>(initialBoard);
   const [traffic, setTraffic] = useState(false);
+  // context is on by default — it is the thing that explains the boards
+  const [places, setPlaces] = useState(true);
 
   // On a phone the rail is wider than the screen, so it stops being a rail and
   // becomes a sheet over the map — and the map, not the filters, is what you
@@ -215,6 +219,7 @@ export function InventoryBrowser({
             onSelect={setOpen}
             insetLeft={showPanel && !narrow ? PANEL_W + 24 : 24}
             traffic={traffic}
+            hotspots={places ? hotspots : []}
           />
         </div>
 
@@ -333,12 +338,22 @@ export function InventoryBrowser({
               Live traffic
             </button>
 
+            <button
+              onClick={() => setPlaces((v) => !v)}
+              aria-pressed={places}
+              className="tmui-ghost pointer-events-auto absolute right-6 top-[68px] z-10"
+              style={places ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
+            >
+              <MapPin className="size-4" strokeWidth={2.4} />
+              Landmarks
+            </button>
+
             {/* The roads borrow the same green and red the pins use for free
                 and booked, which would otherwise read as one scale. Saying
                 what is what costs a line and removes the ambiguity. */}
             {traffic && (
               <div
-                className="tmui-caps pointer-events-none absolute right-6 top-[68px] z-10 flex flex-col gap-1.5 border p-3"
+                className="tmui-caps pointer-events-none absolute right-6 top-[124px] z-10 flex flex-col gap-1.5 border p-3"
                 style={{ background: "#fff", borderColor: "var(--ink)", fontSize: 10.5, fontWeight: 600 }}
               >
                 <span className="flex items-center gap-2">

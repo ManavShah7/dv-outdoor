@@ -1,4 +1,5 @@
 import { getPublicBoards } from "@/lib/boards.db";
+import { getHotspots } from "@/lib/hotspots.db";
 import { text } from "@/components/times/fonts";
 import { SiteHeader } from "@/components/site/SiteChrome";
 import { InventoryBrowser } from "@/components/site/InventoryBrowser";
@@ -21,7 +22,7 @@ export default async function PublicBoardsPage({
   searchParams: Promise<{ board?: string; city?: string }>;
 }) {
   const { board, city } = await searchParams;
-  const { boards, cities } = await getPublicBoards();
+  const [{ boards, cities }, hotspots] = await Promise.all([getPublicBoards(), getHotspots()]);
   return (
     <div className={`tmui ${text.variable}`}>
       <SiteHeader />
@@ -30,6 +31,7 @@ export default async function PublicBoardsPage({
         cities={cities}
         initialBoard={board ?? null}
         initialCity={city ?? null}
+        hotspots={hotspots}
       />
     </div>
   );

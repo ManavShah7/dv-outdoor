@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { Board } from "@/lib/types";
 import { CITY_CENTRES } from "@/lib/mockBoards";
+import type { Hotspot } from "@/lib/hotspots.db";
+import { HotspotLayer } from "@/components/map/HotspotLayer";
 
 const SAURASHTRA = { lat: 21.98, lng: 70.55 };
 
@@ -138,11 +140,13 @@ function Layers({
   selectedId,
   onSelect,
   insetLeft,
+  hotspots,
 }: {
   boards: Board[];
   selectedId?: string;
   onSelect: (b: Board) => void;
   insetLeft: number;
+  hotspots: Hotspot[];
 }) {
   const map = useMap();
   const [zoom, setZoom] = useState(8.4);
@@ -198,6 +202,7 @@ function Layers({
   if (zoom <= CITY_ZOOM_MAX) {
     return (
       <>
+        <HotspotLayer hotspots={hotspots} zoom={zoom} />
         {cityCounts.map((c) => (
           <Marker
             key={c.city}
@@ -221,6 +226,7 @@ function Layers({
 
   return (
     <>
+      <HotspotLayer hotspots={hotspots} zoom={zoom} />
       {boards.map((b) => (
         <Marker
           key={b.id}
@@ -268,6 +274,7 @@ export function BoardMap({
   onSelect,
   insetLeft = 0,
   traffic = false,
+  hotspots = [],
 }: {
   boards: Board[];
   selectedId?: string;
@@ -275,6 +282,7 @@ export function BoardMap({
   /** width of the floating chrome covering the left of the canvas */
   insetLeft?: number;
   traffic?: boolean;
+  hotspots?: Hotspot[];
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -303,7 +311,7 @@ export function BoardMap({
           ]}
           style={{ width: "100%", height: "100%" }}
         >
-          <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} />
+          <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />
           <Traffic on={traffic} />
         </GoogleMap>
       </div>

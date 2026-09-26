@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // `Map` is aliased: the component name would otherwise shadow the built-in Map.
 import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { PublicBoard } from "@/lib/publicBoards";
+import type { Hotspot } from "@/lib/hotspots.db";
+import { HotspotLayer } from "@/components/map/HotspotLayer";
 
 const CITY_ZOOM_MAX = 9.2;
 
@@ -169,10 +171,10 @@ function Traffic({ on }: { on: boolean }) {
 }
 
 function Layers({
-  boards, selected, onSelect, insetLeft,
+  boards, selected, onSelect, insetLeft, hotspots,
 }: {
   boards: PublicBoard[]; selected: string | null;
-  onSelect: (code: string) => void; insetLeft: number;
+  onSelect: (code: string) => void; insetLeft: number; hotspots: Hotspot[];
 }) {
   const map = useMap();
   const [zoom, setZoom] = useState(8);
@@ -250,6 +252,7 @@ function Layers({
   if (zoom <= CITY_ZOOM_MAX) {
     return (
       <>
+        <HotspotLayer hotspots={hotspots} zoom={zoom} />
         {cities.map((c) => (
           <Marker
             key={c.city}
@@ -269,6 +272,7 @@ function Layers({
 
   return (
     <>
+      <HotspotLayer hotspots={hotspots} zoom={zoom} />
       {boards.map((b) => (
         <Marker
           key={b.code}
@@ -283,10 +287,11 @@ function Layers({
 }
 
 export function PublicMap({
-  boards, selected, onSelect, insetLeft = 0, traffic = false,
+  boards, selected, onSelect, insetLeft = 0, traffic = false, hotspots = [],
 }: {
   boards: PublicBoard[]; selected: string | null;
   onSelect: (code: string) => void; insetLeft?: number; traffic?: boolean;
+  hotspots?: Hotspot[];
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!key) {
@@ -309,7 +314,7 @@ export function PublicMap({
         styles={MONO}
         style={{ width: "100%", height: "100%" }}
       >
-        <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} />
+        <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />
         <Traffic on={traffic} />
       </GoogleMap>
   );

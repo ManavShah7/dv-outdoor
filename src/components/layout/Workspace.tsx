@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TrafficCone } from "lucide-react";
+import { MapPin, TrafficCone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Board } from "@/lib/types";
 import type { Enquiry } from "@/lib/enquiries.db";
+import type { Hotspot } from "@/lib/hotspots.db";
 import { cn } from "@/lib/utils";
 import { Sidebar, type NavId } from "@/components/layout/Sidebar";
 import { SearchPanel, type QuickFilter } from "@/components/board/SearchPanel";
@@ -46,9 +47,9 @@ function matches(b: Board, q: string, f: QuickFilter | null) {
 type Mode = "idle" | "managing" | "booking";
 
 export function Workspace({
-  adminName, initialBoards, enquiries,
+  adminName, initialBoards, enquiries, hotspots = [],
 }: {
-  adminName?: string; initialBoards: Board[]; enquiries: Enquiry[];
+  adminName?: string; initialBoards: Board[]; enquiries: Enquiry[]; hotspots?: Hotspot[];
 }) {
   const [boards, setBoards] = useState<Board[]>(initialBoards);
   const [nav, setNav] = useState<NavId>("search");
@@ -62,6 +63,7 @@ export function Workspace({
   const [mode, setMode] = useState<Mode>("idle");
   const [toast, setToast] = useState<string | null>(null);
   const [traffic, setTraffic] = useState(false);
+  const [places, setPlaces] = useState(true);
   const router = useRouter();
 
   /**
@@ -277,6 +279,7 @@ export function Workspace({
           onSelect={selectBoard}
           insetLeft={panel ? 328 + 427 + 24 : 328 + 24}
           traffic={traffic}
+          hotspots={places ? hotspots : []}
         />
       </div>
 
@@ -448,6 +451,19 @@ export function Workspace({
         >
           <TrafficCone className="size-4" strokeWidth={2.2} />
           Live traffic
+        </button>
+
+        <button
+          onClick={() => setPlaces((v) => !v)}
+          aria-pressed={places}
+          className={cn(
+            "pointer-events-auto absolute right-6 top-[68px] z-10 inline-flex h-10 items-center gap-2",
+            "rounded-[var(--radius-control)] px-4 text-footnote font-[590] ring-1 ring-inset transition-colors",
+            places ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-white/[0.12]",
+          )}
+        >
+          <MapPin className="size-4" strokeWidth={2.2} />
+          Landmarks
         </button>
 
         <ChatWidget onActions={applyAgentActions} />
