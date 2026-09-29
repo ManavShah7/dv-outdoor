@@ -69,7 +69,7 @@ export function VoiceNote({ onChange }: { onChange?: (url: string | null, secs: 
 
   if (state === "done" && url) {
     return (
-      <div className="flex h-[68px] w-full items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 ring-1 ring-white/[0.1] ring-inset">
+      <div className="flex h-[68px] w-full items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 ring-1 ring-black/[0.15] ring-inset">
         <button
           onClick={toggle}
           aria-label={playing ? "Pause" : "Play"}
@@ -95,7 +95,7 @@ export function VoiceNote({ onChange }: { onChange?: (url: string | null, secs: 
         "text-body font-[590] ring-1 ring-inset transition-colors",
         state === "recording"
           ? "text-ink-0 ring-transparent"
-          : "bg-chrome-raised text-ink-100 ring-white/[0.1]",
+          : "bg-chrome-raised text-ink-100 ring-black/[0.15]",
       )}
       style={state === "recording" ? { background: "color-mix(in srgb, var(--color-damaged) 18%, transparent)" } : undefined}
     >

@@ -92,14 +92,14 @@ export function AcceptInvite({ token }: { token: string }) {
         Welcome, {invite.fullName.split(" ")[0]}
       </h1>
       <p className="mt-2 text-body text-ink-300">
-        DV Outdoor has invited you as a field agent. Set a password and you are done —
+        The Times Media has invited you as a field agent. Set a password and you are done —
         after this, scanning a board&rsquo;s QR code takes you straight in.
       </p>
 
       <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
         <div>
           <label className="mb-2 block text-subhead text-ink-300">Your name</label>
-          <div className="flex h-[60px] items-center rounded-[var(--radius-card)] bg-black/25 px-5 text-body text-ink-300 ring-1 ring-white/[0.07] ring-inset">
+          <div className="flex h-[60px] items-center rounded-[var(--radius-card)] bg-black/[0.035] px-5 text-body text-ink-300 ring-1 ring-black/[0.11] ring-inset">
             {invite.fullName}
           </div>
           <p className="mt-1.5 text-caption text-ink-600">Set by the office. Ask them if it is wrong.</p>
@@ -113,7 +113,7 @@ export function AcceptInvite({ token }: { token: string }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             autoComplete="email"
-            className="h-[60px] w-full rounded-[var(--radius-card)] bg-chrome-raised px-5 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="h-[60px] w-full rounded-[var(--radius-card)] bg-chrome-raised px-5 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.15] ring-inset outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
@@ -125,7 +125,7 @@ export function AcceptInvite({ token }: { token: string }) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
             autoComplete="new-password"
-            className="h-[60px] w-full rounded-[var(--radius-card)] bg-chrome-raised px-5 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="h-[60px] w-full rounded-[var(--radius-card)] bg-chrome-raised px-5 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.15] ring-inset outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 

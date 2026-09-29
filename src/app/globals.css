@@ -25,24 +25,30 @@
   --spacing: 4px;
 
   /* ---- RADII — three, plus a pill. That is the entire vocabulary. ------ */
-  --radius-control: 10px;   /* inputs, buttons */
-  --radius-card:    14px;   /* nested cards */
-  --radius-panel:   18px;   /* floating panels, popovers */
+  /* Square, like the public site. The pill survives only for genuinely
+     round things — a count badge, an avatar. */
+  --radius-control: 0px;
+  --radius-card:    0px;
+  --radius-panel:   0px;
   --radius-pill:    999px;
 
   /* ---- NEUTRAL RAMP ---------------------------------------------------- */
-  --color-ink-0:   #ffffff;
-  --color-ink-50:  #f7f8f8;
-  --color-ink-100: #eef0f1;
-  --color-ink-200: #e0e3e5;
-  --color-ink-300: #c6cbcf;
-  --color-ink-400: #9aa1a7;
-  --color-ink-500: #6f777e;
-  --color-ink-600: #4d545a;
-  --color-ink-700: #343a3f;
-  --color-ink-800: #21262a;
-  --color-ink-900: #14181b;
-  --color-ink-950: #0b0e10;
+  /* Inverted for the Times Media language: the office now reads black on
+     white like the public site. The scale keeps its direction — ink-0 is the
+     strongest, ink-950 the page — so every component's intent survives the
+     flip without being rewritten. */
+  --color-ink-0:   #000000;
+  --color-ink-50:  #0d0d0d;
+  --color-ink-100: #1a1a1a;
+  --color-ink-200: #333333;
+  --color-ink-300: #4d4d4d;
+  --color-ink-400: #6e6e6e;
+  --color-ink-500: #8a8a8a;
+  --color-ink-600: #a6a6a6;
+  --color-ink-700: #c9c9c9;
+  --color-ink-800: #e2e2e2;
+  --color-ink-900: #f2f2f2;
+  --color-ink-950: #ffffff;
 
   /* ---- SEMANTIC STATUS — the only saturated colour in the product.
      Reserved for map pins and status badges, never decoration.
@@ -71,12 +77,15 @@
    ============================================================================ */
 :root,
 [data-accent="graphite"] {
-  --accent:        #0a84ff;
-  --accent-hover:  #3b9bff;
+  /* Black is the accent. The public site has no second colour and neither
+     does this — saturation is reserved for board status on the map, which
+     is the one place it carries meaning. */
+  --accent:        #000000;
+  --accent-hover:  #262626;
   --accent-on:     #ffffff;
-  --chrome:        #0e1013;   /* sidebar / inspector base */
-  --chrome-raised: #16191d;   /* nested cards inside chrome */
-  --chrome-line:   #23272c;
+  --chrome:        #ffffff;   /* sidebar / inspector base */
+  --chrome-raised: #ffffff;   /* nested cards, separated by a rule not a fill */
+  --chrome-line:   #000000;
 }
 [data-accent="teal"] {
   --accent:        #17a8a4;
@@ -110,9 +119,9 @@
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* ---- ELEVATION — chrome sits ON the map, so shadows are directional. */
-  --shadow-panel: 0 0 0 0.5px rgb(0 0 0 / 0.30), 0 8px 28px -6px rgb(0 0 0 / 0.36);
-  --shadow-pop:   0 0 0 0.5px rgb(0 0 0 / 0.34), 0 16px 48px -12px rgb(0 0 0 / 0.50);
-  --shadow-inset-hairline: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+  --shadow-panel: 0 0 0 1px rgb(0 0 0 / 0.14);
+  --shadow-pop:   0 0 0 1px rgb(0 0 0 / 0.85), 6px 6px 0 rgb(0 0 0 / 0.12);
+  --shadow-inset-hairline: inset 0 1px 0 0 rgb(0 0 0 / 0.05);
 }
 
 /* ============================================================================
@@ -125,30 +134,19 @@
    through its own --tw-backdrop-* composition and silently strips a raw
    backdrop-filter declaration written inside @utility, emitting an empty rule.
    The blur simply never applies and nothing warns you. */
-.material-thin {
-  background-color: color-mix(in srgb, var(--chrome) 68%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  backdrop-filter: blur(20px) saturate(190%);
-}
-.material-regular {
-  background-color: color-mix(in srgb, var(--chrome) 88%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
-  backdrop-filter: blur(24px) saturate(190%);
-}
+/* The Times Media language is flat: paper, rules, no glass. The class names
+   survive so the 41 call sites do not have to change, but they are now solid
+   white. Blur over a light map was muddying the map without adding depth. */
+.material-thin    { background-color: rgba(255,255,255,.94); }
+.material-regular { background-color: #ffffff; }
 /* Sidebars and inspectors. Reads as a solid dark slab that *picks up* colour
    from whatever is underneath as you drag the map — not as a window you see
    through. High opacity with heavy saturation is what produces that: the tint
    bleeds, the detail does not. */
-.material-thick {
-  background-color: color-mix(in srgb, var(--chrome) 96%, transparent);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  backdrop-filter: blur(28px) saturate(200%);
-}
+.material-thick   { background-color: #ffffff; }
 /* Cards nested inside a material panel — translucent against their parent so
    the layering stays legible instead of flattening into one slab. */
-.material-inset {
-  background-color: color-mix(in srgb, var(--chrome-raised) 72%, transparent);
-}
+.material-inset   { background-color: #fafafa; }
 
 /* Google injects its own span for marker labels; force it onto our stack. */
 .dv-city-label {

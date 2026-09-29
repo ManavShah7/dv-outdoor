@@ -30,7 +30,7 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <main className="grid min-h-dvh place-items-center px-6">
       <form onSubmit={submit} className="w-full max-w-[380px]">
-        <h1 className="text-title1 font-[680] text-ink-0">DV Outdoor</h1>
+        <h1 className="text-title1 font-[680] text-ink-0">The Times Media</h1>
         <p className="mt-1.5 text-subhead text-ink-400">Sign in to continue.</p>
 
         <div className="mt-8 flex flex-col gap-3">
@@ -40,7 +40,7 @@ export function LoginForm({ next }: { next?: string }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             autoComplete="email"
-            className="h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised px-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised px-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent"
           />
           <input
             type="password"
@@ -48,7 +48,7 @@ export function LoginForm({ next }: { next?: string }) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             autoComplete="current-password"
-            className="h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised px-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="h-12 w-full rounded-[var(--radius-control)] bg-chrome-raised px-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 

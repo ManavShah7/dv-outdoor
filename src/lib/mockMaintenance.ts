@@ -7,6 +7,10 @@ export type Severity = "red" | "orange" | "yellow";
 export type MaintenanceRequest = {
   id: string;
   boardId: string;
+  /** The stable key across sources. Board ids are database UUIDs now, while
+   *  these rows are still generated against the old in-memory array, so a
+   *  join on id silently matched nothing and emptied the whole queue. */
+  boardCode: string;
   reportedByName: string;
   reportedAt: string;
   description: string;
@@ -138,6 +142,7 @@ export function generateMaintenance(): MaintenanceRequest[] {
     return {
       id: `m${i + 1}`,
       boardId: b.id,
+      boardCode: b.code,
       reportedByName: REPORTERS[Math.floor(r() * REPORTERS.length)],
       reportedAt: new Date(Date.now() - hoursAgo * 3_600_000).toISOString(),
       description: fault.text,

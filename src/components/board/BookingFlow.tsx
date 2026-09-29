@@ -63,9 +63,9 @@ export function BookingFlow({
     d.company.trim() && d.startDate && d.endDate && rateNum > 0 && d.printedBy && datesValid;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-black/[0.09]">
       {/* header */}
-      <div className="flex items-start justify-between border-b border-white/[0.07] px-8 pb-6 pt-8">
+      <div className="flex items-start justify-between border-b border-black/[0.11] px-8 pb-6 pt-8">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             {step === "review" && (
@@ -134,7 +134,7 @@ export function BookingFlow({
                   value={d.printedBy}
                   onChange={(v) => set("printedBy", v as BookingDraft["printedBy"])}
                   options={[
-                    { value: "us", label: "DV Outdoor" },
+                    { value: "us", label: "The Times Media" },
                     { value: "client", label: "Client" },
                   ]}
                 />
@@ -142,7 +142,7 @@ export function BookingFlow({
             </div>
 
             {discount !== null && (
-              <div className="-mt-2 flex items-center justify-between rounded-[var(--radius-control)] bg-black/25 px-4 py-3">
+              <div className="-mt-2 flex items-center justify-between rounded-[var(--radius-control)] bg-black/[0.035] px-4 py-3">
                 <span className="text-footnote text-ink-400">
                   Asking {inr(board.askingRate)}
                 </span>
@@ -173,7 +173,7 @@ export function BookingFlow({
           <Card className="mt-4 flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Company">{d.company}</Field>
-              <Field label="Printer">{d.printedBy === "us" ? "DV Outdoor" : "Client"}</Field>
+              <Field label="Printer">{d.printedBy === "us" ? "The Times Media" : "Client"}</Field>
             </div>
             <div>
               <div className="text-footnote text-ink-400">Lease period</div>
@@ -209,7 +209,7 @@ export function BookingFlow({
         )}
       </div>
 
-      <motion.div layout className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
+      <motion.div layout className="sticky bottom-0 mt-auto border-t border-black/[0.11] material-thick px-8 py-5">
         {step === "form" ? (
           <Button variant="primary" disabled={!canProceed} onClick={() => setStep("review")}>
             Proceed

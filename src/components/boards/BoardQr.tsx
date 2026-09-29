@@ -72,13 +72,13 @@ export function BoardQr({ board }: { board: Board }) {
       <div className="flex w-full gap-2">
         <button
           onClick={download}
-          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/25 text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.1] ring-inset transition-colors hover:bg-white/[0.07]"
+          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/[0.035] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.15] ring-inset transition-colors hover:bg-black/[0.11]"
         >
           <Download className="size-4" strokeWidth={2} /> PNG
         </button>
         <button
           onClick={print}
-          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/25 text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.1] ring-inset transition-colors hover:bg-white/[0.07]"
+          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/[0.035] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.15] ring-inset transition-colors hover:bg-black/[0.11]"
         >
           <Printer className="size-4" strokeWidth={2} /> Print
         </button>

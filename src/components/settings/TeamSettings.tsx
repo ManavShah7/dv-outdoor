@@ -28,7 +28,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-11 w-full min-w-0 rounded-[var(--radius-control)] bg-black/30 px-4 text-subhead text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+      className="h-11 w-full min-w-0 rounded-[var(--radius-control)] bg-black/[0.035] px-4 text-subhead text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent"
     />
   );
 }
@@ -134,7 +134,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
           title="Invite a field agent"
           sub="You enter their name; they set their own password. After that, scanning a board's QR takes them straight in."
         >
-          <form onSubmit={createInvite} className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+          <form onSubmit={createInvite} className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
             <Input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent's full name" />
             <div className="grid grid-cols-2 gap-3">
               <Input type="email" value={agentEmail} onChange={(e) => setAgentEmail(e.target.value)} placeholder="Email (optional)" />
@@ -156,11 +156,11 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
                  style={{ background: "color-mix(in srgb, var(--color-available) 10%, transparent)", borderColor: "transparent" }}>
               <p className="text-subhead font-[590] text-ink-0">Link ready for {freshLink.name}</p>
               <p className="mt-1 text-caption text-ink-400">Valid for 14 days, single use.</p>
-              <div className="mt-3 flex items-center gap-2 rounded-[var(--radius-control)] bg-black/40 px-3 py-2.5">
+              <div className="mt-3 flex items-center gap-2 rounded-[var(--radius-control)] bg-black/[0.05] px-3 py-2.5 ring-1 ring-black/[0.11] ring-inset">
                 <code className="min-w-0 flex-1 truncate text-caption text-ink-300">{freshLink.url}</code>
                 <button
                   onClick={() => { navigator.clipboard.writeText(freshLink.url); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-[7px] bg-white/10 px-2.5 py-1.5 text-caption font-[590] text-ink-100 hover:bg-white/[0.16]"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-[7px] bg-black/[0.07] px-2.5 py-1.5 text-caption font-[590] text-ink-100 hover:bg-black/[0.13]"
                 >
                   {copied ? <Check className="size-3.5" strokeWidth={2.6} /> : <Copy className="size-3.5" strokeWidth={2.2} />}
                   {copied ? "Copied" : "Copy"}
@@ -169,17 +169,17 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
               <div className="mt-3 flex gap-2">
                 {freshLink.phone && (
                   <a
-                    href={`https://wa.me/${freshLink.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${freshLink.name}, set up your DV Outdoor account here: ${freshLink.url}`)}`}
+                    href={`https://wa.me/${freshLink.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${freshLink.name}, set up your The Times Media account here: ${freshLink.url}`)}`}
                     target="_blank" rel="noreferrer"
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/30 text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.1] ring-inset hover:bg-white/[0.07]"
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/[0.035] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.15] ring-inset hover:bg-black/[0.11]"
                   >
                     <MessageCircle className="size-4" strokeWidth={2} /> WhatsApp
                   </a>
                 )}
                 {freshLink.email && (
                   <a
-                    href={`mailto:${freshLink.email}?subject=${encodeURIComponent("Your DV Outdoor account")}&body=${encodeURIComponent(`Hello ${freshLink.name},\n\nSet up your account here:\n${freshLink.url}\n\nThis link works once and expires in 14 days.`)}`}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/30 text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.1] ring-inset hover:bg-white/[0.07]"
+                    href={`mailto:${freshLink.email}?subject=${encodeURIComponent("Your The Times Media account")}&body=${encodeURIComponent(`Hello ${freshLink.name},\n\nSet up your account here:\n${freshLink.url}\n\nThis link works once and expires in 14 days.`)}`}
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-black/[0.035] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.15] ring-inset hover:bg-black/[0.11]"
                   >
                     <Mail className="size-4" strokeWidth={2} /> Email
                   </a>
@@ -198,7 +198,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
           <Section title="Waiting to be accepted">
             <div className="flex flex-col gap-2">
               {pending.map((i) => (
-                <div key={i.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-white/[0.07] ring-inset">
+                <div key={i.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-black/[0.11] ring-inset">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-subhead font-[590] text-ink-0">{i.full_name}</p>
                     <p className="truncate text-caption text-ink-500">
@@ -207,7 +207,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
                   </div>
                   <button
                     onClick={() => { navigator.clipboard.writeText(`${siteOrigin()}/invite/${i.token}`); }}
-                    className="shrink-0 rounded-[7px] bg-white/[0.08] px-3 py-1.5 text-caption font-[590] text-ink-200 hover:bg-white/[0.14]"
+                    className="shrink-0 rounded-[7px] bg-black/[0.13] px-3 py-1.5 text-caption font-[590] text-ink-200 hover:bg-black/[0.10]"
                   >
                     Copy link
                   </button>
@@ -228,7 +228,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
           ) : (
             <div className="flex flex-col gap-2">
               {agents.map((p) => (
-                <div key={p.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-white/[0.07] ring-inset">
+                <div key={p.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-black/[0.11] ring-inset">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-subhead font-[590] text-ink-0">{p.full_name ?? p.email}</p>
                     <p className="truncate text-caption text-ink-500">{p.email}</p>
@@ -251,7 +251,7 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
         <Section title={`Admins (${admins.length})`}>
           <div className="flex flex-col gap-2">
             {admins.map((p) => (
-              <div key={p.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-white/[0.07] ring-inset">
+              <div key={p.id} className="flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-3.5 ring-1 ring-black/[0.11] ring-inset">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-subhead font-[590] text-ink-0">
                     {p.full_name ?? p.email}
@@ -266,12 +266,12 @@ export function TeamSettings({ meEmail }: { meEmail: string }) {
           {!showAdmin ? (
             <button
               onClick={() => setShowAdmin(true)}
-              className="mt-3 inline-flex h-10 items-center gap-2 rounded-[var(--radius-control)] bg-black/25 px-4 text-footnote font-[590] text-ink-200 ring-1 ring-white/[0.08] ring-inset hover:bg-white/[0.07]"
+              className="mt-3 inline-flex h-10 items-center gap-2 rounded-[var(--radius-control)] bg-black/[0.035] px-4 text-footnote font-[590] text-ink-200 ring-1 ring-black/[0.13] ring-inset hover:bg-black/[0.11]"
             >
               <Plus className="size-4" strokeWidth={2.4} /> Add an admin
             </button>
           ) : (
-            <form onSubmit={createAdmin} className="mt-3 flex flex-col gap-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+            <form onSubmit={createAdmin} className="mt-3 flex flex-col gap-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
               <Input value={adminName} onChange={(e) => setAdminName(e.target.value)} placeholder="Full name" />
               <div className="grid grid-cols-2 gap-3">
                 <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="Email" />

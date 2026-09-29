@@ -240,10 +240,10 @@ export function Workspace({
     );
     setBoards((prev) =>
       prev.map((b) =>
-        b.id === openRequest.boardId ? { ...b, status: "under_maintenance" } : b,
+        b.code === openRequest.boardCode ? { ...b, status: "under_maintenance" } : b,
       ),
     );
-    const b = boards.find((x) => x.id === openRequest.boardId);
+    const b = boards.find((x) => x.code === openRequest.boardCode);
     if (b) void persist({ code: b.code, action: "set_status", status: "under_maintenance" },
                         `Could not set ${b.code} to under maintenance.`);
     setToast(`${b?.name ?? "Board"} set to under maintenance`);
@@ -360,11 +360,11 @@ export function Workspace({
                 initial={{ x: 32, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute inset-y-0 right-0 z-30 w-[480px] border-l border-white/[0.08] shadow-[var(--shadow-pop)]"
+                className="absolute inset-y-0 right-0 z-30 w-[480px] border-l border-black/[0.13] shadow-[var(--shadow-pop)]"
               >
                 <MaintenanceDetail
                   request={openRequest}
-                  board={boards.find((b) => b.id === openRequest.boardId)}
+                  board={boards.find((b) => b.code === openRequest.boardCode)}
                   onBack={() => setOpenRequestId(null)}
                   onFeedback={rateAssessment}
                   onStartWork={startWork}
@@ -446,7 +446,7 @@ export function Workspace({
           className={cn(
             "pointer-events-auto absolute right-6 top-6 z-10 inline-flex h-10 items-center gap-2",
             "rounded-[var(--radius-control)] px-4 text-footnote font-[590] ring-1 ring-inset transition-colors",
-            traffic ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-white/[0.12]",
+            traffic ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-black/[0.18]",
           )}
         >
           <TrafficCone className="size-4" strokeWidth={2.2} />
@@ -459,7 +459,7 @@ export function Workspace({
           className={cn(
             "pointer-events-auto absolute right-6 top-[68px] z-10 inline-flex h-10 items-center gap-2",
             "rounded-[var(--radius-control)] px-4 text-footnote font-[590] ring-1 ring-inset transition-colors",
-            places ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-white/[0.12]",
+            places ? "bg-accent text-accent-on ring-transparent" : "material-thick text-ink-100 ring-black/[0.18]",
           )}
         >
           <MapPin className="size-4" strokeWidth={2.2} />

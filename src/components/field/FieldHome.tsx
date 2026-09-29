@@ -23,7 +23,7 @@ export function FieldHome({ name }: { name: string }) {
         Scan the QR code on a board to report a problem or mark a repair done.
       </p>
 
-      <div className="mt-10 flex flex-col items-center gap-4 rounded-[var(--radius-panel)] bg-chrome-raised px-6 py-12 text-center ring-1 ring-white/[0.07] ring-inset">
+      <div className="mt-10 flex flex-col items-center gap-4 rounded-[var(--radius-panel)] bg-chrome-raised px-6 py-12 text-center ring-1 ring-black/[0.11] ring-inset">
         <QrCode className="size-16 text-ink-600" strokeWidth={1.4} />
         <p className="text-body text-ink-400">
           Use your phone camera on the sticker at the board.

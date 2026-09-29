@@ -60,8 +60,8 @@ function RequestCard({
 }) {
   const status = STATUS_LABEL[board.status];
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
-      <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
+    <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-black/[0.11] ring-inset">
+      <div className="relative grid aspect-[16/10] place-items-center bg-black/[0.05]">
         <BoardPhoto code={board.code} override={request.photos[0]} />
         {request.wasRentedAtReport && (
           <span
@@ -96,7 +96,7 @@ function RequestCard({
         <div className="mt-auto pt-4">
           <button
             onClick={onOpen}
-            className="h-10 w-full rounded-[var(--radius-control)] text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.12] ring-inset transition-colors hover:bg-white/[0.07] hover:text-ink-0"
+            className="h-10 w-full rounded-[var(--radius-control)] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.18] ring-inset transition-colors hover:bg-black/[0.11] hover:text-ink-0"
           >
             View Details
           </button>
@@ -119,12 +119,12 @@ export function MaintenanceView({
   const [query, setQuery] = useState("");
   const [active, setActive] = useState<Filter | null>(null);
 
-  const boardById = useMemo(() => new Map(boards.map((b) => [b.id, b])), [boards]);
+  const boardByCode = useMemo(() => new Map(boards.map((b) => [b.code, b])), [boards]);
 
   const grouped = useMemo(() => {
     const q = query.trim().toLowerCase();
     const open = requests.filter((r) => {
-      const b = boardById.get(r.boardId);
+      const b = boardByCode.get(r.boardCode);
       if (!b) return false;
       if (r.status === "resolved") return false;
       if (active?.kind === "status" && b.status !== active.value) return false;
@@ -144,7 +144,7 @@ export function MaintenanceView({
         .filter((r) => r.aiSeverity === sev)
         .sort((a, b) => b.aiUrgencyScore - a.aiUrgencyScore),
     })).filter((g) => g.items.length > 0);
-  }, [requests, boardById, query, active]);
+  }, [requests, boardByCode, query, active]);
 
   const total = grouped.reduce((n, g) => n + g.items.length, 0);
 
@@ -160,10 +160,10 @@ export function MaintenanceView({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search"
               className={cn(
-                "h-11 w-full rounded-[var(--radius-control)] bg-black/30 pl-11",
+                "h-11 w-full rounded-[var(--radius-control)] bg-black/[0.035] pl-11",
                 query ? "pr-11" : "pr-4",
                 "text-subhead text-ink-0 placeholder:text-ink-500",
-                "ring-1 ring-white/[0.08] ring-inset outline-none",
+                "ring-1 ring-black/[0.13] ring-inset outline-none",
                 "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
               )}
             />
@@ -171,7 +171,7 @@ export function MaintenanceView({
               <button
                 onClick={() => setQuery("")}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-ink-300 hover:text-ink-0"
+                className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-black/[0.07] text-ink-300 hover:text-ink-0"
               >
                 <X className="size-3.5" strokeWidth={2.4} />
               </button>
@@ -195,7 +195,7 @@ export function MaintenanceView({
                   "ring-1 ring-inset transition-colors duration-150",
                   on
                     ? "bg-accent text-accent-on ring-transparent"
-                    : "bg-black/25 text-ink-200 ring-white/[0.08] hover:bg-white/[0.07]",
+                    : "bg-black/[0.035] text-ink-200 ring-black/[0.13] hover:bg-black/[0.11]",
                 )}
               >
                 {label}
@@ -223,7 +223,7 @@ export function MaintenanceView({
                   <RequestCard
                     key={r.id}
                     request={r}
-                    board={boardById.get(r.boardId)!}
+                    board={boardByCode.get(r.boardCode)!}
                     onOpen={() => onOpen(r)}
                   />
                 ))}

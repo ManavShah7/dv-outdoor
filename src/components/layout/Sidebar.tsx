@@ -36,7 +36,7 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
+    <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-black/[0.11] ring-inset">
       <div className="text-subhead text-ink-300">{label}</div>
       <div
         className="mt-1 text-display font-[680] tabular-nums"
@@ -68,16 +68,16 @@ export function Sidebar({
   }
 
   return (
-    <aside className="flex h-full w-[328px] shrink-0 flex-col material-thick border-r border-white/[0.06]">
+    <aside className="flex h-full w-[328px] shrink-0 flex-col material-thick border-r border-black">
       {/* wordmark */}
-      <div className="flex h-[108px] items-center border-b border-white/[0.07] px-10">
+      <div className="flex h-[108px] items-center border-b border-black px-10">
         <span className="text-title3 font-[680] tracking-[-0.02em] text-ink-0">
           The Times Media
         </span>
       </div>
 
       {/* navigation */}
-      <nav className="border-b border-white/[0.07] py-4">
+      <nav className="border-b border-black/[0.11] py-4">
         {NAV.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
@@ -121,7 +121,7 @@ export function Sidebar({
         <StatCard label="Booked Boards"    value={counts.booked}    color="var(--color-booked)" />
         <StatCard label="Available Boards" value={counts.available} color="var(--color-available)" />
 
-        <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
+        <div className="rounded-[var(--radius-card)] material-inset px-5 py-4 ring-1 ring-black/[0.11] ring-inset">
           <div className="text-subhead text-ink-300">Maintenance</div>
           <div className="mt-3 flex gap-8">
             <div>
@@ -146,10 +146,10 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-white/[0.07] px-6 py-4">
+      <div className="shrink-0 border-t border-black/[0.11] px-6 py-4">
         <button
           onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-[var(--radius-control)] px-4 py-2.5 text-left transition-colors hover:bg-white/[0.06]"
+          className="flex w-full items-center gap-3 rounded-[var(--radius-control)] px-4 py-2.5 text-left transition-colors hover:bg-black/[0.09]"
         >
           <LogOut className="size-[18px] shrink-0 text-ink-500" strokeWidth={2} />
           <span className="min-w-0 flex-1">

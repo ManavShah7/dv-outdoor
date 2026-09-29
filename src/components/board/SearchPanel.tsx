@@ -62,7 +62,7 @@ export function SearchPanel({
   const searching = query.trim().length > 0 || active !== null;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden material-thick border-r border-white/[0.06]">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-hidden material-thick border-r border-black">
       <div className="px-8 pb-6 pt-8">
         <div className="flex items-center justify-between">
           <h1 className="text-title2 font-[680] text-ink-0">Search</h1>
@@ -84,7 +84,7 @@ export function SearchPanel({
               "h-12 w-full rounded-[var(--radius-control)] material-inset pl-11",
               query ? "pr-11" : "pr-4",
               "text-body text-ink-0 placeholder:text-ink-500",
-              "ring-1 ring-white/[0.07] ring-inset outline-none",
+              "ring-1 ring-black/[0.11] ring-inset outline-none",
               "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
             )}
           />
@@ -114,7 +114,7 @@ export function SearchPanel({
             {query.trim() && (
               <button
                 onClick={() => onQuery("")}
-                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] material-inset py-1.5 pl-3 pr-2 text-footnote font-[590] text-ink-200 ring-1 ring-white/[0.08] ring-inset transition-colors hover:bg-white/[0.07]"
+                className="group inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] material-inset py-1.5 pl-3 pr-2 text-footnote font-[590] text-ink-200 ring-1 ring-black/[0.13] ring-inset transition-colors hover:bg-black/[0.11]"
               >
                 &ldquo;{query.trim()}&rdquo;
                 <X className="size-3.5 opacity-70 group-hover:opacity-100" strokeWidth={2.6} />
@@ -148,7 +148,7 @@ export function SearchPanel({
                       "ring-1 ring-inset transition-colors duration-150",
                       on
                         ? "bg-accent text-accent-on ring-transparent"
-                        : "material-inset text-ink-100 ring-white/[0.07] hover:bg-white/[0.07]",
+                        : "material-inset text-ink-100 ring-black/[0.11] hover:bg-black/[0.11]",
                     )}
                   >
                     {label}

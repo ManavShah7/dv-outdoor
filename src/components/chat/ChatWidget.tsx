@@ -73,9 +73,9 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
-            className="pointer-events-auto absolute bottom-24 right-6 z-40 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-white/[0.08]"
+            className="pointer-events-auto absolute bottom-24 right-6 z-40 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-black/[0.13]"
           >
-            <div className="shrink-0 border-b border-white/[0.07] px-5 py-4">
+            <div className="shrink-0 border-b border-black/[0.11] px-5 py-4">
               <h2 className="text-subhead font-[620] text-ink-0">Ask about your boards</h2>
               <p className="mt-0.5 text-caption text-ink-500">
                 Inventory, clients, revenue, maintenance — or tell it to book something.
@@ -89,7 +89,7 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="rounded-[var(--radius-control)] bg-black/25 px-4 py-2.5 text-left text-footnote text-ink-200 ring-1 ring-white/[0.07] ring-inset transition-colors hover:bg-white/[0.07]"
+                      className="rounded-[var(--radius-control)] bg-black/[0.035] px-4 py-2.5 text-left text-footnote text-ink-200 ring-1 ring-black/[0.11] ring-inset transition-colors hover:bg-black/[0.11]"
                     >
                       {s}
                     </button>
@@ -104,7 +104,7 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
                     "max-w-[88%] whitespace-pre-wrap rounded-[var(--radius-card)] px-4 py-2.5 text-footnote leading-relaxed",
                     m.role === "user"
                       ? "ml-auto bg-accent text-accent-on"
-                      : "bg-black/30 text-ink-100 ring-1 ring-white/[0.06] ring-inset",
+                      : "bg-black/[0.035] text-ink-100 ring-1 ring-black/[0.09] ring-inset",
                   )}
                 >
                   {m.content}
@@ -136,14 +136,14 @@ export function ChatWidget({ onActions }: { onActions: (a: AgentAction[]) => voi
 
             <form
               onSubmit={(e) => { e.preventDefault(); send(input); }}
-              className="shrink-0 border-t border-white/[0.07] p-3"
+              className="shrink-0 border-t border-black/[0.11] p-3"
             >
               <div className="relative">
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask anything…"
-                  className="h-11 w-full rounded-[var(--radius-control)] bg-black/30 pl-4 pr-12 text-footnote text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+                  className="h-11 w-full rounded-[var(--radius-control)] bg-black/[0.035] pl-4 pr-12 text-footnote text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent"
                 />
                 <button
                   type="submit"

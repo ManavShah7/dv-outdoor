@@ -14,6 +14,21 @@ const SAURASHTRA = { lat: 21.98, lng: 70.55 };
    that straddle city lines. What the business actually wants zoomed out is
    "Junagadh 82" — a city aggregate. So: aggregates below the threshold,
    individual pins above it. Two mechanisms, one handoff. */
+/** Desaturated, so board status is the only colour on the map. */
+const MONO: google.maps.MapTypeStyle[] = [
+  { elementType: "geometry", stylers: [{ saturation: -100 }, { lightness: 22 }] },
+  { elementType: "labels.text.fill", stylers: [{ saturation: -100 }, { lightness: -26 }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }, { weight: 2.5 }] },
+  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "poi", elementType: "geometry", stylers: [{ lightness: 48 }] },
+  { featureType: "transit", stylers: [{ visibility: "off" }] },
+  { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ saturation: -100 }, { lightness: 8 }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ saturation: -100 }, { lightness: -8 }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ saturation: -100 }, { lightness: 62 }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ saturation: -100 }, { lightness: -20 }] },
+];
+
 const CITY_ZOOM_MAX = 9.2;
 
 const STATUS_COLOR: Record<Board["status"], string> = {
@@ -304,11 +319,7 @@ export function BoardMap({
           disableDefaultUI
           zoomControl
           clickableIcons={false}
-          styles={[
-            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-            { featureType: "transit", stylers: [{ visibility: "off" }] },
-            { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-          ]}
+          styles={MONO}
           style={{ width: "100%", height: "100%" }}
         >
           <Layers boards={boards} selectedId={selectedId} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />

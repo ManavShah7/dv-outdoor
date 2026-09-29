@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const SYSTEM = `You are the assistant inside DV Outdoor's internal board-management tool. DV Outdoor is an outdoor-advertising company in Gujarat, India, operating roughly 650 hoardings and unipoles concentrated in the Saurashtra region. The people using you are the owner and the office staff.
+const SYSTEM = `You are the assistant inside The Times Media's internal board-management tool. The Times Media is an outdoor-advertising company in Gujarat, India, operating roughly 650 hoardings and unipoles concentrated in the Saurashtra region. The people using you are the owner and the office staff.
 
 Answer from the tools, never from memory. If a tool returns nothing, say so plainly rather than guessing.
 

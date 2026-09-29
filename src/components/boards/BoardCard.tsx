@@ -15,13 +15,13 @@ export function BoardCard({ board, onOpen }: { board: Board; onOpen: () => void 
   const m = statusMeta(board.status);
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
-      <div className="relative grid aspect-[16/10] place-items-center bg-black/35">
+    <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-black/[0.11] ring-inset">
+      <div className="relative grid aspect-[16/10] place-items-center bg-black/[0.05]">
         <BoardPhoto code={board.code} />
-        <span className="absolute left-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 font-mono text-caption tabular-nums text-ink-200">
+        <span className="absolute left-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 font-mono text-caption tabular-nums text-white">
           {board.code}
         </span>
-        <span className="absolute right-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 text-caption font-[620] tabular-nums text-ink-100">
+        <span className="absolute right-3 top-3 rounded-[var(--radius-pill)] bg-black/60 px-2 py-1 text-caption font-[620] tabular-nums text-white">
           {inr(board.askingRate)}
         </span>
       </div>
@@ -55,7 +55,7 @@ export function BoardCard({ board, onOpen }: { board: Board; onOpen: () => void 
         <div className="mt-auto pt-4">
           <button
             onClick={onOpen}
-            className="h-10 w-full rounded-[var(--radius-control)] text-footnote font-[590] text-ink-100 ring-1 ring-white/[0.12] ring-inset transition-colors hover:bg-white/[0.07] hover:text-ink-0"
+            className="h-10 w-full rounded-[var(--radius-control)] text-footnote font-[590] text-ink-100 ring-1 ring-black/[0.18] ring-inset transition-colors hover:bg-black/[0.11] hover:text-ink-0"
           >
             View Details
           </button>

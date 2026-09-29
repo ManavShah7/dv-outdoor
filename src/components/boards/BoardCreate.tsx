@@ -78,7 +78,7 @@ export function BoardCreate({
 
   return (
     <div className="absolute inset-0 z-40 grid place-items-center bg-black/55 p-8">
-      <div className="flex max-h-full w-full max-w-[1000px] overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-white/[0.08]">
+      <div className="flex max-h-full w-full max-w-[1000px] overflow-hidden rounded-[var(--radius-panel)] material-thick shadow-[var(--shadow-pop)] ring-1 ring-black/[0.13]">
         {/* map picker */}
         <div className="relative hidden min-h-[560px] flex-1 lg:block">
           {key ? (
@@ -116,7 +116,7 @@ export function BoardCreate({
         </div>
 
         {/* form */}
-        <div className="flex w-full flex-col overflow-y-auto lg:w-[420px] lg:border-l lg:border-white/[0.08]">
+        <div className="flex w-full flex-col overflow-y-auto lg:w-[420px] lg:border-l lg:border-black/[0.13]">
           <div className="flex items-start justify-between px-7 pb-5 pt-7">
             <div>
               <h2 className="text-title2 font-[680] text-ink-0">New board</h2>
@@ -127,7 +127,7 @@ export function BoardCreate({
             <button
               onClick={onCancel}
               aria-label="Cancel"
-              className="grid size-8 shrink-0 place-items-center rounded-full bg-black/30 text-ink-400 hover:text-ink-0"
+              className="grid size-8 shrink-0 place-items-center rounded-full bg-black/[0.035] text-ink-400 hover:text-ink-0"
             >
               <X className="size-4" strokeWidth={2.2} />
             </button>
@@ -219,7 +219,7 @@ export function BoardCreate({
             </div>
           </div>
 
-          <div className={cn("sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-7 py-5")}>
+          <div className={cn("sticky bottom-0 mt-auto border-t border-black/[0.11] material-thick px-7 py-5")}>
             <Button variant="primary" disabled={!valid} onClick={submit}>
               Create board
             </Button>

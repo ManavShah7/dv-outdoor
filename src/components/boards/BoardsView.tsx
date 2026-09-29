@@ -110,10 +110,10 @@ export function BoardsView({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Code, road, area, city, pincode or client"
               className={cn(
-                "h-11 w-full rounded-[var(--radius-control)] bg-black/30 pl-11",
+                "h-11 w-full rounded-[var(--radius-control)] bg-black/[0.035] pl-11",
                 query ? "pr-11" : "pr-4",
                 "text-subhead text-ink-0 placeholder:text-ink-500",
-                "ring-1 ring-white/[0.08] ring-inset outline-none",
+                "ring-1 ring-black/[0.13] ring-inset outline-none",
                 "transition-shadow duration-150 focus:ring-2 focus:ring-accent",
               )}
             />
@@ -121,7 +121,7 @@ export function BoardsView({
               <button
                 onClick={() => setQuery("")}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-ink-300 hover:text-ink-0"
+                className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-black/[0.07] text-ink-300 hover:text-ink-0"
               >
                 <X className="size-3.5" strokeWidth={2.4} />
               </button>
@@ -129,7 +129,7 @@ export function BoardsView({
           </div>
 
           {/* list for scanning 650 rows, grid for looking at boards */}
-          <div className="flex h-11 shrink-0 items-center gap-1 rounded-[var(--radius-control)] bg-black/30 p-1 ring-1 ring-white/[0.08] ring-inset">
+          <div className="flex h-11 shrink-0 items-center gap-1 rounded-[var(--radius-control)] bg-black/[0.035] p-1 ring-1 ring-black/[0.13] ring-inset">
             {([
               { id: "list", Icon: List, label: "List view" },
               { id: "grid", Icon: LayoutGrid, label: "Grid view" },
@@ -141,7 +141,7 @@ export function BoardsView({
                 aria-pressed={view === id}
                 className={cn(
                   "grid size-[34px] place-items-center rounded-[7px] transition-colors",
-                  view === id ? "bg-white/[0.12] text-ink-0" : "text-ink-400 hover:text-ink-100",
+                  view === id ? "bg-accent text-accent-on" : "text-ink-400 hover:text-ink-100",
                 )}
               >
                 <Icon className="size-[18px]" strokeWidth={2} />
@@ -170,7 +170,7 @@ export function BoardsView({
                   "ring-1 ring-inset transition-colors duration-150",
                   on
                     ? "bg-accent text-accent-on ring-transparent"
-                    : "bg-black/25 text-ink-200 ring-white/[0.08] hover:bg-white/[0.07]",
+                    : "bg-black/[0.035] text-ink-200 ring-black/[0.13] hover:bg-black/[0.11]",
                 )}
               >
                 {f.label}
@@ -212,32 +212,32 @@ export function BoardsView({
                 <tr
                   key={b.id}
                   onClick={() => onOpen(b)}
-                  className="cursor-pointer border-b border-white/[0.05] transition-colors hover:bg-white/[0.04]"
+                  className="cursor-pointer border-b border-black/[0.07] transition-colors hover:bg-white/[0.04]"
                 >
-                  <td className="border-b border-white/[0.05] px-4 py-3 font-mono text-footnote tabular-nums text-ink-400">
+                  <td className="border-b border-black/[0.07] px-4 py-3 font-mono text-footnote tabular-nums text-ink-400">
                     {b.code}
                   </td>
-                  <td className="max-w-[260px] border-b border-white/[0.05] px-4 py-3">
+                  <td className="max-w-[260px] border-b border-black/[0.07] px-4 py-3">
                     <div className="truncate text-subhead font-[590] text-ink-0">{b.name}</div>
                   </td>
-                  <td className="max-w-[280px] border-b border-white/[0.05] px-4 py-3">
+                  <td className="max-w-[280px] border-b border-black/[0.07] px-4 py-3">
                     <div className="truncate text-footnote text-ink-300">{b.area}</div>
                     <div className="truncate text-caption text-ink-500">{b.city} {b.pincode}</div>
                   </td>
-                  <td className="whitespace-nowrap border-b border-white/[0.05] px-4 py-3 text-footnote text-ink-300">
+                  <td className="whitespace-nowrap border-b border-black/[0.07] px-4 py-3 text-footnote text-ink-300">
                     <span className="capitalize">{b.sizeCategory}</span>
                     <span className="ml-1.5 tabular-nums text-ink-500">{b.widthFt}×{b.heightFt}</span>
                   </td>
-                  <td className="whitespace-nowrap border-b border-white/[0.05] px-4 py-3 text-footnote capitalize text-ink-300">
+                  <td className="whitespace-nowrap border-b border-black/[0.07] px-4 py-3 text-footnote capitalize text-ink-300">
                     {b.lighting === "none" ? "Non-lit" : b.lighting}
                   </td>
-                  <td className="whitespace-nowrap border-b border-white/[0.05] px-4 py-3">
+                  <td className="whitespace-nowrap border-b border-black/[0.07] px-4 py-3">
                     <span className="inline-flex items-center gap-2 text-footnote font-[590]" style={{ color: m.color }}>
                       <span className="size-[6px] rounded-full" style={{ background: m.color }} />
                       {m.label}
                     </span>
                   </td>
-                  <td className="max-w-[200px] border-b border-white/[0.05] px-4 py-3">
+                  <td className="max-w-[200px] border-b border-black/[0.07] px-4 py-3">
                     {b.rental ? (
                       <>
                         <div className="truncate text-footnote text-ink-200">{b.rental.company}</div>
@@ -249,7 +249,7 @@ export function BoardsView({
                       <span className="text-footnote text-ink-600">—</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-200">
+                  <td className="whitespace-nowrap border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-200">
                     {inr(b.askingRate)}
                   </td>
                 </tr>

@@ -66,8 +66,8 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
   }
 
   return (
-    <div className="flex h-full w-[460px] shrink-0 flex-col overflow-y-auto material-thick border-l border-white/[0.06]">
-      <div className="flex items-start justify-between gap-3 border-b border-white/[0.07] px-6 py-5">
+    <div className="flex h-full w-[460px] shrink-0 flex-col overflow-y-auto material-thick border-l border-black">
+      <div className="flex items-start justify-between gap-3 border-b border-black/[0.11] px-6 py-5">
         <div className="min-w-0">
           <p className="text-caption2 uppercase text-ink-500">{ago(e.createdAt)}</p>
           <h2 className="mt-1 truncate text-title3 font-[650] text-ink-0">{e.companyName}</h2>
@@ -78,7 +78,7 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 border-b border-white/[0.07] px-6 py-5">
+      <div className="flex flex-col gap-2 border-b border-black/[0.11] px-6 py-5">
         <a href={`tel:${e.phone}`} className="inline-flex items-center gap-2 text-subhead text-ink-100 hover:text-ink-0">
           <Phone className="size-4 text-ink-500" strokeWidth={2} /> {e.phone}
         </a>
@@ -94,7 +94,7 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
       </div>
 
       {(e.board || e.startDate) && (
-        <div className="border-b border-white/[0.07] px-6 py-5">
+        <div className="border-b border-black/[0.11] px-6 py-5">
           {e.board && (
             <>
               <p className="text-caption2 uppercase text-ink-500">Asking about</p>
@@ -114,13 +114,13 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
       )}
 
       {e.message && (
-        <div className="border-b border-white/[0.07] px-6 py-5">
+        <div className="border-b border-black/[0.11] px-6 py-5">
           <p className="text-caption2 uppercase text-ink-500">They said</p>
           <p className="mt-2 whitespace-pre-wrap text-subhead leading-relaxed text-ink-100">{e.message}</p>
         </div>
       )}
 
-      <div className="border-b border-white/[0.07] px-6 py-5">
+      <div className="border-b border-black/[0.11] px-6 py-5">
         <p className="text-caption2 uppercase text-ink-500">Where it stands</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {FLOW.map((f) => (
@@ -130,7 +130,7 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
               onClick={() => post({ action: "set_status", status: f.id, declineReason: note })}
               className={cn(
                 "h-9 rounded-[var(--radius-control)] px-3.5 text-footnote font-[590] ring-1 ring-inset transition-colors",
-                e.status === f.id ? "text-ink-0" : "text-ink-300 ring-white/[0.1] hover:bg-white/[0.06]",
+                e.status === f.id ? "text-ink-0" : "text-ink-300 ring-black/[0.15] hover:bg-black/[0.09]",
               )}
               style={e.status === f.id ? { background: f.tone, color: "#0b0e10", boxShadow: "none" } : undefined}
             >
@@ -143,7 +143,7 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
             value={note}
             onChange={(ev) => setNote(ev.target.value)}
             placeholder="Why? (saved with the enquiry)"
-            className="mt-3 h-10 w-full rounded-[var(--radius-control)] bg-black/30 px-3 text-footnote text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent"
+            className="mt-3 h-10 w-full rounded-[var(--radius-control)] bg-black/[0.035] px-3 text-footnote text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent"
           />
         )}
       </div>
@@ -159,7 +159,7 @@ function Detail({ e, onClose }: { e: Enquiry; onClose: () => void }) {
               value={msg}
               onChange={(ev) => setMsg(ev.target.value)}
               disabled={!e.email}
-              className="mt-3 w-full rounded-[var(--radius-card)] bg-black/30 p-3.5 text-subhead leading-relaxed text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent disabled:opacity-40"
+              className="mt-3 w-full rounded-[var(--radius-card)] bg-black/[0.035] p-3.5 text-subhead leading-relaxed text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.15] ring-inset outline-none focus:ring-2 focus:ring-accent disabled:opacity-40"
             />
             <button
               disabled={busy || !e.email || msg.trim().length < 2}
@@ -201,7 +201,7 @@ export function EnquiriesView({ enquiries }: { enquiries: Enquiry[] }) {
                 onClick={() => setOnly(only === id ? null : (id as RequestStatus | "open"))}
                 className={cn(
                   "h-9 rounded-[var(--radius-control)] px-4 text-footnote font-[520] ring-1 ring-inset transition-colors",
-                  only === id ? "bg-accent text-accent-on ring-transparent" : "bg-black/25 text-ink-200 ring-white/[0.08] hover:bg-white/[0.07]",
+                  only === id ? "bg-accent text-accent-on ring-transparent" : "bg-black/[0.035] text-ink-200 ring-black/[0.13] hover:bg-black/[0.11]",
                 )}
               >
                 {label}
@@ -221,7 +221,7 @@ export function EnquiriesView({ enquiries }: { enquiries: Enquiry[] }) {
                   onClick={() => setOpenId(e.id)}
                   className={cn(
                     "flex items-center gap-4 rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 text-left ring-1 ring-inset transition-colors",
-                    openId === e.id ? "ring-accent" : "ring-white/[0.07] hover:bg-white/[0.05]",
+                    openId === e.id ? "ring-accent" : "ring-black/[0.11] hover:bg-black/[0.07]",
                   )}
                 >
                   <span className="size-2 shrink-0 rounded-full" style={{ background: toneOf(e.status) }} />

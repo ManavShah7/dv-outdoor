@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const controlBase =
   "h-12 w-full min-w-0 rounded-[var(--radius-control)] material-inset px-4 text-body text-ink-0 " +
-  "placeholder:text-ink-500 ring-1 ring-white/[0.07] ring-inset outline-none " +
+  "placeholder:text-ink-500 ring-1 ring-black/[0.11] ring-inset outline-none " +
   "transition-shadow duration-150 focus:ring-2 focus:ring-accent";
 
 export function Label({ children }: { children: React.ReactNode }) {
@@ -121,7 +121,7 @@ export function CompanyCombo({
             <button
               key={c}
               onMouseDown={() => { onChange(c); setOpen(false); }}
-              className="flex w-full items-center justify-between px-4 py-2.5 text-left text-subhead text-ink-100 hover:bg-white/8"
+              className="flex w-full items-center justify-between px-4 py-2.5 text-left text-subhead text-ink-100 hover:bg-black/[0.06]"
             >
               {c}
               {norm(c) === norm(value) && <Check className="size-4 text-accent" />}

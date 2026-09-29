@@ -18,7 +18,7 @@ type Tab = "clients" | "categories";
 function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void }) {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto material-thick">
-      <div className="flex items-start gap-2 border-b border-white/[0.07] px-8 pb-6 pt-8">
+      <div className="flex items-start gap-2 border-b border-black/[0.11] px-8 pb-6 pt-8">
         <button
           onClick={onBack}
           aria-label="Back"
@@ -55,7 +55,7 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
 
         <section>
           <h2 className="text-caption2 uppercase text-ink-500">When they book</h2>
-          <div className="mt-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+          <div className="mt-3 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
             <MonthBars values={p.monthlyBookings} height={84} />
             <p className="mt-3 text-caption text-ink-500">
               Bookings started per calendar month, all years combined.
@@ -65,10 +65,10 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
 
         <section>
           <h2 className="text-caption2 uppercase text-ink-500">Year on year</h2>
-          <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-white/[0.07] ring-inset">
+          <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] bg-chrome-raised ring-1 ring-black/[0.11] ring-inset">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/[0.07]">
+                <tr className="border-b border-black/[0.11]">
                   <th className="px-4 py-2.5 text-left text-caption2 uppercase text-ink-500">Year</th>
                   <th className="px-4 py-2.5 text-right text-caption2 uppercase text-ink-500">Bookings</th>
                   <th className="px-4 py-2.5 text-right text-caption2 uppercase text-ink-500">Value</th>
@@ -76,7 +76,7 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
               </thead>
               <tbody>
                 {p.byYear.map((y) => (
-                  <tr key={y.year} className="border-b border-white/[0.05] last:border-0">
+                  <tr key={y.year} className="border-b border-black/[0.07] last:border-0">
                     <td className="px-4 py-2.5 text-footnote tabular-nums text-ink-200">{y.year}</td>
                     <td className="px-4 py-2.5 text-right text-footnote tabular-nums text-ink-300">{y.bookings}</td>
                     <td className="px-4 py-2.5 text-right text-footnote tabular-nums text-ink-100">{money(y.value)}</td>
@@ -89,12 +89,12 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
 
         <section>
           <h2 className="text-caption2 uppercase text-ink-500">Where they buy</h2>
-          <div className="mt-3 flex flex-col gap-4 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+          <div className="mt-3 flex flex-col gap-4 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
             <div>
               <p className="mb-2.5 text-footnote text-ink-400">Cities</p>
               <RankedBars items={p.topCities} />
             </div>
-            <div className="border-t border-white/[0.07] pt-4">
+            <div className="border-t border-black/[0.11] pt-4">
               <p className="mb-2.5 text-footnote text-ink-400">Areas</p>
               <RankedBars items={p.topAreas} />
             </div>
@@ -103,16 +103,16 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
 
         <section>
           <h2 className="text-caption2 uppercase text-ink-500">What they take</h2>
-          <div className="mt-3 flex flex-col gap-4 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+          <div className="mt-3 flex flex-col gap-4 rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
             <div>
               <p className="mb-2.5 text-footnote text-ink-400">Size</p>
               <RankedBars items={p.sizeMix} />
             </div>
-            <div className="border-t border-white/[0.07] pt-4">
+            <div className="border-t border-black/[0.11] pt-4">
               <p className="mb-2.5 text-footnote text-ink-400">Lighting</p>
               <RankedBars items={p.lightingMix} />
             </div>
-            <div className="grid grid-cols-2 gap-4 border-t border-white/[0.07] pt-4">
+            <div className="grid grid-cols-2 gap-4 border-t border-black/[0.11] pt-4">
               <div>
                 <p className="text-footnote text-ink-400">Avg lease</p>
                 <p className="mt-0.5 text-body font-[590] tabular-nums text-ink-0">
@@ -144,7 +144,7 @@ function CompanyDetail({ p, onBack }: { p: CompanyProfile; onBack: () => void })
 /* ------------------------------------------------------------ category */
 function CategoryCard({ c }: { c: CategoryProfile }) {
   return (
-    <article className="flex flex-col rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+    <article className="flex flex-col rounded-[var(--radius-card)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-subhead font-[620] text-ink-0">{c.category}</h3>
         <span className="shrink-0 text-caption tabular-nums text-ink-500">{c.companies} clients</span>
@@ -169,7 +169,7 @@ function CategoryCard({ c }: { c: CategoryProfile }) {
         <MonthBars values={c.monthlyBookings} height={56} />
       </div>
 
-      <div className="mt-5 border-t border-white/[0.07] pt-4">
+      <div className="mt-5 border-t border-black/[0.11] pt-4">
         <p className="mb-2.5 text-caption2 uppercase text-ink-600">Top areas</p>
         <RankedBars items={c.topAreas.slice(0, 3)} />
       </div>
@@ -217,14 +217,14 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
 
           {/* tabs */}
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <div className="flex h-11 items-center gap-1 rounded-[var(--radius-control)] bg-black/30 p-1 ring-1 ring-white/[0.08] ring-inset">
+            <div className="flex h-11 items-center gap-1 rounded-[var(--radius-control)] bg-black/[0.035] p-1 ring-1 ring-black/[0.13] ring-inset">
               {(["clients", "categories"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={cn(
                     "h-[34px] rounded-[7px] px-4 text-footnote font-[590] capitalize transition-colors",
-                    tab === t ? "bg-white/[0.12] text-ink-0" : "text-ink-400 hover:text-ink-100",
+                    tab === t ? "bg-accent text-accent-on" : "text-ink-400 hover:text-ink-100",
                   )}
                 >
                   {t}
@@ -240,17 +240,17 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Client or category"
                   className={cn(
-                    "h-11 w-full rounded-[var(--radius-control)] bg-black/30 pl-11",
+                    "h-11 w-full rounded-[var(--radius-control)] bg-black/[0.035] pl-11",
                     query ? "pr-11" : "pr-4",
                     "text-subhead text-ink-0 placeholder:text-ink-500",
-                    "ring-1 ring-white/[0.08] ring-inset outline-none focus:ring-2 focus:ring-accent",
+                    "ring-1 ring-black/[0.13] ring-inset outline-none focus:ring-2 focus:ring-accent",
                   )}
                 />
                 {query && (
                   <button
                     onClick={() => setQuery("")}
                     aria-label="Clear"
-                    className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-ink-300 hover:text-ink-0"
+                    className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-black/[0.07] text-ink-300 hover:text-ink-0"
                   >
                     <X className="size-3.5" strokeWidth={2.4} />
                   </button>
@@ -272,7 +272,7 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
                         "h-9 rounded-[var(--radius-control)] px-4 text-footnote font-[520] ring-1 ring-inset transition-colors",
                         on
                           ? "bg-accent text-accent-on ring-transparent"
-                          : "bg-black/25 text-ink-200 ring-white/[0.08] hover:bg-white/[0.07]",
+                          : "bg-black/[0.035] text-ink-200 ring-black/[0.13] hover:bg-black/[0.11]",
                       )}
                     >
                       {c}
@@ -281,7 +281,7 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
                 })}
               </div>
 
-              <div className="mt-6 overflow-x-auto rounded-[var(--radius-card)] ring-1 ring-white/[0.07] ring-inset">
+              <div className="mt-6 overflow-x-auto rounded-[var(--radius-card)] ring-1 ring-black/[0.11] ring-inset">
                 <table className="w-full border-separate border-spacing-0">
                   <thead>
                     <tr>
@@ -305,15 +305,15 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
                         onClick={() => setOpenCompany(p.company)}
                         className="cursor-pointer transition-colors hover:bg-white/[0.04]"
                       >
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-subhead font-[590] text-ink-0">{p.company}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-footnote text-ink-400">{p.category ?? "—"}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-200">{p.currentBoards}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.totalBookings}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.distinctBoards}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.peakConcurrentBoards}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.avgDurationMonths}m</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{inr(p.avgMonthlyRate)}</td>
-                        <td className="border-b border-white/[0.05] px-4 py-3 text-right text-footnote tabular-nums text-ink-100">{money(p.lifetimeValue)}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-subhead font-[590] text-ink-0">{p.company}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-footnote text-ink-400">{p.category ?? "—"}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-200">{p.currentBoards}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.totalBookings}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.distinctBoards}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.peakConcurrentBoards}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{p.avgDurationMonths}m</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-300">{inr(p.avgMonthlyRate)}</td>
+                        <td className="border-b border-black/[0.07] px-4 py-3 text-right text-footnote tabular-nums text-ink-100">{money(p.lifetimeValue)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -344,7 +344,7 @@ export function AnalyticsView({ boards }: { boards: Board[] }) {
             initial={{ x: 32, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute inset-y-0 right-0 z-30 w-[480px] border-l border-white/[0.08] shadow-[var(--shadow-pop)]"
+            className="absolute inset-y-0 right-0 z-30 w-[480px] border-l border-black/[0.13] shadow-[var(--shadow-pop)]"
           >
             <CompanyDetail p={open} onBack={() => setOpenCompany(null)} />
           </motion.div>

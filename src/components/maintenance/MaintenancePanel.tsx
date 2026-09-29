@@ -48,7 +48,7 @@ export function MaintenanceDetail({
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto material-thick">
-      <div className="flex items-start gap-2 border-b border-white/[0.07] px-8 pb-6 pt-8">
+      <div className="flex items-start gap-2 border-b border-black/[0.11] px-8 pb-6 pt-8">
         <button
           onClick={onBack}
           aria-label="Back"
@@ -63,7 +63,7 @@ export function MaintenanceDetail({
       </div>
 
       {/* what the field crew sent */}
-      <section className="border-b border-white/[0.07] px-8 py-7">
+      <section className="border-b border-black/[0.11] px-8 py-7">
         <SectionHeader>Reported</SectionHeader>
         <Card className="mt-4 flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-4">
@@ -94,7 +94,7 @@ export function MaintenanceDetail({
                 <span className="text-footnote text-ink-400">Voice note</span>
                 <span className="text-caption text-ink-500">{request.voiceNote.language}</span>
               </div>
-              <div className="mt-2 flex items-center gap-3 rounded-[var(--radius-control)] bg-black/25 px-3 py-2.5 ring-1 ring-white/[0.07] ring-inset">
+              <div className="mt-2 flex items-center gap-3 rounded-[var(--radius-control)] bg-black/[0.035] px-3 py-2.5 ring-1 ring-black/[0.11] ring-inset">
                 <button
                   aria-label="Play voice note"
                   onClick={(e) => {
@@ -124,7 +124,7 @@ export function MaintenanceDetail({
       </section>
 
       {/* the triage */}
-      <section className="border-b border-white/[0.07] px-8 py-7">
+      <section className="border-b border-black/[0.11] px-8 py-7">
         <SectionHeader>Assessment</SectionHeader>
         <Card className="mt-4 flex flex-col gap-5">
           <div className="flex items-center justify-between">
@@ -156,7 +156,7 @@ export function MaintenanceDetail({
           </div>
 
           {request.wasRentedAtReport && (
-            <div className="flex items-center gap-2.5 rounded-[var(--radius-control)] bg-black/25 px-4 py-3">
+            <div className="flex items-center gap-2.5 rounded-[var(--radius-control)] bg-black/[0.035] px-4 py-3">
               <TriangleAlert className="size-4 shrink-0" style={{ color: SEV[request.aiSeverity].color }} />
               <span className="text-footnote text-ink-200">
                 <span className="font-[620] tabular-nums">{inr(request.revenueAtRisk)}</span> of paid
@@ -181,7 +181,7 @@ export function MaintenanceDetail({
                       "text-footnote font-[590] ring-1 ring-inset transition-colors",
                       on
                         ? "bg-accent text-accent-on ring-transparent"
-                        : "bg-black/25 text-ink-300 ring-white/[0.08] hover:text-ink-0",
+                        : "bg-black/[0.035] text-ink-300 ring-black/[0.13] hover:text-ink-0",
                     )}
                   >
                     <Icon className="size-4" strokeWidth={2} />
@@ -197,7 +197,7 @@ export function MaintenanceDetail({
         </Card>
       </section>
 
-      <div className="sticky bottom-0 mt-auto border-t border-white/[0.07] material-thick px-8 py-5">
+      <div className="sticky bottom-0 mt-auto border-t border-black/[0.11] material-thick px-8 py-5">
         {request.status === "in_progress" ? (
           <p className="text-center text-footnote text-ink-500">
             Already under maintenance. The crew closes it from the field.

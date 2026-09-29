@@ -12,8 +12,8 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DV Outdoor",
-  description: "Board management for DV Outdoor Advertising",
+  title: "The Times Media",
+  description: "Board management for The Times Media",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

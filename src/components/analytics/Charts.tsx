@@ -47,7 +47,7 @@ export function MonthBars({
                 }}
               />
               {on && v > 0 && (
-                <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-[6px] bg-ink-950 px-2 py-1 text-caption tabular-nums text-ink-0 ring-1 ring-white/[0.12]">
+                <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-[6px] bg-ink-950 px-2 py-1 text-caption tabular-nums text-ink-0 ring-1 ring-black/[0.18]">
                   {MONTH_NAMES[i]} · {v}
                 </span>
               )}
@@ -81,7 +81,7 @@ export function RankedBars({ items, suffix }: { items: Counted[]; suffix?: strin
       {items.map((it) => (
         <div key={it.label} className="flex items-center gap-3">
           <span className="w-[112px] shrink-0 truncate text-footnote text-ink-300">{it.label}</span>
-          <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+          <span className="h-2 flex-1 overflow-hidden rounded-full bg-black/[0.09]">
             <span
               className="block h-full rounded-full"
               style={{ width: `${(it.count / max) * 100}%`, background: "var(--accent)" }}
@@ -106,7 +106,7 @@ export function Stat({
   sub?: string;
 }) {
   return (
-    <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-white/[0.07] ring-inset">
+    <div className="rounded-[var(--radius-card)] bg-chrome-raised px-5 py-4 ring-1 ring-black/[0.11] ring-inset">
       <div className="text-caption2 uppercase text-ink-500">{label}</div>
       <div className="mt-1.5 text-title2 font-[680] tabular-nums text-ink-0">{value}</div>
       {sub && <div className="mt-0.5 text-caption tabular-nums text-ink-500">{sub}</div>}

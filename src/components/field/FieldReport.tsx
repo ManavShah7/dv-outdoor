@@ -59,7 +59,7 @@ export function FieldReport({ board, agentName }: { board: Board; agentName: str
   return (
     <main className="mx-auto min-h-dvh max-w-[520px] px-5 pb-10 pt-8">
       {/* which board you are standing at */}
-      <div className="rounded-[var(--radius-panel)] bg-chrome-raised p-5 ring-1 ring-white/[0.07] ring-inset">
+      <div className="rounded-[var(--radius-panel)] bg-chrome-raised p-5 ring-1 ring-black/[0.11] ring-inset">
         <span className="font-mono text-footnote text-ink-500">{board.code}</span>
         <h1 className="mt-1 text-title2 font-[680] leading-tight text-ink-0">{board.name}</h1>
         <p className="mt-2 flex items-start gap-2 text-body text-ink-300">
@@ -94,7 +94,7 @@ export function FieldReport({ board, agentName }: { board: Board; agentName: str
                 onClick={() => setSeverity(s.id)}
                 className={cn(
                   "flex h-[68px] w-full items-center gap-4 rounded-[var(--radius-card)] px-5 text-left transition-colors",
-                  on ? "bg-white/[0.08]" : "bg-chrome-raised hover:bg-white/[0.05]",
+                  on ? "bg-black/[0.13]" : "bg-chrome-raised hover:bg-black/[0.07]",
                 )}
                 style={{
                   boxShadow: on
@@ -122,7 +122,7 @@ export function FieldReport({ board, agentName }: { board: Board; agentName: str
 
       {/* photos */}
       <div className="mt-6">
-        <label className="flex h-[68px] w-full cursor-pointer items-center justify-center gap-3 rounded-[var(--radius-card)] bg-chrome-raised text-body font-[590] text-ink-100 ring-1 ring-white/[0.1] ring-inset">
+        <label className="flex h-[68px] w-full cursor-pointer items-center justify-center gap-3 rounded-[var(--radius-card)] bg-chrome-raised text-body font-[590] text-ink-100 ring-1 ring-black/[0.15] ring-inset">
           <Camera className="size-6" strokeWidth={2} />
           {photos.length ? `Add another photo (${photos.length})` : "Take a photo"}
           <input
@@ -165,7 +165,7 @@ export function FieldReport({ board, agentName }: { board: Board; agentName: str
         onChange={(e) => setNote(e.target.value)}
         rows={3}
         placeholder="Anything to add? (optional)"
-        className="mt-4 w-full rounded-[var(--radius-card)] bg-chrome-raised p-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-white/[0.1] ring-inset outline-none focus:ring-2 focus:ring-accent"
+        className="mt-4 w-full rounded-[var(--radius-card)] bg-chrome-raised p-4 text-body text-ink-0 placeholder:text-ink-500 ring-1 ring-black/[0.15] ring-inset outline-none focus:ring-2 focus:ring-accent"
       />
 
       {/* identity comes from the account, so there is nothing to type */}

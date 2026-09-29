@@ -30,14 +30,15 @@ function Visual({ code, lat, lng }: { code: string; lat: number; lng: number }) 
           className="absolute inset-0 size-full object-cover"
         />
       )}
-      <div className="absolute left-3 top-3 z-10 flex gap-1 rounded-[var(--radius-pill)] material-thick p-1">
+      {/* square segmented control, like the public browser's */}
+      <div className="absolute left-3 top-3 z-10 flex border border-black bg-white">
         {(["street", "photo"] as const).map((v) => (
           <button
             key={v}
             onClick={() => setView(v)}
             className={cn(
-              "rounded-[var(--radius-pill)] px-3 py-1.5 text-caption font-[590] transition-colors",
-              view === v ? "bg-white/15 text-ink-0" : "text-ink-400 hover:text-ink-100",
+              "px-3 py-1.5 text-caption font-[620] uppercase tracking-[0.05em] transition-colors",
+              view === v ? "bg-black text-white" : "text-ink-300 hover:text-ink-0",
             )}
           >
             {v === "street" ? "Street view" : "Photo"}
@@ -62,7 +63,7 @@ export function BoardInspector({
   const remaining = board.rental ? daysUntil(board.rental.endDate) : null;
 
   return (
-    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-white/[0.06]">
+    <div className="flex h-full w-[427px] shrink-0 flex-col overflow-y-auto material-thick border-r border-black">
       <div className="relative">
         <Visual code={board.code} lat={board.lat} lng={board.lng} />
         <button
@@ -75,7 +76,7 @@ export function BoardInspector({
       </div>
 
       {/* identity */}
-      <div className="border-b border-white/[0.07] px-8 py-7">
+      <div className="border-b border-black/[0.11] px-8 py-7">
         <h1 className="text-title2 font-[680] text-ink-0">{board.name}</h1>
         <p className="mt-2 text-body text-ink-300">{board.address}</p>
         <p className="mt-3 text-footnote tabular-nums text-ink-500">
@@ -84,7 +85,7 @@ export function BoardInspector({
       </div>
 
       {/* availability */}
-      <section className="border-b border-white/[0.07] px-8 py-7">
+      <section className="border-b border-black/[0.11] px-8 py-7">
         <SectionHeader>Availability</SectionHeader>
         <Card className="mt-4">
           {board.rental ? (
@@ -110,7 +111,7 @@ export function BoardInspector({
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Rent" accent="money">{inr(board.rental.rate)}</Field>
                 <Field label="Printer">
-                  {board.rental.printedBy === "us" ? "DV Outdoor" : "Client"}
+                  {board.rental.printedBy === "us" ? "The Times Media" : "Client"}
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -149,7 +150,7 @@ export function BoardInspector({
       </section>
 
       {/* QR — the sticker that puts the field crew straight onto this board. */}
-      <section className="border-t border-white/[0.07] px-8 py-7">
+      <section className="border-t border-black/[0.11] px-8 py-7">
         <SectionHeader>Field QR</SectionHeader>
         <Card className="mt-4">
           <BoardQr board={board} />
@@ -157,7 +158,7 @@ export function BoardInspector({
       </section>
 
       {/* Pinned: the primary action should never require scrolling to find. */}
-      <div className="sticky bottom-0 mt-auto flex gap-2 border-t border-white/[0.07] material-thick px-8 py-5">
+      <div className="sticky bottom-0 mt-auto flex gap-2 border-t border-black/[0.11] material-thick px-8 py-5">
         {board.status !== "booked" && (
           <Button variant="primary" onClick={onBook}>Book this board</Button>
         )}
