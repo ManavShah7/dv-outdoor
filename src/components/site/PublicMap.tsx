@@ -6,6 +6,7 @@ import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { PublicBoard } from "@/lib/publicBoards";
 import type { Hotspot } from "@/lib/hotspots.db";
 import { HotspotLayer } from "@/components/map/HotspotLayer";
+import { PopulationLayer, type Cell } from "@/components/map/PopulationLayer";
 
 const CITY_ZOOM_MAX = 9.2;
 
@@ -288,10 +289,13 @@ function Layers({
 
 export function PublicMap({
   boards, selected, onSelect, insetLeft = 0, traffic = false, hotspots = [],
+  population = [],
 }: {
   boards: PublicBoard[]; selected: string | null;
   onSelect: (code: string) => void; insetLeft?: number; traffic?: boolean;
   hotspots?: Hotspot[];
+  /** Empty when the population layer is off — the caller owns the fetch. */
+  population?: Cell[];
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!key) {
@@ -314,6 +318,9 @@ export function PublicMap({
         styles={MONO}
         style={{ width: "100%", height: "100%" }}
       >
+        {/* Under the pins, and dimmed: this is context for the boards, not
+            the subject. At full strength the hexagons swallowed the red ones. */}
+        <PopulationLayer cells={population} opacity={0.8} />
         <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />
         <Traffic on={traffic} />
       </GoogleMap>

@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, MapPin, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronsLeft, Flame, MapPin, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
 import { MapsProvider } from "@/components/map/MapsProvider";
 import { PublicMap } from "@/components/site/PublicMap";
+import { loadPopulation, type Cell } from "@/components/map/PopulationLayer";
 import { BoardVisual } from "@/components/site/BoardVisual";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { boardPhotoUrl } from "@/lib/assets";
@@ -155,6 +156,17 @@ export function InventoryBrowser({
   const [maxRate, setMaxRate] = useState(RATE_MAX);
   const [open, setOpen] = useState<string | null>(initialBoard);
   const [traffic, setTraffic] = useState(false);
+  const [heat, setHeat] = useState(false);
+  // 234 KB of hexagons is not worth fetching for the people who never open
+  // the layer, so it is pulled on the first switch-on and kept after that.
+  const [population, setPopulation] = useState<Cell[]>([]);
+
+  useEffect(() => {
+    if (!heat || population.length) return;
+    let alive = true;
+    loadPopulation().then((c) => alive && setPopulation(c)).catch(() => {});
+    return () => { alive = false; };
+  }, [heat, population.length]);
   // context is on by default — it is the thing that explains the boards
   const [places, setPlaces] = useState(true);
 
@@ -219,6 +231,7 @@ export function InventoryBrowser({
             onSelect={setOpen}
             insetLeft={showPanel && !narrow ? PANEL_W + 24 : 24}
             traffic={traffic}
+            population={heat ? population : []}
             hotspots={places ? hotspots : []}
           />
         </div>
@@ -338,10 +351,22 @@ export function InventoryBrowser({
               Live traffic
             </button>
 
+            {/* Two layers asking the same question from opposite ends: how
+                many people are near the board, and how many are moving. */}
+            <button
+              onClick={() => setHeat((v) => !v)}
+              aria-pressed={heat}
+              className="tmui-ghost pointer-events-auto absolute right-6 top-[68px] z-10"
+              style={heat ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
+            >
+              <Flame className="size-4" strokeWidth={2.4} />
+              Population
+            </button>
+
             <button
               onClick={() => setPlaces((v) => !v)}
               aria-pressed={places}
-              className="tmui-ghost pointer-events-auto absolute right-6 top-[68px] z-10"
+              className="tmui-ghost pointer-events-auto absolute right-6 top-[110px] z-10"
               style={places ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
             >
               <MapPin className="size-4" strokeWidth={2.4} />
@@ -351,17 +376,30 @@ export function InventoryBrowser({
             {/* The roads borrow the same green and red the pins use for free
                 and booked, which would otherwise read as one scale. Saying
                 what is what costs a line and removes the ambiguity. */}
-            {traffic && (
+            {(traffic || heat) && (
               <div
-                className="tmui-caps pointer-events-none absolute right-6 top-[124px] z-10 flex flex-col gap-1.5 border p-3"
+                className="tmui-caps pointer-events-none absolute right-6 top-[166px] z-10 flex flex-col gap-1.5 border p-3"
                 style={{ background: "#fff", borderColor: "var(--ink)", fontSize: 10.5, fontWeight: 600 }}
               >
-                <span className="flex items-center gap-2">
-                  <span style={{ width: 16, height: 3, background: "#16e098" }} /> Roads flowing
-                </span>
-                <span className="flex items-center gap-2">
-                  <span style={{ width: 16, height: 3, background: "#e93a3a" }} /> Roads jammed
-                </span>
+                {traffic && (
+                  <>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 16, height: 3, background: "#16e098" }} /> Roads flowing
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 16, height: 3, background: "#e93a3a" }} /> Roads jammed
+                    </span>
+                  </>
+                )}
+                {heat && (
+                  <>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 44, height: 7, background: "linear-gradient(90deg,#fff4be,#ffaa3c,#eb462d,#8c0a1e)" }} />
+                      People per 400m
+                    </span>
+                    <span style={{ opacity: .55, fontWeight: 500 }}>Kontur (CC BY)</span>
+                  </>
+                )}
                 <span className="mt-1 flex items-center gap-2" style={{ opacity: .6 }}>
                   <span style={{ width: 9, height: 9, borderRadius: 999, background: "#0f9d3a", border: "1px solid #000" }} /> Pins are boards
                 </span>

@@ -41,18 +41,32 @@ const LABEL: Record<HotspotKind, string> = {
   other: "Landmark",
 };
 
+/**
+ * Small and quiet by default, solid on hover.
+ *
+ * The first pass drew these at 26–41px with a 2.2px black ring, which read
+ * as loudly as the board pins themselves and turned a city into confetti.
+ * They are context, not the subject: half the size, a hairline ring, and the
+ * whole marker held under full opacity so the green and red pins stay the
+ * first thing the eye lands on. Hovering brings one back to full strength,
+ * which is when it is actually being read.
+ */
 function icon(h: Hotspot, hot: boolean) {
-  const d = (26 + h.weight * 3) * (hot ? 1.18 : 1);
-  const pad = 5;
+  const d = (14 + h.weight * 1.6) * (hot ? 1.5 : 1);
+  const pad = 4;
   const S = d + pad * 2;
   const c = S / 2;
-  const g = d * 0.56;
+  const g = d * 0.54;
+  const dim = hot ? 1 : 0.62;
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">` +
-    `<circle cx="${c}" cy="${c + 1}" r="${d / 2}" fill="#000" fill-opacity="0.18"/>` +
-    `<circle cx="${c}" cy="${c}" r="${d / 2}" fill="#fff" stroke="#000" stroke-width="${hot ? 3 : 2.2}"/>` +
+    // grouped rather than set on the root: a root-level opacity is ignored
+    // once the SVG is loaded through an <img>, which is how Google takes it
+    `<g opacity="${dim}">` +
+    (hot ? `<circle cx="${c}" cy="${c + 1}" r="${d / 2}" fill="#000" fill-opacity="0.16"/>` : "") +
+    `<circle cx="${c}" cy="${c}" r="${d / 2}" fill="#fff" stroke="#000" stroke-width="${hot ? 1.8 : 1}"/>` +
     `<g transform="translate(${c - g / 2} ${c - g / 2}) scale(${g / 24})">${GLYPH[h.kind] ?? GLYPH.other}</g>` +
-    `</svg>`;
+    `</g></svg>`;
   return {
     url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
     anchor: new google.maps.Point(c, c),
@@ -97,7 +111,8 @@ export function HotspotLayer({
             setHover({ h, x: d.clientX, y: d.clientY });
           }}
           onMouseOut={() => setHover((c) => (c?.h.id === h.id ? null : c))}
-          zIndex={hover?.h.id === h.id ? 20 : 5}
+          // under the board pins: context should never cover the product
+          zIndex={hover?.h.id === h.id ? 20 : 0}
         />
       ))}
 
