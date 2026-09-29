@@ -362,7 +362,8 @@ body {
   padding: calc(70 * var(--u)) calc(60 * var(--u)) calc(70 * var(--u)) calc(153.5 * var(--u)); }
 .tm-hero__sub { margin-top: calc(64 * var(--u)); max-width: calc(460 * var(--u)); }
 .tm-shot { position: relative; overflow: hidden; background: #000; }
-.tm-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tm-shot img,
+.tm-shot video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* --- the button ------------------------------------------------------- */
 .tm-cta-row { display: flex; }
@@ -371,25 +372,47 @@ body {
 .tm-cta-wrap { position: relative; display: inline-block; }
 /* the artwork carries a hairline copy of the button offset 12px down-right */
 .tm-cta-wrap::after {
-  content: ""; position: absolute; inset: calc(13 * var(--u)) calc(-12 * var(--u)) calc(-13 * var(--u)) calc(12 * var(--u));
+  content: ""; position: absolute; inset: calc(9 * var(--u)) calc(-9 * var(--u)) calc(-9 * var(--u)) calc(9 * var(--u));
   border: calc(var(--rule) * var(--u)) solid var(--ink); pointer-events: none;
 }
+/* The frame drew this at 312x84.5 with 34px type, which is the size of a
+   heading rather than a button: next to a 636px-tall hero it read as the
+   loudest thing on the page. Everything here is the frame's geometry scaled
+   by 0.72, so the proportions hold and only the presence comes down. */
 .tm-cta {
   position: relative; z-index: 1;
   display: inline-flex; align-items: center; justify-content: space-between;
-  width: calc(312 * var(--u)); height: calc(84.5 * var(--u));
-  padding: 0 calc(32 * var(--u)) 0 calc(44 * var(--u));
+  width: calc(225 * var(--u)); height: calc(61 * var(--u));
+  padding: 0 calc(23 * var(--u)) 0 calc(32 * var(--u));
   background: var(--ink); color: var(--paper);
-  font-size: calc(34 * var(--u)); font-weight: 700; line-height: 1;
+  font-size: calc(24 * var(--u)); font-weight: 700; line-height: 1;
   text-transform: uppercase; letter-spacing: 0.01em;
   transition: background-color .14s linear, color .14s linear;
 }
 .tm-cta__dot { display: grid; place-items: center; flex-shrink: 0;
-  width: calc(45.5 * var(--u)); height: calc(45.5 * var(--u));
+  width: calc(33 * var(--u)); height: calc(33 * var(--u));
   border-radius: 999px; background: var(--paper); color: var(--ink); }
-.tm-cta__dot svg { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
+.tm-cta__dot svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
 .tm-cta:hover { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 calc(var(--rule)*var(--u)) var(--ink); }
 .tm-cta:hover .tm-cta__dot { background: var(--ink); color: var(--paper); }
+
+/* --- client marks in the cell beside the button ----------------------- */
+.tm-clients__label { font-size: calc(17 * var(--u)); font-weight: 600;
+  letter-spacing: .1em; opacity: .5; }
+.tm-clients { display: grid; grid-template-columns: repeat(4, 1fr);
+  border: calc(var(--rule) * var(--u)) solid var(--ink); }
+.tm-clients li { display: grid; place-items: center;
+  padding: calc(20 * var(--u)) calc(14 * var(--u)); min-width: 0; }
+.tm-clients li + li { border-left: calc(var(--rule) * var(--u)) solid var(--ink); }
+.tm-clients img {
+  max-width: 100%; object-fit: contain;
+  /* The page is black and white, so the marks join it rather than fight it.
+     The brightness step is what stops the paler lockups (Podar's box, the
+     yellow on Berger's can) from greyscaling to almost nothing. */
+  filter: grayscale(1) contrast(1.12) brightness(.9); opacity: .8;
+  transition: opacity .16s linear;
+}
+.tm-clients li:hover img { opacity: 1; }
 
 /* --- stats ------------------------------------------------------------ */
 .tm-stats { display: grid; grid-template-columns: 1fr; }
@@ -423,7 +446,9 @@ body {
 
   .tm-cta-row__box { width: calc(642 * var(--u)); flex-shrink: 0;
     border-right: calc(var(--rule) * var(--u)) solid currentColor; }
-  .tm-cta-row__rest { flex: 1; }
+  .tm-cta-row__rest { flex: 1; display: flex; flex-direction: column;
+    justify-content: center; gap: calc(18 * var(--u));
+    padding: calc(53 * var(--u)) calc(155 * var(--u)) calc(73.5 * var(--u)) calc(70 * var(--u)); }
 
   .tm-gap { height: calc(422 * var(--u)); }
 
@@ -459,8 +484,20 @@ body {
   .tm-hero__sub { margin-top: calc(40 * var(--u)); max-width: none; }
   .tm-hero__shot { height: calc(420 * var(--u)); }
 
-  .tm-cta-row__box { padding: calc(56 * var(--u)) calc(44 * var(--u)); }
-  .tm-cta { width: calc(330 * var(--u)); height: calc(92 * var(--u)); }
+  .tm-cta-row { flex-direction: column; }
+  .tm-cta-row__box { padding: calc(56 * var(--u)) calc(44 * var(--u)) calc(36 * var(--u)); }
+  .tm-cta { width: calc(250 * var(--u)); height: calc(68 * var(--u));
+    font-size: calc(24 * var(--u)); padding: 0 calc(20 * var(--u)) 0 calc(26 * var(--u)); }
+  .tm-cta__dot { width: calc(36 * var(--u)); height: calc(36 * var(--u)); }
+  .tm-cta__dot svg { width: calc(17 * var(--u)); height: calc(17 * var(--u)); }
+
+  /* four marks across a phone would be 60px each — two rows instead */
+  .tm-cta-row__rest { display: flex; flex-direction: column;
+    gap: calc(14 * var(--u)); padding: 0 calc(44 * var(--u)) calc(56 * var(--u)); }
+  .tm-clients__label { font-size: calc(16 * var(--u)); }
+  .tm-clients { grid-template-columns: repeat(2, 1fr); }
+  .tm-clients li:nth-child(odd) { border-left: 0; }
+  .tm-clients li:nth-child(n + 3) { border-top: calc(var(--rule) * var(--u)) solid var(--ink); }
 
   .tm-gap { height: calc(80 * var(--u)); }
 
