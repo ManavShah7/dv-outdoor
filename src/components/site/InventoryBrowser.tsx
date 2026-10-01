@@ -2,19 +2,56 @@
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ChevronDown, ChevronsLeft, Flame, MapPin, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronsLeft, Flame, MapPin, Moon, Route, Search, SlidersHorizontal, TrafficCone, X } from "lucide-react";
 import { MapsProvider } from "@/components/map/MapsProvider";
 import { PublicMap } from "@/components/site/PublicMap";
 import { loadPopulation, type Cell } from "@/components/map/PopulationLayer";
+import { loadRoads, type Way } from "@/components/map/RoadsLayer";
 import { BoardVisual } from "@/components/site/BoardVisual";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { boardPhotoUrl } from "@/lib/assets";
 import type { PublicBoard } from "@/lib/publicBoards";
 import type { Hotspot } from "@/lib/hotspots.db";
+import { isEvidenced, type Visibility } from "@/lib/visibility";
 import { inr, fullDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 const PANEL_W = 427;
+
+/**
+ * The layer stack, and where each layer's data actually comes from.
+ *
+ * Naming the source in the control is the point of it. A client's next
+ * question after "how many people see this board" is "says who", and five
+ * named sources — one of them a satellite — answer it before it is asked.
+ * It is also a licence term for two of them.
+ */
+type LayerState = {
+  traffic: boolean; heat: boolean; roadsOn: boolean; places: boolean; night: boolean;
+};
+type LayerSetters = {
+  setTraffic: Toggle; setHeat: Toggle; setRoadsOn: Toggle; setPlaces: Toggle; setNight: Toggle;
+};
+type Toggle = (f: (v: boolean) => boolean) => void;
+const flip = (f: Toggle) => f((v) => !v);
+
+const LAYERS: {
+  id: string; label: string; source: string;
+  Icon: typeof TrafficCone;
+  get: (s: LayerState) => boolean;
+  set: (s: LayerSetters) => void;
+}[] = [
+  { id: "traffic",  label: "Live traffic",  source: "Google",
+    Icon: TrafficCone, get: (s) => s.traffic,  set: (s) => flip(s.setTraffic) },
+  { id: "roads",    label: "Major roads",   source: "OpenStreetMap",
+    Icon: Route,       get: (s) => s.roadsOn,  set: (s) => flip(s.setRoadsOn) },
+  { id: "pop",      label: "Population",    source: "Kontur · CC BY",
+    Icon: Flame,       get: (s) => s.heat,     set: (s) => flip(s.setHeat) },
+  { id: "night",    label: "Night lights",  source: "NASA VIIRS",
+    Icon: Moon,        get: (s) => s.night,    set: (s) => flip(s.setNight) },
+  { id: "places",   label: "Landmarks",     source: "OpenStreetMap",
+    Icon: MapPin,      get: (s) => s.places,   set: (s) => flip(s.setPlaces) },
+];
 const RATE_MAX = 150000;
 const NARROW = 860;
 
@@ -69,10 +106,74 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
   );
 }
 
+const ROAD_LABEL: Record<string, string> = {
+  motorway: "National highway",
+  trunk: "Trunk road",
+  primary: "Primary road",
+  secondary: "Secondary road",
+};
+
+/**
+ * What we can evidence about this site, with the source named on every line.
+ *
+ * Shown only when `isEvidenced` passes, so nobody is ever told a board is
+ * worth 0 — where the open data has nothing to say about a site, this block
+ * is simply absent and the rest of the panel stands on its own.
+ */
+function Evidence({ v }: { v: Visibility }) {
+  const rows: { k: string; val: string; src: string }[] = [];
+
+  if (v.roadClass) {
+    rows.push({
+      k: v.roadName ?? ROAD_LABEL[v.roadClass],
+      val: v.roadName ? ROAD_LABEL[v.roadClass] : `${v.roadDistanceM} m away`,
+      src: "OpenStreetMap",
+    });
+  }
+  rows.push({
+    k: "People within 1 km",
+    val: v.people1km.toLocaleString("en-IN"),
+    src: "Kontur",
+  });
+  if (v.landmarkCount) {
+    rows.push({
+      k: v.landmarkCount === 1 ? "1 landmark in reach" : `${v.landmarkCount} landmarks in reach`,
+      val: v.landmarkTop.map((l) => l.name).slice(0, 2).join(", "),
+      src: "OpenStreetMap",
+    });
+  }
+  rows.push({
+    k: "Lit at night",
+    val: `brighter than ${v.nightPercentile}% of our sites`,
+    src: "NASA VIIRS",
+  });
+
+  return (
+    <div className="tmui-ev">
+      <div className="tmui-ev__head">
+        <span className="tmui-caps tmui-ev__title">Why this site</span>
+        <span className="tmui-ev__score tabular-nums">{v.score}<i>/100</i></span>
+      </div>
+      <dl className="tmui-ev__list">
+        {rows.map((r) => (
+          <div key={r.k}>
+            <dt>{r.k}</dt>
+            <dd>
+              {r.val}
+              <span className="tmui-ev__src">{r.src}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 function BoardPanel({
-  board, onBack, onMap,
+  board, visibility, onBack, onMap,
 }: {
-  board: PublicBoard; onBack: () => void; onMap?: () => void;
+  board: PublicBoard; visibility?: Visibility;
+  onBack: () => void; onMap?: () => void;
 }) {
   const free = board.availability === "available";
   return (
@@ -129,6 +230,8 @@ function BoardPanel({
         </div>
       </dl>
 
+      {visibility && isEvidenced(visibility) && <Evidence v={visibility} />}
+
       <div className="px-5 py-6" style={{ borderTop: "1px solid var(--ink)" }}>
         <h2 className="tmui-caps" style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: ".06em" }}>
           Check availability
@@ -140,13 +243,15 @@ function BoardPanel({
 }
 
 export function InventoryBrowser({
-  boards, cities, initialBoard, initialCity, hotspots = [],
+  boards, cities, initialBoard, initialCity, hotspots = [], visibility = new Map(),
 }: {
   boards: PublicBoard[];
   cities: string[];
   initialBoard: string | null;
   initialCity: string | null;
   hotspots?: Hotspot[];
+  /** by board code; empty until the scoring script has been run */
+  visibility?: Map<string, Visibility>;
 }) {
   const [query, setQuery] = useState("");
   const [selectedCities, setSelectedCities] = useState<string[]>(initialCity ? [initialCity] : []);
@@ -157,9 +262,15 @@ export function InventoryBrowser({
   const [open, setOpen] = useState<string | null>(initialBoard);
   const [traffic, setTraffic] = useState(false);
   const [heat, setHeat] = useState(false);
-  // 234 KB of hexagons is not worth fetching for the people who never open
-  // the layer, so it is pulled on the first switch-on and kept after that.
+  const [roadsOn, setRoadsOn] = useState(false);
+  const [night, setNight] = useState(false);
+  // The night layer takes itself off the map past the zoom where 463m pixels
+  // still mean anything; without saying so the toggle just looks broken.
+  const [nightShown, setNightShown] = useState(true);
+  // Neither file is worth fetching for the people who never open the layer,
+  // so each is pulled on its first switch-on and kept after that.
   const [population, setPopulation] = useState<Cell[]>([]);
+  const [roads, setRoads] = useState<Way[]>([]);
 
   useEffect(() => {
     if (!heat || population.length) return;
@@ -167,6 +278,13 @@ export function InventoryBrowser({
     loadPopulation().then((c) => alive && setPopulation(c)).catch(() => {});
     return () => { alive = false; };
   }, [heat, population.length]);
+
+  useEffect(() => {
+    if (!roadsOn || roads.length) return;
+    let alive = true;
+    loadRoads().then((w) => alive && setRoads(w)).catch(() => {});
+    return () => { alive = false; };
+  }, [roadsOn, roads.length]);
   // context is on by default — it is the thing that explains the boards
   const [places, setPlaces] = useState(true);
 
@@ -232,6 +350,9 @@ export function InventoryBrowser({
             insetLeft={showPanel && !narrow ? PANEL_W + 24 : 24}
             traffic={traffic}
             population={heat ? population : []}
+            roads={roadsOn ? roads : []}
+            night={night}
+            onNightShownChange={setNightShown}
             hotspots={places ? hotspots : []}
           />
         </div>
@@ -252,7 +373,8 @@ export function InventoryBrowser({
               >
                 <div style={{ width: panelW, height: "100%" }}>
                   {board ? (
-                    <BoardPanel board={board} onBack={() => setOpen(null)} onMap={narrow ? () => setOpen(null) : undefined} />
+                    <BoardPanel board={board} visibility={visibility.get(board.code)}
+                                onBack={() => setOpen(null)} onMap={narrow ? () => setOpen(null) : undefined} />
                   ) : (
                     <div className="tmui-rail">
                       <div className="tmui-rail__top">
@@ -338,50 +460,36 @@ export function InventoryBrowser({
           </AnimatePresence>
 
           <div className="pointer-events-none relative min-w-0 flex-1">
-            {/* A map layer, not a filter — it changes nothing about which
-                boards are listed, so it sits on the map rather than in the
-                rail with Size and Lighting. */}
-            <button
-              onClick={() => setTraffic((v) => !v)}
-              aria-pressed={traffic}
-              className="tmui-ghost pointer-events-auto absolute right-6 top-6 z-10"
-              style={traffic ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
-            >
-              <TrafficCone className="size-4" strokeWidth={2.4} />
-              Live traffic
-            </button>
+            {/* Layers, not filters: none of them changes which boards are
+                listed, so they sit on the map rather than in the rail with
+                Size and Lighting. Five of them is too many to stack as
+                loose buttons, so they are one block with one hairline
+                between each — and each one names where its data comes from,
+                because a client's next question is always "says who". */}
+            <div className="tmui-layers pointer-events-auto absolute right-6 top-6 z-10">
+              {LAYERS.map((l) => {
+                const on = l.get({ traffic, heat, roadsOn, places, night });
+                return (
+                  <button key={l.id} onClick={() => l.set({ setTraffic, setHeat, setRoadsOn, setPlaces, setNight })}
+                          aria-pressed={on} className="tmui-layers__row" data-on={on || undefined}>
+                    <l.Icon className="size-4 shrink-0" strokeWidth={2.4} />
+                    <span className="tmui-layers__name">{l.label}</span>
+                    <span className="tmui-layers__src">{l.source}</span>
+                  </button>
+                );
+              })}
 
-            {/* Two layers asking the same question from opposite ends: how
-                many people are near the board, and how many are moving. */}
-            <button
-              onClick={() => setHeat((v) => !v)}
-              aria-pressed={heat}
-              className="tmui-ghost pointer-events-auto absolute right-6 top-[68px] z-10"
-              style={heat ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
-            >
-              <Flame className="size-4" strokeWidth={2.4} />
-              Population
-            </button>
+              {/* The key lives inside the same block rather than floating
+                  under it. Absolutely positioned below a stack whose height
+                  depends on how many layers exist, it collided with the
+                  fifth row the moment a fifth layer was added. */}
+              {(traffic || heat || roadsOn || night) && (
+                <div className="tmui-layers__key tmui-caps">
 
-            <button
-              onClick={() => setPlaces((v) => !v)}
-              aria-pressed={places}
-              className="tmui-ghost pointer-events-auto absolute right-6 top-[110px] z-10"
-              style={places ? { background: "var(--ink)", color: "var(--paper)" } : { background: "#fff" }}
-            >
-              <MapPin className="size-4" strokeWidth={2.4} />
-              Landmarks
-            </button>
-
-            {/* The roads borrow the same green and red the pins use for free
-                and booked, which would otherwise read as one scale. Saying
-                what is what costs a line and removes the ambiguity. */}
-            {(traffic || heat) && (
-              <div
-                className="tmui-caps pointer-events-none absolute right-6 top-[166px] z-10 flex flex-col gap-1.5 border p-3"
-                style={{ background: "#fff", borderColor: "var(--ink)", fontSize: 10.5, fontWeight: 600 }}
-              >
-                {traffic && (
+                  {/* Google's traffic borrows the same green and red the pins
+                      use for free and booked, which would otherwise read as
+                      one scale. Saying what is what removes the ambiguity. */}
+                  {traffic && (
                   <>
                     <span className="flex items-center gap-2">
                       <span style={{ width: 16, height: 3, background: "#16e098" }} /> Roads flowing
@@ -392,19 +500,40 @@ export function InventoryBrowser({
                   </>
                 )}
                 {heat && (
+                  <span className="flex items-center gap-2">
+                    <span style={{ width: 44, height: 7, background: "linear-gradient(90deg,#fff4be,#ffaa3c,#eb462d,#8c0a1e)" }} />
+                    People per 400m
+                  </span>
+                )}
+                {roadsOn && (
                   <>
                     <span className="flex items-center gap-2">
-                      <span style={{ width: 44, height: 7, background: "linear-gradient(90deg,#fff4be,#ffaa3c,#eb462d,#8c0a1e)" }} />
-                      People per 400m
+                      <span style={{ width: 20, height: 5, background: "#1a1a1a" }} /> Trunk road
                     </span>
-                    <span style={{ opacity: .55, fontWeight: 500 }}>Kontur (CC BY)</span>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 20, height: 3.5, background: "#404040" }} /> Primary
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 20, height: 2.5, background: "#787878" }} /> Secondary
+                    </span>
                   </>
                 )}
-                <span className="mt-1 flex items-center gap-2" style={{ opacity: .6 }}>
-                  <span style={{ width: 9, height: 9, borderRadius: 999, background: "#0f9d3a", border: "1px solid #000" }} /> Pins are boards
-                </span>
-              </div>
-            )}
+                {night && (nightShown ? (
+                  <span className="flex items-center gap-2">
+                    <span style={{ width: 20, height: 7, background: "linear-gradient(90deg,#10142b,#f2c14e,#fff6d0)" }} />
+                    Light emitted at night
+                  </span>
+                ) : (
+                  <span style={{ opacity: .6, fontWeight: 500, lineHeight: 1.35 }}>
+                    Night lights are 463&nbsp;m per pixel — zoom out to see them
+                  </span>
+                ))}
+                  <span className="mt-0.5 flex items-center gap-2" style={{ opacity: .6 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: 999, background: "#0f9d3a", border: "1px solid #000" }} /> Pins are boards
+                  </span>
+                </div>
+              )}
+            </div>
 
             {!showPanel && (
               <button onClick={() => setPanelOverride(true)}

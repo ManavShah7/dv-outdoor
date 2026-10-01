@@ -765,3 +765,45 @@ textarea.tmui-in { height: auto; padding: 12px 14px; line-height: 1.4; resize: v
 .tmui-in::placeholder { color: var(--ink); opacity: .35; }
 .tmui-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .tmui-note { font-size: 12.5px; letter-spacing: .02em; }
+
+/* --- the map's layer stack -------------------------------------------- */
+/* Five layers is past the point where loose buttons read as a set. One
+   block, one hairline between rows, and each row carries the name of the
+   dataset behind it — which is a licence term for two of them and the
+   answer to "says who" for all five. */
+.tmui-layers { display: flex; flex-direction: column; width: 238px;
+  background: #fff; border: 1px solid var(--ink); }
+.tmui-layers__row { display: flex; align-items: center; gap: 9px;
+  padding: 9px 11px; text-align: left; color: var(--ink);
+  transition: background-color .12s linear, color .12s linear; }
+.tmui-layers__row + .tmui-layers__row { border-top: 1px solid rgba(0,0,0,.14); }
+.tmui-layers__row:hover { background: rgba(0,0,0,.06); }
+.tmui-layers__row[data-on] { background: var(--ink); color: var(--paper); }
+.tmui-layers__row[data-on]:hover { background: #1f1f1f; }
+.tmui-layers__name { font-size: 11.5px; font-weight: 650; letter-spacing: .05em;
+  text-transform: uppercase; white-space: nowrap; }
+.tmui-layers__src { margin-left: auto; font-size: 9px; font-weight: 600;
+  letter-spacing: .03em; text-transform: uppercase; opacity: .45;
+  white-space: nowrap; }
+.tmui-layers__row[data-on] .tmui-layers__src { opacity: .6; }
+
+.tmui-layers__key { display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 11px 11px; border-top: 1px solid var(--ink);
+  font-size: 10px; font-weight: 600; pointer-events: none; }
+
+/* --- the evidence block in the board panel ---------------------------- */
+/* Four open datasets, one line each, with the source named on every line.
+   A client's objection to a visibility claim is always "says who", so the
+   answer is printed beside the claim rather than in a footnote. */
+.tmui-ev { padding: 20px; border-bottom: 1px solid var(--hair);
+  background: rgba(0,0,0,.035); }
+.tmui-ev__head { display: flex; align-items: baseline; gap: 10px; }
+.tmui-ev__title { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; }
+.tmui-ev__score { margin-left: auto; font-size: 25px; font-weight: 700; line-height: 1; }
+.tmui-ev__score i { font-size: 12px; font-weight: 600; font-style: normal; opacity: .4; }
+.tmui-ev__list { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.tmui-ev__list dt { font-size: 13px; font-weight: 650; }
+.tmui-ev__list dd { display: flex; align-items: baseline; gap: 8px;
+  margin-top: 1px; font-size: 12.5px; opacity: .72; }
+.tmui-ev__src { margin-left: auto; flex-shrink: 0; font-size: 9px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; opacity: .5; }

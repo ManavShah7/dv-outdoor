@@ -6,7 +6,10 @@ import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { PublicBoard } from "@/lib/publicBoards";
 import type { Hotspot } from "@/lib/hotspots.db";
 import { HotspotLayer } from "@/components/map/HotspotLayer";
-import { PopulationLayer, type Cell } from "@/components/map/PopulationLayer";
+import { DeckLayers } from "@/components/map/DeckLayers";
+import { NightLightsLayer } from "@/components/map/NightLightsLayer";
+import type { Cell } from "@/components/map/PopulationLayer";
+import type { Way } from "@/components/map/RoadsLayer";
 
 const CITY_ZOOM_MAX = 9.2;
 
@@ -289,13 +292,16 @@ function Layers({
 
 export function PublicMap({
   boards, selected, onSelect, insetLeft = 0, traffic = false, hotspots = [],
-  population = [],
+  population = [], roads = [], night = false, onNightShownChange,
 }: {
   boards: PublicBoard[]; selected: string | null;
   onSelect: (code: string) => void; insetLeft?: number; traffic?: boolean;
   hotspots?: Hotspot[];
-  /** Empty when the population layer is off — the caller owns the fetch. */
+  /** Empty when the layer is off — the caller owns the fetch for both. */
   population?: Cell[];
+  roads?: Way[];
+  night?: boolean;
+  onNightShownChange?: (shown: boolean) => void;
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!key) {
@@ -318,9 +324,13 @@ export function PublicMap({
         styles={MONO}
         style={{ width: "100%", height: "100%" }}
       >
-        {/* Under the pins, and dimmed: this is context for the boards, not
-            the subject. At full strength the hexagons swallowed the red ones. */}
-        <PopulationLayer cells={population} opacity={0.8} />
+        {/* Order matters and is the order they are written in: satellite
+            imagery under everything, then the population wash, then the road
+            network on top of it, then Google's own traffic, then our pins.
+            All of it is context for the boards and none of it may out-shout
+            them — at full strength the hexagons swallowed the red pins. */}
+        <NightLightsLayer on={night} onShownChange={onNightShownChange} />
+        <DeckLayers population={population} roads={roads} populationOpacity={0.8} />
         <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />
         <Traffic on={traffic} />
       </GoogleMap>

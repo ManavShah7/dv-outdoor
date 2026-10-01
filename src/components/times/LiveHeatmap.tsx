@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Map as GoogleMap } from "@vis.gl/react-google-maps";
 import { MapsProvider } from "@/components/map/MapsProvider";
-import { PopulationLayer, loadPopulation, type Cell } from "@/components/map/PopulationLayer";
+import { DeckLayers } from "@/components/map/DeckLayers";
+import { loadPopulation, type Cell } from "@/components/map/PopulationLayer";
 
 /** Desaturated basemap so the hexagons are the only colour on it. */
 const MONO: google.maps.MapTypeStyle[] = [
@@ -48,7 +49,7 @@ export function LiveHeatmap({ lat, lng, zoom = 12 }: { lat: number; lng: number;
           styles={MONO}
           style={{ width: "100%", height: "100%" }}
         >
-          <PopulationLayer cells={cells} />
+          <DeckLayers population={cells} />
         </GoogleMap>
         <span className="tm-live__cap">
           {failed
