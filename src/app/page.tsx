@@ -1,5 +1,5 @@
 import { text } from "@/components/times/fonts";
-import { Nav, Hero, CtaRow, Gap, Stats, Roads, StreetView, Reach } from "@/components/times/sections";
+import { Nav, Hero, CtaRow, Stats, Roads, StreetView, Reach } from "@/components/times/sections";
 import { TimesContact } from "@/components/times/TimesContact";
 import { TimesFoot } from "@/components/times/TimesFoot";
 
@@ -16,7 +16,6 @@ export default function LandingPage() {
         <Nav />
         <Hero />
         <CtaRow />
-        <Gap />
         <Stats />
         <Roads />
         <StreetView />

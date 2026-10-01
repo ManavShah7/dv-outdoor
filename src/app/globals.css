@@ -397,19 +397,19 @@ body {
 .tm-cta:hover .tm-cta__dot { background: var(--ink); color: var(--paper); }
 
 /* --- client marks in the cell beside the button ----------------------- */
-.tm-clients__label { font-size: calc(17 * var(--u)); font-weight: 600;
-  letter-spacing: .1em; opacity: .5; }
-.tm-clients { display: grid; grid-template-columns: repeat(4, 1fr);
-  border: calc(var(--rule) * var(--u)) solid var(--ink); }
-.tm-clients li { display: grid; place-items: center;
-  padding: calc(20 * var(--u)) calc(14 * var(--u)); min-width: 0; }
-.tm-clients li + li { border-left: calc(var(--rule) * var(--u)) solid var(--ink); }
+/* No cells and no label: with the marks this size they are legible on their
+   own, and a caption explaining what a logo is was the only thing in the
+   band nobody needed. Aligned to the baseline of the row rather than
+   centred, because these lockups have wildly different heights. */
+.tm-clients { display: flex; flex-wrap: wrap; align-items: center;
+  gap: calc(30 * var(--u)) calc(24 * var(--u)); }
+.tm-clients li { display: grid; place-items: center; min-width: 0; }
 .tm-clients img {
   max-width: 100%; object-fit: contain;
   /* The page is black and white, so the marks join it rather than fight it.
-     The brightness step is what stops the paler lockups (Podar's box, the
+     The brightness step is what stops the paler lockups (Podar's panels, the
      yellow on Berger's can) from greyscaling to almost nothing. */
-  filter: grayscale(1) contrast(1.12) brightness(.9); opacity: .8;
+  filter: grayscale(1) contrast(1.12) brightness(.9); opacity: .82;
   transition: opacity .16s linear;
 }
 .tm-clients li:hover img { opacity: 1; }
@@ -417,22 +417,30 @@ body {
 /* --- stats ------------------------------------------------------------ */
 .tm-stats { display: grid; grid-template-columns: 1fr; }
 .tm-stats__cell { display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: calc(85 * var(--u)) calc(30 * var(--u)) calc(88 * var(--u)); }
-.tm-stats__l { margin-top: calc(20 * var(--u)); }
+  padding: calc(58 * var(--u)) calc(30 * var(--u)) calc(60 * var(--u)); }
+/* The frame set the number at 60 and the label at 41, which is heading size
+   for the word "Billboards": the three cells were reading as a second hero
+   rather than as a figure with its unit under it. Both come down and the
+   label drops well below the number it belongs to. */
+.tm-stats__cell .tm-t60 { font-size: calc(46 * var(--u)); line-height: calc(54 * var(--u)); }
+.tm-stats__l { margin-top: calc(12 * var(--u));
+  font-size: calc(21 * var(--u)); line-height: calc(27 * var(--u)); letter-spacing: .04em; }
 
 /* --- split bands (copy one side, photograph the other) ---------------- */
 .tm-split { display: flex; flex-direction: column; }
 .tm-split__copy { display: flex; flex-direction: column; justify-content: center;
-  padding: calc(110 * var(--u)) calc(70 * var(--u)) calc(110 * var(--u)) calc(175 * var(--u)); }
-.tm-split__body { margin-top: calc(55 * var(--u)); max-width: calc(560 * var(--u)); }
-.tm-split__fig { display: grid; place-items: center; padding: calc(60 * var(--u)); }
+  padding: calc(84 * var(--u)) calc(70 * var(--u)) calc(84 * var(--u)) calc(175 * var(--u)); }
+.tm-split__body { margin-top: calc(40 * var(--u)); max-width: calc(560 * var(--u)); }
+.tm-split__fig { display: grid; place-items: center; padding: calc(48 * var(--u)); }
 .tm-split__fig .tm-shot,
 .tm-split__fig .tm-live { width: calc(659.5 * var(--u)); height: calc(474 * var(--u)); max-width: 100%; }
 
 /* --- the closing band ------------------------------------------------- */
 .tm-reach { display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: calc(146 * var(--u)) calc(50 * var(--u)) calc(224 * var(--u)); }
-.tm-reach__fig { margin-top: calc(164 * var(--u)); width: calc(999.5 * var(--u)); max-width: 100%;
+  padding: calc(104 * var(--u)) calc(50 * var(--u)) calc(124 * var(--u)); }
+/* 164px between a heading and the map it introduces read as two unrelated
+   things that happened to share a black band. */
+.tm-reach__fig { margin-top: calc(76 * var(--u)); width: calc(999.5 * var(--u)); max-width: 100%;
   aspect-ratio: 999.5 / 541.5; }
 .tm-reach__fig img { width: 100%; height: auto; display: block; }
 
@@ -446,16 +454,14 @@ body {
 
   .tm-cta-row__box { width: calc(642 * var(--u)); flex-shrink: 0;
     border-right: calc(var(--rule) * var(--u)) solid currentColor; }
-  .tm-cta-row__rest { flex: 1; display: flex; flex-direction: column;
-    justify-content: center; gap: calc(18 * var(--u));
-    padding: calc(53 * var(--u)) calc(155 * var(--u)) calc(73.5 * var(--u)) calc(70 * var(--u)); }
+  .tm-cta-row__rest { flex: 1; display: flex; align-items: center;
+    padding: calc(34 * var(--u)) calc(60 * var(--u)) calc(34 * var(--u)) calc(64 * var(--u)); }
 
-  .tm-gap { height: calc(422 * var(--u)); }
+  .tm-split { flex-direction: row; min-height: calc(640 * var(--u)); }
 
   .tm-stats { grid-template-columns: repeat(3, 1fr); }
   .tm-stats__cell + .tm-stats__cell { border-left: calc(var(--rule) * var(--u)) solid currentColor; }
 
-  .tm-split { flex-direction: row; min-height: calc(745 * var(--u)); }
   .tm-split__copy { width: calc(797 * var(--u)); flex-shrink: 0; }
   .tm-split__fig { flex: 1; }
   /* the second band mirrors: photograph left, copy right */
@@ -492,16 +498,13 @@ body {
   .tm-cta__dot svg { width: calc(17 * var(--u)); height: calc(17 * var(--u)); }
 
   /* four marks across a phone would be 60px each — two rows instead */
-  .tm-cta-row__rest { display: flex; flex-direction: column;
-    gap: calc(14 * var(--u)); padding: 0 calc(44 * var(--u)) calc(56 * var(--u)); }
-  .tm-clients__label { font-size: calc(16 * var(--u)); }
-  .tm-clients { grid-template-columns: repeat(2, 1fr); }
-  .tm-clients li:nth-child(odd) { border-left: 0; }
-  .tm-clients li:nth-child(n + 3) { border-top: calc(var(--rule) * var(--u)) solid var(--ink); }
+  /* four marks across a phone would be 60px each, so they wrap to two rows */
+  .tm-cta-row__rest { padding: 0 calc(44 * var(--u)) calc(56 * var(--u)); }
+  .tm-clients { gap: calc(26 * var(--u)) calc(24 * var(--u)); }
 
-  .tm-gap { height: calc(80 * var(--u)); }
-
-  .tm-stats__cell { padding: calc(56 * var(--u)) calc(30 * var(--u)); }
+  .tm-stats__cell { padding: calc(44 * var(--u)) calc(30 * var(--u)); }
+  .tm-stats__cell .tm-t60 { font-size: calc(44 * var(--u)); line-height: calc(52 * var(--u)); }
+  .tm-stats__l { font-size: calc(20 * var(--u)); line-height: calc(26 * var(--u)); }
   .tm-stats__cell + .tm-stats__cell { border-top: calc(var(--rule) * var(--u)) solid currentColor; }
 
   .tm-split__copy { padding: calc(80 * var(--u)) calc(44 * var(--u)) calc(56 * var(--u)); }

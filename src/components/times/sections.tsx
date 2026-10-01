@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { assetUrl } from "@/lib/assets";
+import { HeroClip } from "@/components/times/HeroClip";
 import { LiveStreetView } from "@/components/times/LiveStreetView";
 import { LiveHeatmap } from "@/components/times/LiveHeatmap";
 
@@ -18,42 +19,17 @@ function Shot({ src, alt, className }: { src: string; alt: string; className?: s
 }
 
 /**
- * The hero clip: muted, looping, no controls, with the first frame as its
- * poster so the band is never empty while 2.3 MB arrives. `playsInline` is
- * what stops iOS taking it full screen, and the poster doubles as the
- * fallback for anyone who has asked their browser not to autoplay.
- */
-function Clip({ src, poster, alt, className }: {
-  src: string; poster: string; alt: string; className?: string;
-}) {
-  return (
-    <div className={`tm-shot ${className ?? ""}`}>
-      <video
-        src={src}
-        poster={poster}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        aria-label={alt}
-      />
-    </div>
-  );
-}
-
-/**
- * Optical sizing, not a shared box. These four marks have wildly different
- * proportions — Hyundai is 8:1, Tanishq is closer to 3:2 — so capping them
- * all at one height made Hyundai fill its cell while Tanishq sat in the
- * middle of it looking like a mistake. Each carries the dimension that
- * governs it and the value that makes the four read as equals.
+ * Optical sizing, not a shared box. These four marks run from 8:1 to 3:2, so
+ * one shared height made Hyundai fill its space while Tanishq sat marooned
+ * in the middle of its own. Each carries whichever dimension governs it, at
+ * the value that makes the four read as equals — which matters more now that
+ * they stand on the page with no cell around them.
  */
 const CLIENTS = [
-  { name: "Tanishq",                 file: "tanishq.svg", h: 42 },
-  { name: "Hyundai",                 file: "hyundai.svg", w: 138 },
-  { name: "Berger Paints",           file: "berger.png",  h: 50 },
-  { name: "Podar International School", file: "podar.png", w: 118 },
+  { name: "Tanishq",                    file: "tanishq.svg", h: 78 },
+  { name: "Hyundai",                    file: "hyundai.svg", w: 280 },
+  { name: "Berger Paints",              file: "berger.png",  h: 98 },
+  { name: "Podar International School", file: "podar.png",   w: 210 },
 ];
 
 export function Nav() {
@@ -88,7 +64,7 @@ export function Hero() {
           directly to you.
         </p>
       </div>
-      <Clip
+      <HeroClip
         src={assetUrl("site/hero.mp4")}
         poster={assetUrl("site/hero-poster.jpg")}
         alt="Traffic moving past lit hoardings at night"
@@ -113,12 +89,11 @@ export function CtaRow() {
         </span>
       </div>
       {/* The frame leaves this cell blank. Client marks are what a media
-          owner is actually judged on, and they sit in ruled cells so the
-          strip is built the same way as the rest of the page. They are
-          greyscaled: four full-colour lockups beside a black-and-white
-          layout read as a foreign object. */}
+          owner is actually judged on, so four of them stand here — no cells,
+          no label, nothing explaining them. They are greyscaled: four
+          full-colour lockups beside a black-and-white layout read as a
+          foreign object. */}
       <div className="tm-cta-row__rest">
-        <span className="tm-clients__label tm-caps">Seen on our boards</span>
         <ul className="tm-clients">
           {CLIENTS.map((c) => (
             <li key={c.name}>
@@ -138,10 +113,6 @@ export function CtaRow() {
       </div>
     </section>
   );
-}
-
-export function Gap() {
-  return <div className="tm-gap tm-rb" />;
 }
 
 const STATS = [
