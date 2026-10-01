@@ -35,17 +35,15 @@ const CLIENTS = [
 export function Nav() {
   return (
     <header className="tm-nav tm-rt tm-rb">
-      {/* The frame leaves this cell empty. A public site with no wordmark and
-          no way home is a worse problem than a small deviation, so the mark
-          goes where a mark goes — delete this block to match the artwork. */}
-      <div className="tm-nav__mark">
-        <Link href="/" className="tm-t25 tm-caps" style={{ fontWeight: 700 }}>
-          The Times Media
-        </Link>
-      </div>
+      {/* The frame leaves this cell empty and the second revision kept it
+          empty, so it stays empty. The earlier objection — a site with no
+          wordmark and no way home — does not apply on the home page itself:
+          you are already home, and /boards keeps its own wordmark. */}
+      <div className="tm-nav__mark" />
       <nav className="tm-nav__links tm-t25 tm-caps" style={{ fontWeight: 500 }}>
         <a href="#roads">About us</a>
         <Link href="/boards">Map</Link>
+        <a href="#contact">Contact</a>
       </nav>
     </header>
   );
