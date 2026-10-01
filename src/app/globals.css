@@ -367,6 +367,11 @@ body {
 .tm-shot { position: relative; overflow: hidden; background: #000; }
 .tm-shot img,
 .tm-shot video { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* A photograph can be cropped to fill its frame; a map cannot. On a phone
+   the figure is nearly square against this map's 1.39, and cover was
+   cutting Dwarka off the west coast and the tip off the east. The artwork
+   is black on black, so there is no letterbox to see. */
+.tm-shot--map img { object-fit: contain; }
 
 /* --- the button ------------------------------------------------------- */
 .tm-cta-row { display: flex; }
@@ -402,17 +407,23 @@ body {
 /* --- client marks in the cell beside the button ----------------------- */
 /* No cells and no label: with the marks this size they are legible on their
    own, and a caption explaining what a logo is was the only thing in the
-   band nobody needed. Aligned to the baseline of the row rather than
-   centred, because these lockups have wildly different heights. */
-.tm-clients { display: flex; flex-wrap: wrap; align-items: center;
-  gap: calc(30 * var(--u)) calc(24 * var(--u)); }
+   band nobody needed.
+   The gap is the whole job here. At 24 the four marks read as one crowded
+   blob — two of these lockups carry filled panels, so their edges land
+   almost touching. 76 is roughly a third of the widest mark, which is the
+   distance at which four logos read as four and not as a texture. */
+.tm-clients { display: flex; flex-wrap: wrap; justify-content: center;
+  align-items: center; gap: calc(28 * var(--u)) calc(76 * var(--u)); }
 .tm-clients li { display: grid; place-items: center; min-width: 0; }
 .tm-clients img {
   max-width: 100%; object-fit: contain;
   /* The page is black and white, so the marks join it rather than fight it.
      The brightness step is what stops the paler lockups (Podar's panels, the
      yellow on Berger's can) from greyscaling to almost nothing. */
-  filter: grayscale(1) contrast(1.12) brightness(.9); opacity: .82;
+  filter: grayscale(1) contrast(1.12) brightness(.9);
+  /* --mark-dim is set per mark: the two with filled panels need holding
+     back or they out-weigh the two that are line drawings. */
+  opacity: calc(.84 * var(--mark-dim, 1));
   transition: opacity .16s linear;
 }
 .tm-clients li:hover img { opacity: 1; }
@@ -463,9 +474,13 @@ body {
     padding: calc(39 * var(--u)) 0 calc(45 * var(--u)) calc(153 * var(--u)); }
   /* The revision draws this row at 156 with the right-hand cell empty. The
      marks go in it anyway, so their own height is what has to come to 156:
-     the tallest is 98, which leaves 29 above and below. */
+     the tallest is 86, which leaves 35 above and below. Centred in the cell
+     rather than pushed left — the button is already anchored left in its
+     own cell, and a left-aligned group left 215 of dead space trailing. */
+  /* justify-content belongs here, not on the list: the list is a flex item
+     that shrinks to its content, so centring inside it centred nothing. */
   .tm-cta-row__rest { flex: 1; display: flex; align-items: center;
-    padding: calc(29 * var(--u)) calc(60 * var(--u)) calc(29 * var(--u)) calc(64 * var(--u)); }
+    justify-content: center; padding: calc(35 * var(--u)) calc(56 * var(--u)); }
 
   .tm-split { flex-direction: row; min-height: calc(745 * var(--u)); }
 
@@ -510,7 +525,7 @@ body {
   /* four marks across a phone would be 60px each — two rows instead */
   /* four marks across a phone would be 60px each, so they wrap to two rows */
   .tm-cta-row__rest { padding: 0 calc(44 * var(--u)) calc(56 * var(--u)); }
-  .tm-clients { gap: calc(26 * var(--u)) calc(24 * var(--u)); }
+  .tm-clients { gap: calc(26 * var(--u)) calc(40 * var(--u)); }
 
   .tm-stats__cell { padding: calc(44 * var(--u)) calc(30 * var(--u)); }
   .tm-stats__cell .tm-t60 { font-size: calc(44 * var(--u)); line-height: calc(52 * var(--u)); }

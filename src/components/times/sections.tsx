@@ -26,10 +26,12 @@ function Shot({ src, alt, className }: { src: string; alt: string; className?: s
  * they stand on the page with no cell around them.
  */
 const CLIENTS = [
-  { name: "Tanishq",                    file: "tanishq.svg", h: 78 },
-  { name: "Hyundai",                    file: "hyundai.svg", w: 280 },
-  { name: "Berger Paints",              file: "berger.png",  h: 98 },
-  { name: "Podar International School", file: "podar.png",   w: 210 },
+  { name: "Tanishq",                    file: "tanishq.svg", h: 68, dim: 1 },
+  { name: "Hyundai",                    file: "hyundai.svg", w: 246, dim: 1 },
+  { name: "Berger Paints",              file: "berger.png",  h: 86, dim: 0.9 },
+  // Podar's lockup has its panels filled, so at the same opacity as three
+  // line marks it reads as a block rather than a logo. Held back to even it.
+  { name: "Podar International School", file: "podar.png",   w: 176, dim: 0.78 },
 ];
 
 export function Nav() {
@@ -99,11 +101,13 @@ export function CtaRow() {
               <img
                 src={assetUrl(`site/logos/${c.file}`)}
                 alt={c.name}
-                style={
-                  c.h
+                style={{
+                  ...(c.h
                     ? { height: `calc(${c.h} * var(--u))` }
-                    : { width: `calc(${c.w} * var(--u))` }
-                }
+                    : { width: `calc(${c.w} * var(--u))` }),
+                  // a custom property, which CSSProperties does not model
+                  ...({ "--mark-dim": c.dim } as Record<string, string | number>),
+                }}
               />
             </li>
           ))}
@@ -144,7 +148,16 @@ export function Roads() {
         </p>
       </div>
       <div className="tm-split__fig">
-        <Shot src={assetUrl("site/hero.jpg")} alt="A main road at night, lined with hoardings" />
+        {/* Drawn from our own data rather than photographed: OpenStreetMap's
+            road network for the peninsula, with every site we own as a point
+            of light on it. No Google tiles, so the band costs nothing to
+            load, and the shape of Saurashtra comes out of the roads
+            themselves. Rebuild it with scripts/draw-saurashtra.py. */}
+        <Shot
+          src={assetUrl("site/saurashtra.png")}
+          alt="The major road network of Saurashtra, with all 650 Times Media sites marked"
+          className="tm-shot--map"
+        />
       </div>
     </section>
   );
