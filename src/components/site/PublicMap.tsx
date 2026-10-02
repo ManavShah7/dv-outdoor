@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 // `Map` is aliased: the component name would otherwise shadow the built-in Map.
 import { Map as GoogleMap, useMap, Marker } from "@vis.gl/react-google-maps";
 import type { PublicBoard } from "@/lib/publicBoards";
@@ -12,6 +12,8 @@ import type { Cell } from "@/components/map/PopulationLayer";
 import type { Way } from "@/components/map/RoadsLayer";
 
 const CITY_ZOOM_MAX = 9.2;
+
+export type View = { lat: number; lng: number; zoom: number };
 
 /**
  * Green is free, red is taken — the one convention a client does not have to
@@ -175,31 +177,45 @@ function Traffic({ on }: { on: boolean }) {
 }
 
 function Layers({
-  boards, selected, onSelect, insetLeft, hotspots,
+  boards, selected, onSelect, insetLeft, hotspots, view,
 }: {
   boards: PublicBoard[]; selected: string | null;
   onSelect: (code: string) => void; insetLeft: number; hotspots: Hotspot[];
+  view?: View;
 }) {
   const map = useMap();
-  const [zoom, setZoom] = useState(8);
   const [iconScale, setIconScale] = useState(1);
   const lastInset = useRef(insetLeft);
 
-  useEffect(() => {
-    if (!map) return;
-    const l = map.addListener("zoom_changed", () => setZoom(map.getZoom() ?? 8));
+  /* The zoom lives on the Google map, so it is read as the external value it
+     is. It used to be mirrored into state seeded at 8, which was harmless
+     while the map always fitted itself to the data — fitBounds fires
+     zoom_changed, so the seed was immediately replaced. A map opened on a
+     fixed view fires nothing, so the seed stuck at 8, and 8 is below
+     CITY_ZOOM_MAX: the landing page's map drew one city donut labelled 175
+     instead of Rajkot's pins. */
+  const subscribeZoom = useCallback((cb: () => void) => {
+    if (!map) return () => {};
+    const l = map.addListener("zoom_changed", cb);
     return () => l.remove();
   }, [map]);
+  const zoom = useSyncExternalStore(
+    subscribeZoom,
+    () => map?.getZoom() ?? 8,
+    () => 8,
+  );
 
   // Follow the filters — the map should show what the rail left behind. Skip
   // while a board is open: fitBounds settles asynchronously and would land
   // after the fly-to below, yanking the view back off the selected board.
   const fit = useCallback(() => {
-    if (!map || boards.length === 0) return;
+    // A caller that asked for a fixed view means it: refitting to the data
+    // would throw that view away on every resize.
+    if (view || !map || boards.length === 0) return;
     const b = new google.maps.LatLngBounds();
     for (const x of boards) b.extend({ lat: x.lat, lng: x.lng });
     map.fitBounds(b, { top: 56, right: 56, bottom: 72, left: 56 });
-  }, [map, boards]);
+  }, [map, boards, view]);
 
   useEffect(() => {
     if (selected) return;
@@ -293,6 +309,7 @@ function Layers({
 export function PublicMap({
   boards, selected, onSelect, insetLeft = 0, traffic = false, hotspots = [],
   population = [], roads = [], night = false, onNightShownChange,
+  view, gestureHandling = "greedy",
 }: {
   boards: PublicBoard[]; selected: string | null;
   onSelect: (code: string) => void; insetLeft?: number; traffic?: boolean;
@@ -302,6 +319,11 @@ export function PublicMap({
   roads?: Way[];
   night?: boolean;
   onNightShownChange?: (shown: boolean) => void;
+  /** Fixed opening view. Set it and the map stops fitting itself to the data. */
+  view?: View;
+  /** "cooperative" lets a one-finger scroll past the map, which is what a
+   *  map embedded in a scrolling page has to do. */
+  gestureHandling?: "greedy" | "cooperative" | "none";
 }) {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!key) {
@@ -314,10 +336,10 @@ export function PublicMap({
 
   return (
       <GoogleMap
-        defaultCenter={{ lat: 21.98, lng: 70.55 }}
-        defaultZoom={8}
+        defaultCenter={view ? { lat: view.lat, lng: view.lng } : { lat: 21.98, lng: 70.55 }}
+        defaultZoom={view ? view.zoom : 8}
         minZoom={6}
-        gestureHandling="greedy"
+        gestureHandling={gestureHandling}
         disableDefaultUI
         zoomControl
         clickableIcons={false}
@@ -331,7 +353,7 @@ export function PublicMap({
             them — at full strength the hexagons swallowed the red pins. */}
         <NightLightsLayer on={night} onShownChange={onNightShownChange} />
         <DeckLayers population={population} roads={roads} populationOpacity={0.8} />
-        <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} />
+        <Layers boards={boards} selected={selected} onSelect={onSelect} insetLeft={insetLeft} hotspots={hotspots} view={view} />
         <Traffic on={traffic} />
       </GoogleMap>
   );

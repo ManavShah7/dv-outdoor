@@ -22,24 +22,24 @@ export function LiveStreetView({
 
   return (
     <MapsProvider>
-      <div className="tm-live">
+      <div className="ed-live ed-live--pano">
         <StreetView lat={lat} lng={lng} className="absolute inset-0" />
-        <button className="tm-live__full" onClick={() => setFull(true)}>
+        <button className="ed-live__act" onClick={() => setFull(true)}>
           <Expand className="size-4" strokeWidth={2.4} />
           Full screen
         </button>
-        <span className="tm-live__cap">{caption}</span>
+        <span className="ed-live__pill">{caption}</span>
       </div>
 
       {full && (
-        <div className="tm-fullscreen">
-          <div className="tm-fullscreen__bar">
-            <span className="tm-fullscreen__title">{caption}</span>
-            <button className="tm-fullscreen__close" onClick={() => setFull(false)}>
+        <div className="ed-fullscreen">
+          <div className="ed-fullscreen__bar">
+            <span className="ed-fullscreen__title">{caption}</span>
+            <button className="ed-fullscreen__close" onClick={() => setFull(false)}>
               <X className="size-4" strokeWidth={2.4} /> Close
             </button>
           </div>
-          <div className="tm-fullscreen__stage">
+          <div className="ed-fullscreen__stage">
             <StreetView lat={lat} lng={lng} className="absolute inset-0" />
           </div>
         </div>

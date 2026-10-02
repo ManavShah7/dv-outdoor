@@ -13,8 +13,8 @@ import { useCallback, useSyncExternalStore } from "react";
  * that setting, and CSS cannot stop playback, so the choice has to be made
  * here — which is the only reason this is a client component.
  */
-export function HeroClip({ src, poster, alt, className }: {
-  src: string; poster: string; alt: string; className?: string;
+export function HeroClip({ src, poster, alt }: {
+  src: string; poster: string; alt: string;
 }) {
   const subscribe = useCallback((cb: () => void) => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -28,7 +28,7 @@ export function HeroClip({ src, poster, alt, className }: {
   );
 
   return (
-    <div className={`tm-shot ${className ?? ""}`}>
+    <>
       {still ? (
         // eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage
         <img src={poster} alt={alt} />
@@ -44,6 +44,6 @@ export function HeroClip({ src, poster, alt, className }: {
           aria-label={alt}
         />
       )}
-    </div>
+    </>
   );
 }
