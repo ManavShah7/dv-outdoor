@@ -47,11 +47,8 @@ export function EdContact() {
     <section id="contact" className="ed-contact ed-wrap">
       <div className="ed-contact__in">
         <div>
-          <Reveal as="span" className="ed-label">04 — Enquire</Reveal>
-          <Reveal as="h2" delay={60} className="ed-h2" style={{ marginTop: "0.5em" }}>
-            Tell us the city.
-          </Reveal>
-          <Reveal delay={120}>
+          <Reveal as="h2" className="ed-h2">Tell us the city.</Reveal>
+          <Reveal delay={80}>
             <p className="ed-lead" style={{ marginTop: "1em", maxWidth: "30ch" }}>
               We come back the same day with what is free, what it costs, and a
               photograph of every site.

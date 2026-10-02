@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { assetUrl } from "@/lib/assets";
 import { SALES_EMAIL } from "@/lib/sales";
+import { inr } from "@/lib/utils";
 import { Reveal } from "@/components/times/Reveal";
 import { HeroClip } from "@/components/times/HeroClip";
 import { EdNav } from "@/components/times/EdNav";
@@ -10,25 +11,22 @@ import type { PublicBoard } from "@/lib/publicBoards";
 import type { Hotspot } from "@/lib/hotspots.db";
 
 /**
- * The landing page, rebuilt as an editorial spread.
+ * The landing page.
  *
- * What replaced what, and why:
+ * The first editorial pass was tasteful and characterless, for reasons worth
+ * writing down because they are easy to repeat: three sections built from one
+ * template (eyebrow, serif heading with a single italicised word, lead,
+ * figure, italic caption, plate number), two numbering systems running at
+ * once, three equally weighted figures where there should have been a
+ * hierarchy, aphorisms in place of facts, and not one element touching an
+ * edge. Uniform spacing and uniform weight read as generated whatever the
+ * typeface is.
  *
- *   The old build reproduced a 1900-wide Figma frame by scaling every value
- *   off one --u unit. Faithful, and the reason the page read as basic — a
- *   fixed frame cannot hold motion (sticky and scroll animation only behaved
- *   at exactly 1900px), and a half-and-half hero with hairline boxes has
- *   nowhere to go. This is a real container, fluid type, and a twelve-column
- *   grid that each section takes an unequal share of.
- *
- *   The two split bands ran copy-left / photo-right twice in a row, which is
- *   what made the middle of the page feel like one long section. The spreads
- *   alternate now, and the copy column sticks while its figure travels.
- *
- *   The standalone population heatmap is gone. It was the same Kontur layer
- *   the board map already carries, so the page was paying for two Google map
- *   loads to show one dataset twice. The live board map does that work and
- *   four other layers besides.
+ * So the sections no longer share a structure. One is a standfirst, one a
+ * full-bleed plate with its heading lapped over the image, one a dense
+ * specification of a real board's real fields, one a plate again. The italic
+ * appears twice on the whole page and the accent twice, rather than in every
+ * heading. Density alternates with air instead of averaging out to neither.
  */
 
 const ARROW = (
@@ -38,29 +36,41 @@ const ARROW = (
   </svg>
 );
 
-/* The marks keep their per-logo optical sizing: these four run from 8:1 to
-   3:2, and one shared height made Hyundai fill its space while Tanishq sat
-   marooned in the middle of its own. */
+/* Per-logo optical sizing: these run from 8:1 to 3:2, and one shared height
+   made Hyundai fill its space while Tanishq sat marooned in the middle of
+   its own. */
 const CLIENTS = [
-  { name: "Tanishq",                    file: "tanishq.svg", h: 52, dim: 1 },
-  { name: "Hyundai",                    file: "hyundai.svg", w: 176, dim: 1 },
-  { name: "Berger Paints",              file: "berger.png",  h: 62, dim: 0.9 },
-  { name: "Podar International School", file: "podar.png",   w: 130, dim: 0.78 },
+  { name: "Tanishq",                    file: "tanishq.svg", h: 46, dim: 1 },
+  { name: "Hyundai",                    file: "hyundai.svg", w: 158, dim: 1 },
+  { name: "Berger Paints",              file: "berger.png",  h: 56, dim: 0.9 },
+  { name: "Podar International School", file: "podar.png",   w: 118, dim: 0.78 },
 ];
 
-const FIGURES = [
-  { n: "600+", lab: "Hoardings", note: "Unipoles, hoardings and gantries. All of them ours, not brokered." },
-  { n: "5",    lab: "Cities covered", note: "With the inventory mapped site by site, not listed by area." },
-  { n: "100s", lab: "Brands", note: "Jewellery, paint, automotive, education, retail — booked direct." },
+const FACTS: [string, string][] = [
+  ["Owned outright", "Not brokered, not resold. Every site on the map is ours to let."],
+  ["Mapped site by site", "Exact coordinates rather than an area listing. Open any one in Street View."],
+  ["Maintained by us", "Our own crew, a QR sticker on every frame, and a photograph after each repair."],
 ];
+
+/** The five with the most inventory, which is what the figure in the
+ *  standfirst refers to. */
+const CITIES = ["Rajkot", "Jamnagar", "Bhavnagar", "Junagadh", "Porbandar"];
 
 const SOURCES = [
-  { name: "Live traffic", who: "Google — refetched every two minutes" },
-  { name: "Major roads", who: "OpenStreetMap — 10,169 classified ways" },
-  { name: "Population", who: "Kontur — 400 m cells, CC BY" },
-  { name: "Night lights", who: "NASA VIIRS — Suomi-NPP day/night band" },
-  { name: "Landmarks", who: "OpenStreetMap — 423 junctions, markets, stations" },
+  { name: "Live traffic", who: "Google" },
+  { name: "Major roads", who: "OpenStreetMap" },
+  { name: "Population", who: "Kontur, CC BY" },
+  { name: "Night lights", who: "NASA VIIRS" },
+  { name: "Landmarks", who: "OpenStreetMap" },
 ];
+
+/** The site the Street View section stands at — one of the Junagadh boards
+ *  with a Google panorama within reach of its own pole. */
+const SHOWN_CODE = "JUN-022";
+
+function lightingLabel(l: PublicBoard["lighting"]) {
+  return l === "backlit" ? "Back-lit" : l === "frontlit" ? "Front-lit" : "Non-lit";
+}
 
 export function Landing({
   boards,
@@ -69,33 +79,42 @@ export function Landing({
   boards: PublicBoard[];
   hotspots: Hotspot[];
 }) {
+  const site = boards.find((b) => b.code === SHOWN_CODE) ?? boards[0];
+
   return (
     <>
       <EdNav />
 
       {/* ---- hero ---- */}
-      <section className="ed-hero ed-wrap">
-        <Reveal className="ed-hero__eyebrow">
-          <span className="ed-label">Outdoor advertising · Saurashtra</span>
-          <hr className="ed-rule" />
-          <span className="ed-label">Rajkot, Gujarat</span>
+      <section className="ed-hero ed-hero--bleed">
+        <Reveal as="span" className="ed-label" style={{ display: "block" }}>
+          Outdoor advertising · Saurashtra, Gujarat
         </Reveal>
 
-        <Reveal as="h1" delay={60} className="ed-display ed-hero__h1">
-          We make your stories <span className="ed-i">heard</span> by millions.
+        <Reveal as="h1" delay={60} className="ed-display ed-hero__h1"
+                style={{ marginTop: "clamp(18px, 2vw, 34px)" }}>
+          We make your stories <span className="ed-i">heard</span> by millions
+          <span className="ed-stop">.</span>
         </Reveal>
 
         <div className="ed-hero__under">
-          <Reveal delay={140}>
+          <Reveal delay={140} className="ed-hero__col">
             <p className="ed-lead ed-hero__lead">
-              600+ hoardings across Saurashtra — ours, maintained by us, and
-              rented to you directly. No agency in the middle.
+              600+ hoardings, unipoles and gantries across Saurashtra. We own
+              them, we maintain them, and you rent them from us — there is no
+              agency in the middle.
             </p>
             <div className="ed-hero__actions">
               <Link href="/boards" className="ed-cta">
                 See every site {ARROW}
               </Link>
               <a href="#contact" className="ed-link">Get a quote</a>
+            </div>
+            <div className="ed-cities">
+              <span className="ed-label">Cities</span>
+              <ul>
+                {CITIES.map((c) => <li key={c}>{c}</li>)}
+              </ul>
             </div>
           </Reveal>
 
@@ -105,12 +124,7 @@ export function Landing({
                 src={assetUrl("site/hero.mp4")}
                 poster={assetUrl("site/hero-poster.jpg")}
                 alt="Traffic moving past lit hoardings at night"
-               
               />
-            </div>
-            <div className="ed-film__cap">
-              <span className="ed-cap">A city artery after dark, when a lit board earns its rent.</span>
-              <span className="ed-label">01</span>
             </div>
           </Reveal>
         </div>
@@ -138,119 +152,110 @@ export function Landing({
         </Reveal>
       </section>
 
-      {/* ---- the figures ---- */}
-      <section className="ed-figs ed-wrap">
-        <div className="ed-figs__row">
-          {FIGURES.map((f, i) => (
-            <Reveal key={f.lab} delay={i * 90} className="ed-fig">
-              <span className="ed-num ed-fig__n">{f.n}</span>
-              <span className="ed-label ed-fig__lab">{f.lab}</span>
-              <Reveal as="hr" variant="rule" delay={i * 90 + 160} className="ed-rule ed-fig__rule" />
-              <p className="ed-body ed-fig__note">{f.note}</p>
+      {/* ---- the figures, set as a sentence rather than three cells ---- */}
+      <section className="ed-stand ed-wrap">
+        <Reveal as="p" className="ed-stand__line">
+          <b>600+</b> hoardings across <b>5</b> cities, booked direct by
+          <b> 100s</b> of brands.
+        </Reveal>
+        <div className="ed-stand__facts">
+          {FACTS.map(([t, d], i) => (
+            <Reveal key={t} delay={i * 80} className="ed-stand__fact">
+              <span className="ed-label">{t}</span>
+              <p className="ed-body">{d}</p>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ---- spread 1 · coverage ---- */}
-      <section id="roads" className="ed-spread ed-spread--wide ed-wrap">
-        <div className="ed-spread__in">
-          <div className="ed-spread__copy">
-            <Reveal as="span" className="ed-label">01 — Coverage</Reveal>
-            <Reveal as="h2" delay={60} className="ed-h2">
-              Every site we own, on the network that <span className="ed-i">carries</span> it.
-            </Reveal>
-            <Reveal delay={120}>
-              <p className="ed-lead">
-                Our media reaches 7 out of 10 residents in the major cities of
-                Saurashtra. This is not an illustration of that — it is the
-                road network, and our 650 sites on it.
-              </p>
-            </Reveal>
-          </div>
-          <Reveal delay={160} className="ed-spread__fig">
-            <div className="ed-frame ed-frame--map">
+      {/* ---- plate · coverage. Full bleed, heading lapped over the figure ---- */}
+      <section id="roads" className="ed-band ed-dark">
+        <div className="ed-plate ed-wrap">
+          <Reveal as="h2" className="ed-h2 ed-plate__head">Where they are.</Reveal>
+          <Reveal delay={90} className="ed-plate__fig">
+            <div className="ed-frame ed-frame--map" style={{ outline: "none" }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage */}
               <img
                 src={assetUrl("site/saurashtra.png")}
                 alt="The major road network of Saurashtra with all 650 Times Media sites marked"
               />
             </div>
-            <div className="ed-film__cap">
-              <span className="ed-cap">
-                Drawn from OpenStreetMap. The peninsula is the roads — there is no
-                coastline in this picture.
-              </span>
-              <span className="ed-label">02</span>
-            </div>
+          </Reveal>
+          <Reveal delay={150} className="ed-plate__foot">
+            <span className="ed-cap" style={{ maxWidth: "46ch" }}>
+              Every site we own, on the road network that carries it. The shape of
+              the peninsula is the roads — there is no coastline in this drawing.
+            </span>
+            <span className="ed-label">Roads: OpenStreetMap</span>
           </Reveal>
         </div>
       </section>
 
-      {/* ---- spread 2 · street view ---- */}
-      <section className="ed-spread ed-spread--flip ed-wrap">
-        <div className="ed-spread__in">
-          <div className="ed-spread__copy">
-            <Reveal as="span" className="ed-label">02 — The site itself</Reveal>
-            <Reveal as="h2" delay={60} className="ed-h2">
-              Stand at the pole before you <span className="ed-i">book</span> it.
-            </Reveal>
-            <Reveal delay={120}>
-              <p className="ed-lead">
+      {/* ---- the dense one. One real site: panorama and specification ---- */}
+      <section className="ed-spread ed-wrap" style={{ borderTop: "none" }}>
+        <div className="ed-site__in">
+          <Reveal className="ed-spread__fig">
+            <LiveStreetView lat={site.lat} lng={site.lng} caption={`${site.code} · ${site.area}`} />
+          </Reveal>
+          <div>
+            <Reveal as="h2" className="ed-h2">Stand at the pole before you book it.</Reveal>
+            <Reveal delay={80}>
+              <p className="ed-lead" style={{ marginTop: "0.8em", maxWidth: "34ch" }}>
                 Every site opens into Street View at its own coordinates. Judge the
-                approach, the sightline and the clutter around it the way a driver
-                will — without the trip.
+                approach and the clutter around it the way a driver will.
               </p>
             </Reveal>
-            <Reveal delay={170}>
-              <Link href="/boards" className="ed-link">Open the map</Link>
+            <Reveal delay={140}>
+              <dl className="ed-spec" style={{ marginTop: "clamp(22px, 2.2vw, 36px)" }}>
+                <dt>Site</dt><dd>{site.code}</dd>
+                <dt>Where</dt><dd>{site.name}</dd>
+                <dt>Size</dt><dd>{site.widthFt} × {site.heightFt} ft</dd>
+                <dt>Lighting</dt><dd>{lightingLabel(site.lighting)}</dd>
+                <dt>Rate</dt><dd>{inr(site.askingRate)} / month</dd>
+                <dt>Status</dt>
+                <dd>
+                  {site.availability === "available" ? (
+                    <span className="ed-spec__free">
+                      <span className="ed-spec__dot" /> Free now
+                    </span>
+                  ) : (
+                    "Booked"
+                  )}
+                </dd>
+              </dl>
+            </Reveal>
+            <Reveal delay={190} style={{ marginTop: "clamp(22px, 2vw, 32px)", display: "block" }}>
+              <Link href={`/boards?board=${site.code}`} className="ed-link">
+                Open this site
+              </Link>
             </Reveal>
           </div>
-          <Reveal delay={160} className="ed-spread__fig">
-            <LiveStreetView lat={21.5222} lng={70.4579} caption="Motibaug Road, Junagadh" />
-            <div className="ed-film__cap">
-              <span className="ed-cap">Live panorama. Drag it.</span>
-              <span className="ed-label">03</span>
-            </div>
-          </Reveal>
         </div>
       </section>
 
-      {/* ---- spread 3 · the data ---- */}
-      <section className="ed-spread ed-wrap">
-        <div className="ed-spread__in">
-          <div className="ed-spread__copy">
-            <Reveal as="span" className="ed-label">03 — Evidence</Reveal>
-            <Reveal as="h2" delay={60} className="ed-h2">
-              Five sources. One answer to <span className="ed-i">says who</span>.
-            </Reveal>
-            <Reveal delay={120}>
-              <p className="ed-lead">
-                Anyone can tell you a board is busy. Each layer here comes from a
-                dataset with a name and a licence attached, and the map says which
-                is which.
-              </p>
-            </Reveal>
-            <Reveal delay={170}>
-              <ol className="ed-src">
-                {SOURCES.map((s) => (
-                  <li key={s.name}>
-                    <span className="ed-src__name">{s.name}</span>
-                    <span className="ed-label ed-src__who">{s.who}</span>
-                  </li>
-                ))}
-              </ol>
+      {/* ---- plate · the live map. Heading beside the figure, not over it ---- */}
+      <section className="ed-band ed-dark">
+        <div className="ed-plate ed-plate--side ed-wrap">
+          <div className="ed-plate__in">
+            <div className="ed-plate__aside">
+              <Reveal as="h2" className="ed-h2 ed-plate__head">
+                Where the numbers come from.
+              </Reveal>
+              <Reveal delay={150} className="ed-plate__foot">
+                <div className="ed-credits" style={{ flexDirection: "column" }}>
+                  {SOURCES.map((s) => (
+                    <div key={s.name}>
+                      <b>{s.name}</b>
+                      <span className="ed-label">{s.who}</span>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+            <Reveal delay={90} className="ed-plate__fig">
+              <LiveLayers boards={boards} hotspots={hotspots} />
             </Reveal>
           </div>
-          <Reveal delay={160} className="ed-spread__fig">
-            <LiveLayers boards={boards} hotspots={hotspots} />
-            <div className="ed-film__cap">
-              <span className="ed-cap">
-                All five layers on at once, over our own green and red pins.
-              </span>
-              <span className="ed-label">04</span>
-            </div>
-          </Reveal>
         </div>
       </section>
     </>

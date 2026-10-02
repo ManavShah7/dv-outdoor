@@ -430,3 +430,154 @@
 @media (max-width: 420px) {
   .ed { --t-num: clamp(54px, 15vw, 70px); }
 }
+
+/* =====================================================================
+   Second pass. The first one was tasteful and generic — three sections
+   built from one template (label, serif heading with a single italicised
+   word, lead, figure, italic caption, plate number), two numbering systems
+   running at once, nothing touching an edge, and three equal figures where
+   there should have been a hierarchy. Evenly spaced, evenly weighted, and
+   therefore characterless.
+
+   What follows breaks that on purpose: things bleed off edges, the sections
+   stop sharing a structure, density alternates with air, and the italic and
+   the accent each appear twice on the whole page instead of in every
+   heading.
+   ===================================================================== */
+
+/* Off the right edge of the window, not inset in the container. The single
+   biggest difference between a page that was designed and one that was
+   assembled out of components is whether anything is allowed to touch an
+   edge. */
+.ed-bleed-r { margin-right: calc(-1 * var(--gut)); }
+
+/* A full-width band that still aligns its contents to the container. */
+.ed-band { width: 100%; }
+
+/* The accent exists twice on this page: the full stop in the headline and
+   the live availability dot in the specification table. Both times it means
+   something — the dot is the same red the product uses for a booked board. */
+.ed-stop { color: #d8232a; }
+
+/* --- the standfirst --------------------------------------------------
+   Replaces the row of three equal figures. Numerals set inline in a serif
+   sentence is a typesetter's device; three identically sized cells with a
+   rule under each is a dashboard's. */
+.ed-stand { padding-block: clamp(38px, 4.6vw, 82px);
+  border-bottom: 1px solid var(--hair); }
+.ed-stand__line { font-family: var(--serif); font-weight: 400;
+  font-size: clamp(30px, 4.1vw, 68px); line-height: 1.08;
+  letter-spacing: -0.018em; max-width: 26ch; }
+.ed-stand__line b { font-weight: 400; font-size: 1.42em; line-height: 0.8; }
+.ed-stand__facts { display: grid; gap: clamp(14px, 1.4vw, 26px);
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: clamp(26px, 2.8vw, 48px); }
+.ed-stand__fact { padding-top: 12px; border-top: 1px solid var(--hair); }
+.ed-stand__fact p { margin-top: 6px; }
+
+/* --- full-bleed dark bands ------------------------------------------- */
+.ed-plate { position: relative; padding-block: clamp(44px, 5.4vw, 96px); }
+.ed-plate__head { position: relative; z-index: 2; max-width: 20ch; }
+/* The heading sits over the top of the figure rather than above it. Nothing
+   on the first pass overlapped anything. */
+.ed-plate__fig { margin-top: clamp(-26px, -2.4vw, -10px); }
+.ed-plate__foot { display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 10px 28px; margin-top: clamp(18px, 1.8vw, 28px);
+  padding-top: clamp(14px, 1.3vw, 20px); border-top: 1px solid var(--hair); }
+
+/* --- the specification table -----------------------------------------
+   The dense section. One real board, its real fields, set tight. Specific
+   data in a table reads like a company's own site; a third paragraph of
+   prose about how good the sightlines are reads like filler. */
+.ed-spec { display: grid; grid-template-columns: auto 1fr; gap: 0 clamp(16px, 2vw, 40px); }
+.ed-spec dt { padding-block: 9px; border-top: 1px solid var(--hair);
+  font-size: var(--t-label); font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-40); white-space: nowrap; }
+.ed-spec dd { padding-block: 9px; border-top: 1px solid var(--hair);
+  font-size: clamp(14px, 1.06vw, 17px); font-weight: 500; text-align: right;
+  font-variant-numeric: tabular-nums; }
+.ed-spec__free { display: inline-flex; align-items: center; gap: 7px; }
+.ed-spec__dot { width: 7px; height: 7px; border-radius: 999px; background: #0f9d3a; }
+
+/* --- the credits row -------------------------------------------------
+   Five sources as a single ruled line of credits, not a numbered list.
+   Same information, a third of the furniture. */
+.ed-credits { display: flex; flex-wrap: wrap; gap: 4px clamp(18px, 2.4vw, 44px); }
+.ed-credits div { display: flex; flex-direction: column; gap: 2px; }
+.ed-credits b { font-size: clamp(12.5px, .92vw, 15px); font-weight: 600; }
+
+@media (min-width: 900px) {
+  .ed-stand__facts { grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 52px); }
+  .ed-stand__line { max-width: 22ch; }
+
+  /* the hero loses its bottom-aligned hole: copy sits straight under the
+     headline and the film runs off the right of the window */
+  .ed-hero__under { grid-template-columns: 5fr 7fr; align-items: start; }
+  .ed-film { aspect-ratio: 16 / 10; }
+
+  .ed-plate__head { max-width: 16ch; }
+  .ed-plate__fig { margin-top: clamp(-54px, -3.6vw, -20px); }
+
+  /* the dense spread: panorama left, specification right, tight */
+  .ed-site__in { display: grid; grid-template-columns: 7fr 5fr;
+    gap: clamp(34px, 4vw, 76px); align-items: start; }
+}
+
+/* --- the hero's right bleed -------------------------------------------
+   `margin-right: -gut` only cancelled the container's padding, so the film
+   stopped at the container's edge — 1540 of 1600 — which looks like a
+   mistake rather than a decision. The hero therefore sits outside .ed-wrap
+   and recreates only its left inset, leaving its right side open to the
+   window.
+
+   The inset is computed from `100%` rather than `100vw` on purpose: 100vw
+   includes the scrollbar, so on any browser with a classic one the figure
+   would overshoot and give the page a horizontal scroll. */
+.ed-hero--bleed {
+  padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
+  padding-right: 0;
+}
+/* everything except the film keeps a right gutter, or the type runs into
+   the edge of the window */
+.ed-hero--bleed > .ed-rev:not(.ed-hero__film) { padding-right: var(--gut); }
+.ed-hero--bleed .ed-hero__col { padding-right: clamp(20px, 2.6vw, 52px); }
+
+/* The five cities, named. This space used to be empty — the grid row is as
+   tall as the film and the copy is not, so there was a 270px hole under the
+   call to action. Filling it with the actual city names says more than the
+   air did and backs up the figure in the standfirst. */
+.ed-cities { margin-top: clamp(26px, 2.8vw, 46px);
+  padding-top: clamp(13px, 1.2vw, 20px); border-top: 1px solid var(--hair); }
+/* No separator glyphs between the names. A "·" set as ::before on every
+   item after the first leads the line whenever the list wraps, which it does
+   at five names in a 540px column — the gap does the same job and cannot
+   break. */
+.ed-cities ul { display: flex; flex-wrap: wrap; gap: 7px clamp(16px, 1.8vw, 30px);
+  margin-top: 11px; }
+.ed-cities li { font-size: clamp(13px, .96vw, 15.5px); font-weight: 500;
+  color: var(--ink-60); }
+
+@media (min-width: 900px) {
+  .ed-hero__film { align-self: stretch; }
+  .ed-hero__film .ed-film { height: 100%; aspect-ratio: auto; min-height: clamp(380px, 32vw, 560px); }
+}
+
+/* --- the second plate, composed differently ---------------------------
+   The first plate laps its heading over the top-left of the figure, which
+   works because "Where they are." is one line. The second heading is two,
+   and the map swallowed the whole of the second one. Rather than shorten
+   the copy to fit a device, this plate puts the heading and the credits in
+   a column beside the figure — so the two dark bands no longer share a
+   composition either, which was half the point. */
+.ed-plate--side .ed-plate__in { display: grid; gap: clamp(24px, 2.8vw, 56px);
+  grid-template-columns: minmax(0, 1fr); align-items: start; }
+.ed-plate--side .ed-plate__fig { margin-top: 0; }
+.ed-plate--side .ed-plate__foot { margin-top: clamp(20px, 2vw, 32px); }
+
+@media (min-width: 900px) {
+  .ed-plate--side .ed-plate__in { grid-template-columns: 4fr 8fr; }
+  .ed-plate--side .ed-plate__head { max-width: 14ch; }
+  .ed-plate--side .ed-plate__aside { position: sticky; top: clamp(110px, 10vw, 170px); }
+  .ed-plate--side .ed-plate__foot { border-top: 0; padding-top: 0; }
+}
