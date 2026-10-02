@@ -49,3 +49,7 @@ next-env.d.ts
 /public/boards/
 /public/audio/
 !.env.example
+
+# The import writes a code->photo mapping here. Board codes are the
+# business, and this repo is public.
+scripts/.photo-map.json
