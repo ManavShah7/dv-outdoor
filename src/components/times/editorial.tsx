@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { assetUrl } from "@/lib/assets";
+import { assetUrl, boardPhotoUrl } from "@/lib/assets";
 import { SALES_EMAIL } from "@/lib/sales";
 import { Reveal } from "@/components/times/Reveal";
 import { HeroClip } from "@/components/times/HeroClip";
@@ -46,9 +46,9 @@ const CLIENTS = [
 ];
 
 const FACTS: [string, string][] = [
-  ["Owned outright", "Not brokered, not resold. Every site on the map is ours to let."],
-  ["Mapped site by site", "Exact coordinates rather than an area listing. Open any one in Street View."],
-  ["Maintained by us", "Our own crew, a QR sticker on every frame, and a photograph after each repair."],
+  ["Our own sites", "Every board on the map belongs to us. We do not resell anybody else's inventory."],
+  ["Mapped individually", "Each site has its own coordinates and its own photograph, not an area listing."],
+  ["Our own crew", "Every frame carries a QR sticker. The crew scans it, photographs the fault, and the office sees it the same minute."],
 ];
 
 /** The five with the most inventory, which is what the figure in the
@@ -75,6 +75,11 @@ export function Landing({
   hotspots: Hotspot[];
 }) {
   const site = boards.find((b) => b.code === SHOWN_CODE) ?? boards[0];
+  /* Only JUN-001 to JUN-026 have been photographed, so the rail is built
+     from exactly those rather than from whatever the first N boards are. */
+  const photographed = boards.filter(
+    (b) => /^JUN-0(0[1-9]|1[0-9]|2[0-6])$/.test(b.code),
+  );
 
   return (
     <>
@@ -95,9 +100,8 @@ export function Landing({
         <div className="ed-hero__under">
           <Reveal delay={140} className="ed-hero__col">
             <p className="ed-lead ed-hero__lead">
-              600+ hoardings, unipoles and gantries across Saurashtra. We own
-              them, we maintain them, and you rent them from us — there is no
-              agency in the middle.
+              We own and maintain 600+ hoardings, unipoles and gantries across
+              Saurashtra. You rent them from us directly.
             </p>
             <div className="ed-hero__actions">
               <Link href="/boards" className="ed-cta">
@@ -163,10 +167,35 @@ export function Landing({
         </div>
       </section>
 
+      {/* ---- the boards themselves, photographed ----
+          The 26 Junagadh sites are the only ones shot so far, which is why
+          this rail is all Junagadh. It runs off the right of the window
+          rather than sitting in a tidy grid. */}
+      <section className="ed-sites">
+        <div className="ed-wrap ed-sites__head">
+          <h2 className="ed-h3">A few of the Junagadh sites.</h2>
+          <span className="ed-label">Photographed on site · 26 of 650</span>
+        </div>
+        <div className="ed-sites__rail">
+          {photographed.map((b) => (
+            <figure key={b.code}>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage */}
+                <img src={boardPhotoUrl(b.code)} alt={`${b.name}, ${b.area}, Junagadh`} loading="lazy" />
+              </div>
+              <figcaption>
+                <span className="ed-sites__code">{b.code}</span>
+                <span className="ed-sites__where">{b.area}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       {/* ---- plate · coverage. Full bleed, heading lapped over the figure ---- */}
       <section id="roads" className="ed-band ed-dark">
         <div className="ed-plate ed-wrap">
-          <Reveal as="h2" className="ed-h2 ed-plate__head">Where they are.</Reveal>
+          <Reveal as="h2" className="ed-h2 ed-plate__head">All 650 of them.</Reveal>
           <Reveal delay={90} className="ed-plate__fig">
             <div className="ed-frame ed-frame--map" style={{ outline: "none" }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- remote asset from Supabase Storage */}
@@ -178,8 +207,8 @@ export function Landing({
           </Reveal>
           <Reveal delay={150} className="ed-plate__foot">
             <span className="ed-cap" style={{ maxWidth: "46ch" }}>
-              Every site we own, on the road network that carries it. The shape of
-              the peninsula is the roads — there is no coastline in this drawing.
+              Drawn from OpenStreetMap. There is no coastline in this picture;
+              the shape of the peninsula is its roads.
             </span>
             <span className="ed-label">Roads: OpenStreetMap</span>
           </Reveal>
@@ -193,9 +222,9 @@ export function Landing({
             <Reveal as="h2" className="ed-h2">Stand at the pole before you book it.</Reveal>
             <Reveal delay={80}>
               <p className="ed-lead">
-                Every site opens into Street View at its own coordinates. Judge the
-                approach, the sightline and the clutter around it the way a driver
-                will — without the trip.
+                Every site opens into Street View at its own coordinates, so you
+                can see the approach and what sits beside it before anybody
+                travels out to look.
               </p>
             </Reveal>
             <Reveal delay={140}>

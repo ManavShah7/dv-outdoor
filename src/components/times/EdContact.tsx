@@ -50,8 +50,8 @@ export function EdContact() {
           <Reveal as="h2" className="ed-h2">Tell us the city.</Reveal>
           <Reveal delay={80}>
             <p className="ed-lead" style={{ marginTop: "1em", maxWidth: "30ch" }}>
-              We come back the same day with what is free, what it costs, and a
-              photograph of every site.
+              Tell us which cities and roughly when. We reply the same day with
+              what is free and what it costs.
             </p>
             <p className="ed-body" style={{ marginTop: "1.6em" }}>
               Or write to{" "}

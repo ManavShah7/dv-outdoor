@@ -559,3 +559,53 @@
   .ed-plate--side .ed-plate__aside { position: sticky; top: clamp(110px, 10vw, 170px); }
   .ed-plate--side .ed-plate__foot { border-top: 0; padding-top: 0; }
 }
+
+/* =====================================================================
+   Third pass. Still reading as generated, and the reason was staring at
+   me: a page that sells hoardings contained not one photograph of a
+   hoarding. Two drawn maps, a Street View frame and a stock clip of a road
+   in Kuala Lumpur. Every image on it was either generated from data or
+   bought, which is exactly how a generated page looks.
+
+   There are 26 photographs of the actual boards in storage. They have
+   Gujarati on them, rickshaws in front of them and dust on them, and no
+   amount of typesetting substitutes for that.
+   ===================================================================== */
+
+/* A band that bleeds both edges and scrolls sideways. Deliberately not a
+   uniform grid: a 4x2 grid of identically cropped photographs is its own
+   kind of generated, and this way the row runs off the right of the window,
+   which says there are more without a line of copy saying so. */
+.ed-sites { padding-block: clamp(34px, 4vw, 70px);
+  border-top: 1px solid var(--hair); }
+.ed-sites__head { display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 10px 30px;
+  margin-bottom: clamp(20px, 2.2vw, 36px); }
+.ed-sites__rail {
+  display: flex; gap: clamp(10px, 1.1vw, 18px);
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  /* Both, and they are not the same thing. `padding` sets where the photos
+     start; `scroll-padding` sets where a snap point is measured from. With
+     only the former, scroll-snap aligned the first figure's start edge to
+     the content box and auto-scrolled the rail by exactly the padding — so
+     the page loaded with the first photograph already half off the left of
+     the window. */
+  padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
+  padding-right: var(--gut);
+  scroll-padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
+  /* the rail is the one place on the page a scrollbar would be noise */
+  scrollbar-width: none;
+}
+.ed-sites__rail::-webkit-scrollbar { display: none; }
+.ed-sites figure { flex: 0 0 auto; scroll-snap-align: start;
+  width: clamp(240px, 31vw, 440px); }
+.ed-sites figure > div { position: relative; width: 100%; aspect-ratio: 3 / 2;
+  overflow: hidden; background: color-mix(in srgb, var(--ink) 6%, var(--paper)); }
+.ed-sites img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-sites figcaption { display: flex; justify-content: space-between;
+  align-items: baseline; gap: 12px; margin-top: 9px; }
+.ed-sites__code { font-size: clamp(11.5px, .86vw, 13.5px); font-weight: 600;
+  letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.ed-sites__where { font-size: clamp(11.5px, .86vw, 13.5px);
+  color: var(--ink-40); text-align: right; }
