@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { assetUrl } from "@/lib/assets";
 import { SALES_EMAIL } from "@/lib/sales";
-import { inr } from "@/lib/utils";
 import { Reveal } from "@/components/times/Reveal";
 import { HeroClip } from "@/components/times/HeroClip";
 import { EdNav } from "@/components/times/EdNav";
@@ -57,20 +56,16 @@ const FACTS: [string, string][] = [
 const CITIES = ["Rajkot", "Jamnagar", "Bhavnagar", "Junagadh", "Porbandar"];
 
 const SOURCES = [
-  { name: "Live traffic", who: "Google" },
-  { name: "Major roads", who: "OpenStreetMap" },
-  { name: "Population", who: "Kontur, CC BY" },
-  { name: "Night lights", who: "NASA VIIRS" },
-  { name: "Landmarks", who: "OpenStreetMap" },
+  { name: "Live traffic", who: "Google — refetched every two minutes" },
+  { name: "Major roads", who: "OpenStreetMap — 10,169 classified ways" },
+  { name: "Population", who: "Kontur — 400 m cells, CC BY" },
+  { name: "Night lights", who: "NASA VIIRS — Suomi-NPP day/night band" },
+  { name: "Landmarks", who: "OpenStreetMap — 423 junctions, markets, stations" },
 ];
 
 /** The site the Street View section stands at — one of the Junagadh boards
  *  with a Google panorama within reach of its own pole. */
 const SHOWN_CODE = "JUN-022";
-
-function lightingLabel(l: PublicBoard["lighting"]) {
-  return l === "backlit" ? "Back-lit" : l === "frontlit" ? "Front-lit" : "Non-lit";
-}
 
 export function Landing({
   boards,
@@ -191,68 +186,55 @@ export function Landing({
         </div>
       </section>
 
-      {/* ---- the dense one. One real site: panorama and specification ---- */}
-      <section className="ed-spread ed-wrap" style={{ borderTop: "none" }}>
-        <div className="ed-site__in">
-          <Reveal className="ed-spread__fig">
-            <LiveStreetView lat={site.lat} lng={site.lng} caption={`${site.code} · ${site.area}`} />
-          </Reveal>
-          <div>
+      {/* ---- the site itself ---- */}
+      <section className="ed-spread ed-spread--flip ed-wrap" style={{ borderTop: "none" }}>
+        <div className="ed-spread__in">
+          <div className="ed-spread__copy">
             <Reveal as="h2" className="ed-h2">Stand at the pole before you book it.</Reveal>
             <Reveal delay={80}>
-              <p className="ed-lead" style={{ marginTop: "0.8em", maxWidth: "34ch" }}>
+              <p className="ed-lead">
                 Every site opens into Street View at its own coordinates. Judge the
-                approach and the clutter around it the way a driver will.
+                approach, the sightline and the clutter around it the way a driver
+                will — without the trip.
               </p>
             </Reveal>
             <Reveal delay={140}>
-              <dl className="ed-spec" style={{ marginTop: "clamp(22px, 2.2vw, 36px)" }}>
-                <dt>Site</dt><dd>{site.code}</dd>
-                <dt>Where</dt><dd>{site.name}</dd>
-                <dt>Size</dt><dd>{site.widthFt} × {site.heightFt} ft</dd>
-                <dt>Lighting</dt><dd>{lightingLabel(site.lighting)}</dd>
-                <dt>Rate</dt><dd>{inr(site.askingRate)} / month</dd>
-                <dt>Status</dt>
-                <dd>
-                  {site.availability === "available" ? (
-                    <span className="ed-spec__free">
-                      <span className="ed-spec__dot" /> Free now
-                    </span>
-                  ) : (
-                    "Booked"
-                  )}
-                </dd>
-              </dl>
-            </Reveal>
-            <Reveal delay={190} style={{ marginTop: "clamp(22px, 2vw, 32px)", display: "block" }}>
-              <Link href={`/boards?board=${site.code}`} className="ed-link">
-                Open this site
-              </Link>
+              <Link href="/boards" className="ed-link">Open the map</Link>
             </Reveal>
           </div>
+          <Reveal delay={100} className="ed-spread__fig">
+            <LiveStreetView lat={site.lat} lng={site.lng} caption={`${site.code} · ${site.area}`} />
+          </Reveal>
         </div>
       </section>
 
-      {/* ---- plate · the live map. Heading beside the figure, not over it ---- */}
+      {/* ---- plate · the live map, with the sources named in full ---- */}
       <section className="ed-band ed-dark">
         <div className="ed-plate ed-plate--side ed-wrap">
           <div className="ed-plate__in">
             <div className="ed-plate__aside">
               <Reveal as="h2" className="ed-h2 ed-plate__head">
-                Where the numbers come from.
+                Five sources. One answer to <span className="ed-i">says who</span>.
               </Reveal>
-              <Reveal delay={150} className="ed-plate__foot">
-                <div className="ed-credits" style={{ flexDirection: "column" }}>
+              <Reveal delay={80}>
+                <p className="ed-lead" style={{ marginTop: "0.9em" }}>
+                  Anyone can tell you a board is busy. Each layer here comes from a
+                  dataset with a name and a licence attached, and the map says which
+                  is which.
+                </p>
+              </Reveal>
+              <Reveal delay={150}>
+                <ol className="ed-src" style={{ marginTop: "clamp(20px, 2vw, 34px)" }}>
                   {SOURCES.map((s) => (
-                    <div key={s.name}>
-                      <b>{s.name}</b>
-                      <span className="ed-label">{s.who}</span>
-                    </div>
+                    <li key={s.name}>
+                      <span className="ed-src__name">{s.name}</span>
+                      <span className="ed-label ed-src__who">{s.who}</span>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </Reveal>
             </div>
-            <Reveal delay={90} className="ed-plate__fig">
+            <Reveal delay={100} className="ed-plate__fig">
               <LiveLayers boards={boards} hotspots={hotspots} />
             </Reveal>
           </div>
