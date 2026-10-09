@@ -44,19 +44,18 @@ export function EdContact() {
   }
 
   return (
-    <section id="contact" className="ed-contact ed-wrap">
+    <section id="contact" className="ed-sec ed-sec--line ed-wrap">
       <div className="ed-contact__in">
         <div>
           <Reveal as="h2" className="ed-h2">Tell us the city.</Reveal>
           <Reveal delay={80}>
-            <p className="ed-lead" style={{ marginTop: "1em", maxWidth: "30ch" }}>
+            <p className="ed-lead" style={{ marginTop: "0.7em" }}>
               Tell us which cities and roughly when. We reply the same day with
               what is free and what it costs.
             </p>
-            <p className="ed-body" style={{ marginTop: "1.6em" }}>
+            <p className="ed-body" style={{ marginTop: "1.4em" }}>
               Or write to{" "}
-              <a href={`mailto:${SALES_EMAIL}`} className="ed-link"
-                 style={{ letterSpacing: ".04em", textTransform: "none" }}>
+              <a href={`mailto:${SALES_EMAIL}`} className="ed-link">
                 {SALES_EMAIL}
               </a>
             </p>
@@ -65,12 +64,12 @@ export function EdContact() {
 
         <Reveal delay={160}>
           {sent ? (
-            <p className="ed-h3">
+            <p className="ed-h2">
               Thank you — we will call you today.
             </p>
           ) : (
             <form onSubmit={submit} className="ed-form">
-              <div className="ed-form__row">
+              <div className="ed-row">
                 <input className="ed-in" placeholder="Company name" value={companyName}
                        onChange={(e) => setCompany(e.target.value)} aria-label="Company name" />
                 <input className="ed-in" placeholder="Your name" value={contactPerson}
@@ -80,7 +79,7 @@ export function EdContact() {
                      onChange={(e) => setPhone(e.target.value)} aria-label="Phone number" />
               <input className="ed-in" placeholder="Which cities, and roughly when?" value={message}
                      onChange={(e) => setMessage(e.target.value)} aria-label="Which cities, and roughly when" />
-              <button type="submit" disabled={!valid || busy} className="ed-send">
+              <button type="submit" disabled={!valid || busy} className="ed-cta ed-send">
                 {busy ? "Sending" : "Send enquiry"}
               </button>
               {error && <p className="ed-body" style={{ color: "#c0392b" }}>{error}</p>}
