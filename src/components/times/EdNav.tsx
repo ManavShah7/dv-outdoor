@@ -48,9 +48,9 @@ export function EdNav() {
           <span className="ed-logo__word">The Times Media</span>
         </Link>
         <nav className="ed-nav__links">
-          <a href="#roads">Coverage</a>
+          <a href="#roads">About</a>
           <Link href="/boards">Map</Link>
-          <a href="#contact">Enquire</a>
+          <a href="#contact" className="ed-nav__cta">Enquire</a>
         </nav>
       </div>
     </header>

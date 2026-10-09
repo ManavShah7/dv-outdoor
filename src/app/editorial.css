@@ -1,186 +1,611 @@
 /* =====================================================================
-   The Times Media — landing page
+   The Times Media — landing page, editorial build
    ---------------------------------------------------------------------
-   Third pass, and a subtractive one. The previous build had eight sections
-   and seventeen distinct type sizes, and every section was a different
-   device: a serif display with an italicised word and a red full stop, a
-   sentence with oversized numerals set into it, a photo rail, a dark plate
-   with the heading lapped over the image, a second dark plate composed the
-   other way, a numbered credit list. Each one was defensible on its own and
-   together they read as a page performing rather than a company speaking —
-   which is the thing that kept reading as generated.
+   This replaces the `.tm` scope, which reproduced a 1900-wide Figma frame
+   by scaling every value off a single --u unit. That was right for matching
+   an artwork and wrong for everything else: it pinned the whole page to one
+   width, and position:sticky and scroll-driven animation only behaved at
+   exactly 1900px, which rules out the one thing that most separates a page
+   that looks expensive from one that does not.
 
-   So: one typeface, six type sizes, five sections, and the real
-   photographs doing the work. Nothing here is a device.
+   So: a real container, fluid type set with clamp(), a twelve-column grid
+   that sections opt into asymmetrically, and motion that works at any size.
+
+   Two faces. Instrument Serif for display and numerals — one weight, an
+   italic, and enough thick-to-thin that scale alone carries the drama.
+   Inter for anything that is read or operated.
    ===================================================================== */
 
 .ed {
-  --ink: #111113;
-  --paper: #ffffff;
-  --ink-70: #4a4a4f;
-  --ink-45: #85858c;
-  --hair: #e4e4e7;
+  /* ink */
+  --ink: #0a0a0a;
+  --paper: #fdfdfc;          /* a hair off white; flat #fff reads cheap at size */
+  --ink-60: color-mix(in srgb, var(--ink) 60%, var(--paper));
+  --ink-40: color-mix(in srgb, var(--ink) 40%, var(--paper));
+  --ink-16: color-mix(in srgb, var(--ink) 16%, var(--paper));
+  --hair: color-mix(in srgb, var(--ink) 19%, var(--paper));
 
-  --max: 1240px;
-  --gut: clamp(22px, 5vw, 64px);
+  /* measure */
+  --max: 1480px;
+  --gut: clamp(20px, 4.4vw, 76px);
+  --col: calc((min(100vw, var(--max)) - 2 * var(--gut)) / 12);
 
-  /* Six steps. The old build had seventeen, which is not a scale. */
-  --t-xl:  clamp(38px, 4.9vw, 68px);
-  --t-l:   clamp(24px, 2.3vw, 34px);
-  --t-m:   clamp(17px, 1.25vw, 20px);
-  --t-s:   clamp(15px, 1.05vw, 16.5px);
-  --t-xs:  13.5px;
-  --t-lab: 11.5px;
+  /* type — every step fluid, so nothing is pinned to one viewport */
+  --t-display: clamp(52px, 8.6vw, 148px);
+  --t-h2:      clamp(34px, 4.4vw, 74px);
+  --t-h3:      clamp(23px, 2.1vw, 34px);
+  --t-num:     clamp(62px, 9.6vw, 164px);
+  --t-lead:    clamp(17px, 1.42vw, 24px);
+  --t-body:    clamp(15px, 1.02vw, 17.5px);
+  --t-label:   clamp(10px, 0.72vw, 11.5px);
 
-  --sans: var(--tm-text), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --serif: var(--tm-display), "Instrument Serif", Georgia, serif;
+  --sans:  var(--tm-text), ui-sans-serif, system-ui, sans-serif;
 
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: var(--t-s);
-  line-height: 1.55;
+  font-size: var(--t-body);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .ed-wrap { width: 100%; max-width: var(--max); margin-inline: auto;
   padding-inline: var(--gut); }
+.ed-bleed { width: 100%; }
 
-/* --- type ---------------------------------------------------------------
-   One face. Weight and size carry the hierarchy; the display sizes tighten
-   their tracking the way a grotesk needs to when it gets large. */
-/* 16ch broke this into four short lines stacked in the left third of the
-   page, with the right half empty — crushed, not clean. At 24ch the same
-   sentence sets in two. */
-.ed-h1 { font-size: var(--t-xl); line-height: 1.06; font-weight: 600;
-  letter-spacing: -0.03em; max-width: 24ch; text-wrap: balance; }
-.ed-h2 { font-size: var(--t-l); line-height: 1.14; font-weight: 600;
-  letter-spacing: -0.021em; max-width: 20ch; }
-.ed-lead { font-size: var(--t-m); line-height: 1.5; color: var(--ink-70);
-  letter-spacing: -0.011em; max-width: 46ch; }
-.ed-body { font-size: var(--t-s); line-height: 1.6; color: var(--ink-70); }
-.ed-cap { font-size: var(--t-xs); line-height: 1.45; color: var(--ink-45); }
-.ed-label { font-size: var(--t-lab); font-weight: 600; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--ink-45); }
+/* --- primitives -------------------------------------------------------- */
 
-/* --- reveal -------------------------------------------------------------
-   A rise and a fade, once. No stagger across siblings any more: the stagger
-   was another thing announcing itself. */
-.ed-rev { opacity: 0; transform: translateY(12px);
-  transition: opacity .6s cubic-bezier(.22,.61,.36,1),
-              transform .6s cubic-bezier(.22,.61,.36,1);
-  transition-delay: var(--d, 0ms); }
-.ed-rev[data-in] { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .ed-rev { opacity: 1; transform: none; transition: none; }
+/* The one typographic move the whole page is built on: display set large,
+   leading pulled well under 1, optical sizing done by hand. Instrument
+   Serif has no optical size axis, so the tracking tightens as it grows. */
+.ed-display {
+  font-family: var(--serif); font-weight: 400;
+  font-size: var(--t-display); line-height: 0.92;
+  letter-spacing: -0.021em;
+}
+.ed-h2 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: var(--t-h2); line-height: 1.0; letter-spacing: -0.016em;
+}
+.ed-h3 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: var(--t-h3); line-height: 1.12; letter-spacing: -0.01em;
+}
+.ed-num {
+  font-family: var(--serif); font-weight: 400;
+  font-size: var(--t-num); line-height: 0.82; letter-spacing: -0.03em;
+  font-variant-numeric: lining-nums;
+}
+.ed-i { font-style: italic; }
+
+.ed-lead {
+  font-size: var(--t-lead); line-height: 1.44; font-weight: 400;
+  letter-spacing: -0.009em; color: var(--ink-60);
+}
+.ed-body { font-size: var(--t-body); line-height: 1.6; color: var(--ink-60); }
+
+/* Small caps sans, widely tracked — the counterweight to the serif. Used
+   for eyebrows, credits, captions and anything that labels rather than
+   speaks. */
+.ed-label {
+  font-size: var(--t-label); font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-40);
+}
+.ed-cap { font-family: var(--serif); font-style: italic;
+  font-size: clamp(13px, 1.04vw, 16px); line-height: 1.4; color: var(--ink-40); }
+
+.ed-rule { height: 1px; background: var(--hair); border: 0; }
+
+/* --- dark bands -------------------------------------------------------- */
+.ed-dark {
+  --ink: #fdfdfc; --paper: #08090a;
+  --ink-60: color-mix(in srgb, var(--ink) 66%, var(--paper));
+  --ink-40: color-mix(in srgb, var(--ink) 44%, var(--paper));
+  --ink-16: color-mix(in srgb, var(--ink) 18%, var(--paper));
+  --hair: color-mix(in srgb, var(--ink) 20%, var(--paper));
+  background: var(--paper); color: var(--ink);
 }
 
-/* --- nav ----------------------------------------------------------------- */
-.ed-nav { position: sticky; top: 0; z-index: 60;
-  border-bottom: 1px solid transparent;
-  transition: background-color .25s ease, border-color .25s ease; }
-.ed-nav[data-stuck] { background: rgba(255,255,255,.88);
-  backdrop-filter: saturate(1.5) blur(12px);
-  -webkit-backdrop-filter: saturate(1.5) blur(12px);
-  border-bottom-color: var(--hair); }
-.ed-nav__in { display: flex; align-items: center; justify-content: space-between;
-  gap: 24px; height: clamp(60px, 4.8vw, 74px); }
-.ed-logo { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); }
-.ed-mark { width: 30px; height: 29px; flex-shrink: 0; }
-.ed-logo__word { font-size: var(--t-xs); font-weight: 600; letter-spacing: .07em;
-  text-transform: uppercase; white-space: nowrap; }
-.ed-nav__links { display: flex; align-items: center; gap: clamp(18px, 2.2vw, 34px); }
-.ed-nav__links a { font-size: var(--t-xs); font-weight: 500; color: var(--ink-70);
-  transition: color .16s ease; }
-.ed-nav__links a:hover { color: var(--ink); }
+/* --- reveal ------------------------------------------------------------
+   Restrained by design: a short rise and a fade, staggered across
+   siblings. No parallax, no pinning, nothing that fights the scroll. */
+.ed-rev {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .7s cubic-bezier(.22,.61,.36,1),
+              transform .7s cubic-bezier(.22,.61,.36,1);
+  transition-delay: var(--d, 0ms);
+}
+.ed-rev[data-in] { opacity: 1; transform: none; }
+/* A rule that draws itself in from the left reads as the page being set
+   rather than loaded. */
+.ed-rev-rule { transform: scaleX(0); transform-origin: left center;
+  transition: transform .9s cubic-bezier(.22,.61,.36,1); transition-delay: var(--d, 0ms); }
+.ed-rev-rule[data-in] { transform: scaleX(1); }
 
-/* --- the one button shape on the page ------------------------------------ */
-.ed-cta { display: inline-flex; align-items: center; gap: 10px;
-  height: 46px; padding-inline: 22px; border-radius: 2px;
+@media (prefers-reduced-motion: reduce) {
+  .ed-rev, .ed-rev-rule { opacity: 1; transform: none; transition: none; }
+}
+
+/* --- nav ---------------------------------------------------------------
+   Sticky, hairline, and it earns its keep by getting out of the way: the
+   backdrop only frosts once the page has moved, so the hero meets the top
+   of the window with nothing over it. */
+.ed-nav {
+  position: sticky; top: 0; z-index: 60;
+  border-bottom: 1px solid transparent;
+  transition: background-color .3s ease, border-color .3s ease, backdrop-filter .3s ease;
+}
+.ed-nav[data-stuck] {
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: saturate(1.6) blur(14px);
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom-color: var(--hair);
+}
+.ed-nav__in { display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; height: clamp(62px, 5.2vw, 86px); }
+.ed-logo { display: inline-flex; align-items: center; gap: clamp(9px, .72vw, 13px);
+  color: var(--ink); }
+.ed-mark { width: clamp(26px, 2.04vw, 34px); height: auto; flex-shrink: 0; }
+.ed-logo__word { font-size: clamp(12.5px, .92vw, 15px); font-weight: 700;
+  letter-spacing: .085em; text-transform: uppercase; white-space: nowrap; }
+.ed-nav__links { display: flex; align-items: center; gap: clamp(18px, 2.3vw, 42px); }
+.ed-nav__links a { font-size: var(--t-label); font-weight: 600;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--ink-60);
+  transition: color .18s ease; }
+.ed-nav__links a:hover { color: var(--ink); }
+.ed-nav__cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: clamp(34px, 2.8vw, 42px); padding-inline: clamp(13px, 1.1vw, 19px);
+  background: var(--ink); color: var(--paper) !important;
+  font-size: var(--t-label); font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: opacity .18s ease;
+}
+.ed-nav__cta:hover { opacity: .82; }
+
+/* --- hero --------------------------------------------------------------
+   The headline runs the full measure and the supporting material hangs
+   underneath it in two unequal columns — the asymmetry is the point. A
+   centred hero with a half-and-half split was the old page's problem. */
+.ed-hero { padding-top: clamp(44px, 6vw, 104px); padding-bottom: clamp(30px, 3.4vw, 54px); }
+.ed-hero__eyebrow { display: flex; align-items: center; gap: 14px;
+  margin-bottom: clamp(22px, 2.4vw, 40px); }
+.ed-hero__eyebrow .ed-rule { flex: 1; }
+.ed-hero__h1 { max-width: 15.5em; text-wrap: balance; }
+.ed-hero__under {
+  margin-top: clamp(26px, 3vw, 52px);
+  display: grid; gap: clamp(20px, 2.4vw, 44px);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+}
+.ed-hero__lead { max-width: 34ch; }
+.ed-hero__actions { display: flex; flex-wrap: wrap; align-items: center;
+  gap: clamp(14px, 1.4vw, 26px); margin-top: clamp(20px, 1.8vw, 30px); }
+
+/* The hero film: full-bleed, tall, and the caption sits under it in the
+   margin like a plate in a magazine. */
+.ed-film { position: relative; width: 100%; overflow: hidden; background: #08090a;
+  aspect-ratio: 16 / 7; }
+.ed-film video, .ed-film img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-film__cap { display: flex; justify-content: space-between; gap: 20px;
+  margin-top: 12px; }
+
+/* --- the primary action ------------------------------------------------ */
+.ed-cta {
+  display: inline-flex; align-items: center; gap: clamp(10px, .9vw, 16px);
+  height: clamp(48px, 3.9vw, 62px); padding-inline: clamp(22px, 1.9vw, 32px);
   background: var(--ink); color: var(--paper);
-  font-size: var(--t-s); font-weight: 550; letter-spacing: -.005em;
-  transition: opacity .18s ease; }
-.ed-cta:hover { opacity: .85; }
-.ed-cta svg { width: 15px; height: 15px; }
-.ed-link { font-size: var(--t-s); font-weight: 550; color: var(--ink);
-  border-bottom: 1px solid var(--hair); padding-bottom: 2px;
-  transition: border-color .18s ease; }
+  font-size: clamp(12px, .88vw, 14px); font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase;
+  transition: transform .22s cubic-bezier(.22,.61,.36,1), opacity .22s ease;
+}
+.ed-cta svg { width: 1em; height: 1em; }
+.ed-cta:hover { transform: translateX(4px); }
+.ed-link {
+  font-size: clamp(12px, .88vw, 14px); font-weight: 600; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink);
+  border-bottom: 1px solid var(--ink-16); padding-bottom: 3px;
+  transition: border-color .2s ease;
+}
 .ed-link:hover { border-bottom-color: var(--ink); }
 
-/* --- section rhythm ------------------------------------------------------
-   One spacing value, used everywhere. The old build had a different pad on
-   every band. */
-.ed-sec { padding-block: clamp(56px, 7vw, 108px); }
-.ed-sec--line { border-top: 1px solid var(--hair); }
-.ed-head { display: flex; flex-wrap: wrap; align-items: baseline;
-  justify-content: space-between; gap: 10px 32px;
-  margin-bottom: clamp(26px, 3vw, 44px); }
-
-/* --- hero ---------------------------------------------------------------- */
-.ed-hero { padding-top: clamp(44px, 5.4vw, 86px);
-  padding-bottom: clamp(44px, 5.4vw, 86px); }
-.ed-hero__copy { max-width: none; }
-.ed-hero__lead { margin-top: clamp(18px, 1.8vw, 26px); }
-.ed-hero__act { margin-top: clamp(24px, 2.4vw, 34px); }
-.ed-film { margin-top: clamp(34px, 4vw, 60px); width: 100%;
-  aspect-ratio: 16 / 7; overflow: hidden; background: #111113; border-radius: 3px; }
-.ed-film video, .ed-film img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-/* --- client marks --------------------------------------------------------- */
+/* --- client marks ------------------------------------------------------ */
 .ed-clients { border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
-  padding-block: clamp(22px, 2.4vw, 34px); }
+  padding-block: clamp(26px, 2.8vw, 46px); }
 .ed-clients__in { display: flex; flex-wrap: wrap; align-items: center;
-  gap: 20px clamp(28px, 4.4vw, 72px); }
+  gap: clamp(20px, 2vw, 34px) clamp(30px, 4.6vw, 86px); }
+.ed-clients__lab { flex-shrink: 0; }
 .ed-clients ul { display: flex; flex-wrap: wrap; align-items: center;
-  gap: 20px clamp(26px, 3.6vw, 58px); }
-.ed-clients img { display: block; width: auto; max-width: 100%;
-  filter: grayscale(1); opacity: calc(.68 * var(--mark-dim, 1));
-  transition: opacity .18s ease; }
+  gap: clamp(22px, 2.4vw, 40px) clamp(30px, 3.8vw, 68px); }
+.ed-clients img {
+  display: block; width: auto; max-width: 100%;
+  filter: grayscale(1) contrast(1.1) brightness(.92);
+  opacity: calc(.62 * var(--mark-dim, 1));
+  transition: opacity .2s ease;
+}
 .ed-clients li:hover img { opacity: 1; }
 
-/* --- the boards, photographed --------------------------------------------
-   The strongest thing on the page: real sites, shot on location. It runs off
-   the right of the window rather than sitting in a grid.
-   `scroll-padding` as well as `padding` — snap measures from the former, and
-   with only the latter the rail opened already scrolled by its own inset. */
-.ed-rail { display: flex; gap: 14px; overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x proximity; scrollbar-width: none;
+/* --- the figures -------------------------------------------------------
+   An editorial data row, not three equal boxes. The numerals are set huge
+   in the serif and sit on a shared hairline; each one is staggered off that
+   line by a different amount so the row reads as typeset rather than as a
+   table. */
+.ed-figs { padding-block: clamp(40px, 5vw, 88px); }
+.ed-figs__row { display: grid; gap: clamp(26px, 3vw, 44px);
+  grid-template-columns: minmax(0, 1fr); }
+.ed-fig { display: flex; flex-direction: column; }
+.ed-fig__n { display: block; }
+.ed-fig__lab { margin-top: clamp(10px, .9vw, 16px); }
+.ed-fig__rule { margin-top: clamp(14px, 1.2vw, 22px); }
+.ed-fig__note { margin-top: clamp(10px, .9vw, 15px); max-width: 24ch; }
+
+/* --- editorial spread -------------------------------------------------
+   Copy in a narrow column, figure wide alongside it, and which side each
+   takes alternates. The old page ran copy-left/photo-right twice in a row,
+   which is what made the middle of it feel like one long section. */
+/* The hairline is doing structural work, not decoration: without it each
+   spread floated in white and the page read as a stack of unrelated blocks
+   with too much air between them. */
+.ed-spread { padding-block: clamp(42px, 5.2vw, 92px);
+  border-top: 1px solid var(--hair); }
+.ed-spread__in { display: grid; gap: clamp(28px, 3.4vw, 64px);
+  grid-template-columns: minmax(0, 1fr); align-items: start; }
+.ed-spread__copy { display: flex; flex-direction: column;
+  gap: clamp(14px, 1.3vw, 22px); }
+.ed-spread__copy .ed-lead { max-width: 32ch; }
+.ed-spread__fig { position: relative; min-width: 0; }
+.ed-spread__notes { display: flex; flex-direction: column; gap: 10px;
+  margin-top: clamp(18px, 1.8vw, 30px); padding-top: clamp(16px, 1.5vw, 24px);
+  border-top: 1px solid var(--hair); }
+.ed-spread__note { display: flex; justify-content: space-between; gap: 18px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--hair); }
+.ed-spread__note:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* the frame around any figure — a hairline, never a box shadow */
+.ed-frame { position: relative; width: 100%; overflow: hidden;
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+  outline: 1px solid var(--hair); outline-offset: -1px; }
+.ed-frame > img { width: 100%; height: auto; display: block; }
+.ed-frame--map { background: #08090a; }
+.ed-frame--map > img { object-fit: contain; }
+
+/* --- the live frames --------------------------------------------------- */
+.ed-live { position: relative; width: 100%; overflow: hidden; background: #0d0f11;
+  outline: 1px solid var(--hair); outline-offset: -1px; }
+.ed-live--pano { aspect-ratio: 3 / 2; }
+.ed-live--map  { aspect-ratio: 16 / 10; }
+.ed-live__pill {
+  position: absolute; left: clamp(10px, .8vw, 16px); top: clamp(10px, .8vw, 16px);
+  z-index: 5; padding: 7px 11px;
+  background: color-mix(in srgb, #08090a 82%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fdfdfc;
+  font-size: var(--t-label); font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.ed-live__act {
+  position: absolute; right: clamp(10px, .8vw, 16px); top: clamp(10px, .8vw, 16px);
+  z-index: 5; display: inline-flex; align-items: center; gap: 8px;
+  height: clamp(32px, 2.5vw, 38px); padding-inline: clamp(11px, .9vw, 15px);
+  background: #fdfdfc; color: #08090a;
+  font-size: var(--t-label); font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: opacity .18s ease;
+}
+.ed-live__act:hover { opacity: .82; }
+.ed-live__hint {
+  position: absolute; left: 50%; bottom: clamp(12px, 1vw, 20px); z-index: 5;
+  transform: translateX(-50%);
+  padding: 7px 13px; background: color-mix(in srgb, #08090a 72%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fdfdfc; font-size: var(--t-label); font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase;
+  opacity: 1; transition: opacity .5s ease;
+  pointer-events: none;
+}
+.ed-live__hint[data-gone] { opacity: 0; }
+
+/* --- the full-screen stage ---------------------------------------------
+   Street View opened full screen. Carried over from the old build, which is
+   where the comment about only mounting one panorama came from: sharing an
+   element between the inline frame and this one left two panoramas running
+   and Google bills per panorama load. */
+.ed-fullscreen { position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column; background: #08090a; }
+.ed-fullscreen__bar { display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 12px 16px; background: #fdfdfc; color: #08090a;
+  border-bottom: 1px solid color-mix(in srgb, #08090a 14%, #fdfdfc); }
+.ed-fullscreen__title { font-size: 11.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; }
+.ed-fullscreen__close { display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding-inline: 15px; background: #08090a; color: #fdfdfc;
+  font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  transition: opacity .18s ease; }
+.ed-fullscreen__close:hover { opacity: .82; }
+.ed-fullscreen__stage { position: relative; flex: 1; min-height: 0; }
+
+/* --- sources -----------------------------------------------------------
+   The five datasets, set as a numbered editorial list. This is the answer
+   to "says who", so it is typeset like a credit column, not like a legend. */
+.ed-src { display: grid; gap: 0; counter-reset: s; }
+.ed-src li { counter-increment: s; display: grid; gap: 4px 16px;
+  grid-template-columns: 2.4em 1fr;
+  padding-block: clamp(12px, 1.1vw, 18px);
+  border-top: 1px solid var(--hair); }
+.ed-src li:last-child { border-bottom: 1px solid var(--hair); }
+.ed-src li::before { content: counter(s, decimal-leading-zero);
+  font-family: var(--serif); font-size: clamp(15px, 1.2vw, 20px);
+  line-height: 1.1; color: var(--ink-40); }
+.ed-src__name { font-size: clamp(14px, 1.06vw, 18px); font-weight: 600;
+  letter-spacing: -.004em; }
+.ed-src__who { grid-column: 2; }
+
+/* --- contact ----------------------------------------------------------- */
+.ed-contact { padding-block: clamp(48px, 5.8vw, 104px);
+  border-top: 1px solid var(--hair); }
+.ed-contact__in { display: grid; gap: clamp(30px, 3.6vw, 70px);
+  grid-template-columns: minmax(0, 1fr); align-items: start; }
+.ed-form { display: grid; gap: clamp(12px, 1vw, 16px); }
+.ed-in {
+  width: 100%; height: clamp(48px, 3.8vw, 58px); padding-inline: clamp(14px, 1.1vw, 18px);
+  background: transparent; color: var(--ink);
+  border: 0; border-bottom: 1px solid var(--ink-16); border-radius: 0;
+  font: 400 var(--t-body)/1 var(--sans); letter-spacing: -.004em;
+  outline: none; transition: border-color .2s ease;
+}
+.ed-in::placeholder { color: var(--ink-40); }
+.ed-in:focus { border-bottom-color: var(--ink); }
+.ed-form__row { display: grid; gap: clamp(12px, 1vw, 16px);
+  grid-template-columns: minmax(0, 1fr); }
+.ed-send {
+  justify-self: start; margin-top: clamp(8px, .8vw, 14px);
+  display: inline-flex; align-items: center; gap: 12px;
+  height: clamp(48px, 3.9vw, 60px); padding-inline: clamp(24px, 2vw, 36px);
+  background: var(--ink); color: var(--paper);
+  font-size: clamp(12px, .88vw, 14px); font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase;
+  transition: transform .22s cubic-bezier(.22,.61,.36,1), opacity .2s ease;
+}
+.ed-send:hover:not(:disabled) { transform: translateX(4px); }
+.ed-send:disabled { opacity: .3; }
+
+/* --- footer ------------------------------------------------------------ */
+.ed-foot { border-top: 1px solid var(--hair);
+  padding-block: clamp(26px, 2.6vw, 44px); }
+.ed-foot__in { display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 18px clamp(24px, 3vw, 54px); }
+.ed-foot__links { display: flex; flex-wrap: wrap; align-items: center;
+  gap: 14px clamp(18px, 2.2vw, 36px); }
+
+/* =====================================================================
+   Wide. Everything above is the single-column phone layout; the grid and
+   the asymmetry switch on here. Written this way round because a page that
+   is designed wide and then crushed is how the old one ended up with a
+   figure whose west coast got cropped off on a phone.
+   ===================================================================== */
+@media (min-width: 900px) {
+  /* the headline keeps a hanging margin so the serif's left sidebearing
+     lines up with the rules under it rather than looking indented */
+  .ed-display { letter-spacing: -0.028em; }
+
+  .ed-hero__under { grid-template-columns: 4fr 7fr; gap: clamp(30px, 4vw, 86px); }
+  .ed-hero__film { grid-column: 2; }
+  .ed-film { aspect-ratio: 16 / 8.5; }
+
+  .ed-figs__row { grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 56px); }
+  /* staggered off the shared line, so the row is typeset not tabulated */
+  .ed-fig:nth-child(2) { padding-top: clamp(20px, 2.4vw, 46px); }
+  .ed-fig:nth-child(3) { padding-top: clamp(40px, 4.8vw, 92px); }
+
+  .ed-spread__in { grid-template-columns: 4fr 8fr; gap: clamp(36px, 4.4vw, 90px); }
+  /* every other spread flips, so three of these in a row do not read as
+     one long section the way the old page's two did. The columns reverse
+     with it — moving only the children left the figure in the 4fr column
+     and gave the copy the 8fr, which is backwards. */
+  .ed-spread--flip .ed-spread__in { grid-template-columns: 8fr 4fr; }
+  .ed-spread--flip .ed-spread__copy { grid-column: 2; grid-row: 1; }
+  .ed-spread--flip .ed-spread__fig  { grid-column: 1; grid-row: 1; }
+
+  .ed-spread--wide .ed-spread__in { grid-template-columns: 3fr 9fr; }
+
+  .ed-contact__in { grid-template-columns: 5fr 7fr; }
+  .ed-form__row { grid-template-columns: 1fr 1fr; }
+
+  /* the copy column sticks while its figure scrolls past — the one piece
+     of scroll behaviour on the page, and it only works because this build
+     is not locked to a single frame width */
+  .ed-spread__copy { position: sticky; top: clamp(110px, 10vw, 170px); }
+}
+
+@media (min-width: 1200px) {
+  .ed-hero__h1 { max-width: 13.5em; }
+  .ed-spread--wide .ed-spread__in { grid-template-columns: 3fr 9fr; }
+}
+
+/* The figures row needs its serif numerals to stay on one line at every
+   size; below this they would hyphenate "100s" which looks like a bug. */
+@media (max-width: 420px) {
+  .ed { --t-num: clamp(54px, 15vw, 70px); }
+}
+
+/* =====================================================================
+   Second pass. The first one was tasteful and generic — three sections
+   built from one template (label, serif heading with a single italicised
+   word, lead, figure, italic caption, plate number), two numbering systems
+   running at once, nothing touching an edge, and three equal figures where
+   there should have been a hierarchy. Evenly spaced, evenly weighted, and
+   therefore characterless.
+
+   What follows breaks that on purpose: things bleed off edges, the sections
+   stop sharing a structure, density alternates with air, and the italic and
+   the accent each appear twice on the whole page instead of in every
+   heading.
+   ===================================================================== */
+
+/* Off the right edge of the window, not inset in the container. The single
+   biggest difference between a page that was designed and one that was
+   assembled out of components is whether anything is allowed to touch an
+   edge. */
+.ed-bleed-r { margin-right: calc(-1 * var(--gut)); }
+
+/* A full-width band that still aligns its contents to the container. */
+.ed-band { width: 100%; }
+
+/* The accent exists twice on this page: the full stop in the headline and
+   the live availability dot in the specification table. Both times it means
+   something — the dot is the same red the product uses for a booked board. */
+.ed-stop { color: #d8232a; }
+
+/* --- the standfirst --------------------------------------------------
+   Replaces the row of three equal figures. Numerals set inline in a serif
+   sentence is a typesetter's device; three identically sized cells with a
+   rule under each is a dashboard's. */
+.ed-stand { padding-block: clamp(38px, 4.6vw, 82px);
+  border-bottom: 1px solid var(--hair); }
+.ed-stand__line { font-family: var(--serif); font-weight: 400;
+  font-size: clamp(30px, 4.1vw, 68px); line-height: 1.08;
+  letter-spacing: -0.018em; max-width: 26ch; }
+.ed-stand__line b { font-weight: 400; font-size: 1.42em; line-height: 0.8; }
+.ed-stand__facts { display: grid; gap: clamp(14px, 1.4vw, 26px);
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: clamp(26px, 2.8vw, 48px); }
+.ed-stand__fact { padding-top: 12px; border-top: 1px solid var(--hair); }
+.ed-stand__fact p { margin-top: 6px; }
+
+/* --- full-bleed dark bands ------------------------------------------- */
+.ed-plate { position: relative; padding-block: clamp(44px, 5.4vw, 96px); }
+/* Balanced because the aside column is 420px and the serif is 74px: a
+   three-line heading left "who." alone on the last line. */
+.ed-plate__head { position: relative; z-index: 2; max-width: 20ch;
+  text-wrap: balance; }
+/* The heading sits over the top of the figure rather than above it. Nothing
+   on the first pass overlapped anything. */
+.ed-plate__fig { margin-top: clamp(-26px, -2.4vw, -10px); }
+.ed-plate__foot { display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 10px 28px; margin-top: clamp(18px, 1.8vw, 28px);
+  padding-top: clamp(14px, 1.3vw, 20px); border-top: 1px solid var(--hair); }
+
+@media (min-width: 900px) {
+  .ed-stand__facts { grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 52px); }
+  .ed-stand__line { max-width: 22ch; }
+
+  /* the hero loses its bottom-aligned hole: copy sits straight under the
+     headline and the film runs off the right of the window */
+  .ed-hero__under { grid-template-columns: 5fr 7fr; align-items: start; }
+  .ed-film { aspect-ratio: 16 / 10; }
+
+  .ed-plate__head { max-width: 16ch; }
+  .ed-plate__fig { margin-top: clamp(-54px, -3.6vw, -20px); }
+}
+
+/* --- the hero's right bleed -------------------------------------------
+   `margin-right: -gut` only cancelled the container's padding, so the film
+   stopped at the container's edge — 1540 of 1600 — which looks like a
+   mistake rather than a decision. The hero therefore sits outside .ed-wrap
+   and recreates only its left inset, leaving its right side open to the
+   window.
+
+   The inset is computed from `100%` rather than `100vw` on purpose: 100vw
+   includes the scrollbar, so on any browser with a classic one the figure
+   would overshoot and give the page a horizontal scroll. */
+.ed-hero--bleed {
+  padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
+  padding-right: 0;
+}
+/* everything except the film keeps a right gutter, or the type runs into
+   the edge of the window */
+.ed-hero--bleed > .ed-rev:not(.ed-hero__film) { padding-right: var(--gut); }
+.ed-hero--bleed .ed-hero__col { padding-right: clamp(20px, 2.6vw, 52px); }
+
+/* The five cities, named. This space used to be empty — the grid row is as
+   tall as the film and the copy is not, so there was a 270px hole under the
+   call to action. Filling it with the actual city names says more than the
+   air did and backs up the figure in the standfirst. */
+.ed-cities { margin-top: clamp(26px, 2.8vw, 46px);
+  padding-top: clamp(13px, 1.2vw, 20px); border-top: 1px solid var(--hair); }
+/* No separator glyphs between the names. A "·" set as ::before on every
+   item after the first leads the line whenever the list wraps, which it does
+   at five names in a 540px column — the gap does the same job and cannot
+   break. */
+.ed-cities ul { display: flex; flex-wrap: wrap; gap: 7px clamp(16px, 1.8vw, 30px);
+  margin-top: 11px; }
+.ed-cities li { font-size: clamp(13px, .96vw, 15.5px); font-weight: 500;
+  color: var(--ink-60); }
+
+@media (min-width: 900px) {
+  .ed-hero__film { align-self: stretch; }
+  .ed-hero__film .ed-film { height: 100%; aspect-ratio: auto; min-height: clamp(380px, 32vw, 560px); }
+}
+
+/* --- the second plate, composed differently ---------------------------
+   The first plate laps its heading over the top-left of the figure, which
+   works because "Where they are." is one line. The second heading is two,
+   and the map swallowed the whole of the second one. Rather than shorten
+   the copy to fit a device, this plate puts the heading and the credits in
+   a column beside the figure — so the two dark bands no longer share a
+   composition either, which was half the point. */
+.ed-plate--side .ed-plate__in { display: grid; gap: clamp(24px, 2.8vw, 56px);
+  grid-template-columns: minmax(0, 1fr); align-items: start; }
+.ed-plate--side .ed-plate__fig { margin-top: 0; }
+.ed-plate--side .ed-plate__foot { margin-top: clamp(20px, 2vw, 32px); }
+
+@media (min-width: 900px) {
+  .ed-plate--side .ed-plate__in { grid-template-columns: 4fr 8fr; }
+  .ed-plate--side .ed-plate__head { max-width: 14ch; }
+  .ed-plate--side .ed-plate__aside { position: sticky; top: clamp(110px, 10vw, 170px); }
+  .ed-plate--side .ed-plate__foot { border-top: 0; padding-top: 0; }
+}
+
+/* =====================================================================
+   Third pass. Still reading as generated, and the reason was staring at
+   me: a page that sells hoardings contained not one photograph of a
+   hoarding. Two drawn maps, a Street View frame and a stock clip of a road
+   in Kuala Lumpur. Every image on it was either generated from data or
+   bought, which is exactly how a generated page looks.
+
+   There are 26 photographs of the actual boards in storage. They have
+   Gujarati on them, rickshaws in front of them and dust on them, and no
+   amount of typesetting substitutes for that.
+   ===================================================================== */
+
+/* A band that bleeds both edges and scrolls sideways. Deliberately not a
+   uniform grid: a 4x2 grid of identically cropped photographs is its own
+   kind of generated, and this way the row runs off the right of the window,
+   which says there are more without a line of copy saying so. */
+.ed-sites { padding-block: clamp(34px, 4vw, 70px);
+  border-top: 1px solid var(--hair); }
+.ed-sites__head { display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 10px 30px;
+  margin-bottom: clamp(20px, 2.2vw, 36px); }
+.ed-sites__rail {
+  display: flex; gap: clamp(10px, 1.1vw, 18px);
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  /* Both, and they are not the same thing. `padding` sets where the photos
+     start; `scroll-padding` sets where a snap point is measured from. With
+     only the former, scroll-snap aligned the first figure's start edge to
+     the content box and auto-scrolled the rail by exactly the padding — so
+     the page loaded with the first photograph already half off the left of
+     the window. */
   padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
   padding-right: var(--gut);
-  scroll-padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut)); }
-.ed-rail::-webkit-scrollbar { display: none; }
-.ed-rail figure { flex: 0 0 auto; scroll-snap-align: start;
-  width: clamp(250px, 30vw, 400px); }
-.ed-rail figure > div { position: relative; width: 100%; aspect-ratio: 3 / 2;
-  overflow: hidden; background: #f4f4f5; border-radius: 3px; }
-.ed-rail img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.ed-rail figcaption { display: flex; justify-content: space-between;
-  gap: 12px; margin-top: 10px; }
-
-/* --- the coverage map ----------------------------------------------------- */
-.ed-map { width: 100%; background: #0b0b0c; border-radius: 3px; overflow: hidden; }
-.ed-map img { width: 100%; height: auto; display: block; }
-
-/* --- contact --------------------------------------------------------------- */
-.ed-form { display: grid; gap: 14px; max-width: 520px; }
-.ed-row { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); }
-.ed-in { width: 100%; height: 48px; padding-inline: 14px;
-  background: var(--paper); color: var(--ink);
-  border: 1px solid var(--hair); border-radius: 2px;
-  font: 400 var(--t-s)/1 var(--sans); outline: none;
-  transition: border-color .18s ease; }
-.ed-in::placeholder { color: var(--ink-45); }
-.ed-in:focus { border-color: var(--ink); }
-.ed-send { justify-self: start; margin-top: 4px; }
-.ed-send:disabled { opacity: .35; }
-
-/* --- footer ---------------------------------------------------------------- */
-.ed-foot { border-top: 1px solid var(--hair); padding-block: clamp(26px, 2.6vw, 38px); }
-.ed-foot__in { display: flex; flex-wrap: wrap; align-items: center;
-  justify-content: space-between; gap: 14px 32px; }
-.ed-foot__links { display: flex; flex-wrap: wrap; gap: 14px clamp(18px, 2.2vw, 32px); }
-
-@media (min-width: 820px) {
-  .ed-row { grid-template-columns: 1fr 1fr; }
-  .ed-contact__in { display: grid; grid-template-columns: 5fr 7fr;
-    gap: clamp(36px, 4vw, 72px); align-items: start; }
+  scroll-padding-left: calc(max(0px, (100% - var(--max)) / 2) + var(--gut));
+  /* the rail is the one place on the page a scrollbar would be noise */
+  scrollbar-width: none;
 }
+.ed-sites__rail::-webkit-scrollbar { display: none; }
+.ed-sites figure { flex: 0 0 auto; scroll-snap-align: start;
+  width: clamp(240px, 31vw, 440px); }
+.ed-sites figure > div { position: relative; width: 100%; aspect-ratio: 3 / 2;
+  overflow: hidden; background: color-mix(in srgb, var(--ink) 6%, var(--paper)); }
+.ed-sites img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-sites figcaption { display: flex; justify-content: space-between;
+  align-items: baseline; gap: 12px; margin-top: 9px; }
+.ed-sites__code { font-size: clamp(11.5px, .86vw, 13.5px); font-weight: 600;
+  letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.ed-sites__where { font-size: clamp(11.5px, .86vw, 13.5px);
+  color: var(--ink-40); text-align: right; }
